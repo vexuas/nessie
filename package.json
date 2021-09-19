@@ -2,5 +2,8 @@
   "name": "nessie",
   "version": "0.0.0",
   "description": "Apex Legends Map Rotation Discord Bot",
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^13.1.0"
+  }
 }
