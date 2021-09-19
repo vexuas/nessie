@@ -1,0 +1,6 @@
+{
+  "name": "nessie",
+  "version": "0.0.0",
+  "description": "Apex Legends Map Rotation Discord Bot",
+  "main": "index.js"
+}
