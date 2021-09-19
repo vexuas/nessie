@@ -4,6 +4,7 @@
   "description": "Apex Legends Map Rotation Discord Bot",
   "main": "index.js",
   "dependencies": {
+    "date-fns": "^2.24.0",
     "discord.js": "^13.1.0",
     "nodemon": "^2.0.12"
   }
