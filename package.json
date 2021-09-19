@@ -1,0 +1,15 @@
+{
+  "name": "nessie",
+  "version": "0.0.0",
+  "description": "Apex Legends Map Rotation Discord Bot",
+  "main": "index.js",
+  "dependencies": {
+    "date-fns": "^2.24.0",
+    "discord.js": "^13.1.0",
+    "mocha": "^9.1.1",
+    "nodemon": "^2.0.12"
+  },
+  "devDependencies": {
+    "auto": "^10.32.0"
+  }
+}
