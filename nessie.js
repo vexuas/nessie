@@ -28,11 +28,16 @@ nessie.on('messageCreate', async (message) => {
   const nessiePrefix = defaultPrefix;
 
   try {
+    /**
+     * Nessie checks if messages contains any mentions
+     * If it does and if one of the mentions contains nessie's user, returns a message with the current prefix i.e @Nessie
+     */
     message.mentions.users.forEach((user) => {
       if(user === nessie.user){
         return message.channel.send('My current prefix is ' + '`' + `${nessiePrefix}` + '`');
       }
     });
+    //Ignores messages without a prefix
     if(message.content.startsWith(defaultPrefix)){
       await message.channel.send('hello!');
     }
