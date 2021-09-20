@@ -24,8 +24,15 @@ nessie.once('ready', async () => {
 })
 
 nessie.on('messageCreate', async (message) => {
+  if (message.author.bot) return; //Ignore messages made by nessie
+  const nessiePrefix = defaultPrefix;
+
   try {
-    if (message.author.bot) return;
+    message.mentions.users.forEach((user) => {
+      if(user === nessie.user){
+        return message.channel.send('My current prefix is ' + '`' + `${nessiePrefix}` + '`');
+      }
+    });
     if(message.content.startsWith(defaultPrefix)){
       await message.channel.send('hello!');
     }
