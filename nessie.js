@@ -9,7 +9,7 @@ const { defaultPrefix, token } = require('./config/nessie.json'); //Get config d
 const commands = require('./commands'); //Get list of commands
 
 nessie.login(token); //Login to discord with bot's token
-
+//------
 /**
  * Event handler that fires once when nessie boots up and succesfully logs in
  */
@@ -21,11 +21,15 @@ nessie.once('ready', async () => {
     console.log(e);
   }
 })
-
+//------
+/**
+ * Event handler for when a message is sent in a channel that nessie is in
+ */
 nessie.on('messageCreate', async (message) => {
   if (message.author.bot) return; //Ignore messages made by nessie
   const nessiePrefix = defaultPrefix;
 
+  
   try {
     /**
      * Nessie checks if messages contains any mentions
