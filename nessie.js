@@ -5,9 +5,8 @@
  **/
 const Discord = require('discord.js');
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES]});
-
-//Get config data from config folder
-const { defaultPrefix, token } = require('./config/nessie.json');
+const { defaultPrefix, token } = require('./config/nessie.json'); //Get config data from config folder
+const commands = require('./commands'); //Get list of commands
 
 nessie.login(token); //Login to discord with bot's token
 
@@ -38,8 +37,14 @@ nessie.on('messageCreate', async (message) => {
       }
     });
     //Ignores messages without a prefix
-    if(message.content.startsWith(defaultPrefix)){
-      await message.channel.send('hello!');
+    if(message.content.startsWith(nessiePrefix)){
+      const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
+      const command = args.shift().toLowerCase(); //gets command as a string from array
+      const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
+
+      if(commands[command]){
+        await commands[command].execute(message);
+      }
     }
   } catch(e){
     console.log(e);
