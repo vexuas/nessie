@@ -5,12 +5,11 @@
  **/
 const Discord = require('discord.js');
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES]});
-
-//Get config data from config folder
-const { defaultPrefix, token } = require('./config/nessie.json');
+const { defaultPrefix, token } = require('./config/nessie.json'); //Get config data from config folder
+const commands = require('./commands'); //Get list of commands
 
 nessie.login(token); //Login to discord with bot's token
-
+//------
 /**
  * Event handler that fires once when nessie boots up and succesfully logs in
  */
@@ -22,11 +21,15 @@ nessie.once('ready', async () => {
     console.log(e);
   }
 })
-
+//------
+/**
+ * Event handler for when a message is sent in a channel that nessie is in
+ */
 nessie.on('messageCreate', async (message) => {
   if (message.author.bot) return; //Ignore messages made by nessie
   const nessiePrefix = defaultPrefix;
 
+  
   try {
     /**
      * Nessie checks if messages contains any mentions
@@ -38,8 +41,22 @@ nessie.on('messageCreate', async (message) => {
       }
     });
     //Ignores messages without a prefix
-    if(message.content.startsWith(defaultPrefix)){
-      await message.channel.send('hello!');
+    if(message.content.startsWith(nessiePrefix)){
+      const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
+      const command = args.shift().toLowerCase(); //gets command as a string from array
+      const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
+
+      //Check if command exists in the command file
+      if(commands[command]){
+        //If it does check if there are any arguments passed and if the command expects an argument
+        if(arguments.length > 0 && !commands[command].hasArguments){
+          await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
+        } else {
+          await commands[command].execute({message, arguments}); //Executes command
+        }
+      } else {
+        await message.channel.send("I'm not sure what you meant by that! （・□・；）"); //Sends error reply if command doesn't exist
+      }
     }
   } catch(e){
     console.log(e);
