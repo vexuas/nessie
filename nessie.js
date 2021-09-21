@@ -42,8 +42,16 @@ nessie.on('messageCreate', async (message) => {
       const command = args.shift().toLowerCase(); //gets command as a string from array
       const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
 
+      //Check if command exists in the command file
       if(commands[command]){
-        await commands[command].execute(message);
+        //If it does check if there are any arguments passed and if the command expects an argument
+        if(arguments.length > 0 && !commands[command].hasArguments){
+          await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
+        } else {
+          await commands[command].execute({message, arguments}); //Executes command
+        }
+      } else {
+        await message.channel.send("I'm not sure what you meant by that! （・□・；）"); //Sends error reply if command doesn't exist
       }
     }
   } catch(e){
