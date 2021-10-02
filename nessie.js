@@ -4,7 +4,7 @@
  * Basically need to explicitly tell discord which events our bot needs
  **/
 const Discord = require('discord.js');
-const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES]});
+const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
 const { defaultPrefix, token } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
 

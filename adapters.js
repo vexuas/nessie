@@ -1,23 +1,14 @@
-const https = require('https');
-const { StringDecoder } = require('string_decoder');
-const decoder = new StringDecoder('utf-8');
+const axios = require('axios');
 const { apiKey } = require('./config/nessie.json');
 
 
-exports.getCurrentMapRotations = () => {
-  let data = '';
-  const options = {
-    hostname: 'api.mozambiquehe.re',
-    path: `/maprotation?version=2&auth=${apiKey}`,
-    method: 'GET'
+exports.getCurrentMapRotations = async () => {
+  try {
+    const data = await axios.get(`https://api.mozambiquehe.re/maprotation?version=2&auth=${apiKey}`).then(response => {
+      return response.data;
+    })
+    return data;
+  } catch(e){
+    console.log(e); //Maybe add special error handling
   }
-  const req = https.request(options, response => {
-    response.on('data', chunk => {
-      data += chunk
-    })
-    response.on('end', () => {
-     console.log(JSON.parse(data));
-    })
-  })
-  req.end();
 }
