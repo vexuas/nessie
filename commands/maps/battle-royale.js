@@ -1,4 +1,4 @@
-const { getCurrentMapRotations } = require('../../adapters');
+const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
 
 module.exports = {
   name: 'br',
@@ -7,13 +7,18 @@ module.exports = {
   async execute({message, arguments}){
     message.channel.sendTyping();
     try {
-      const data = await getCurrentMapRotations();
-      const pubsData = data.battle_royale;
-      const dataToSend = `Current Map: ${pubsData.current.map}\nNext Map: ${pubsData.next.map}`;
-      if(arguments === 'ranked'){
-        return message.channel.send('Battle Royale Ranked map command');
+      if(!arguments){
+        const data = await getBattleRoyalePubs();
+        const dataToSend = `Current Map: ${data.current.map}\nNext Map: ${data.next.map}`;
+        return message.channel.send(dataToSend);
+      } else{
+        if(arguments === 'ranked'){
+          const data = await getBattleRoyaleRanked();
+          const dataToSend = `Current Map: ${data.current.map}\nNext Map: ${data.next.map}`;
+          return message.channel.send(dataToSend);
+        }
+        return message.channel.send("I don't understand that argument （・□・；）");
       }
-      return message.channel.send(dataToSend);
     } catch(e){
       console.log(e); //Add proper error handling someday
     }
