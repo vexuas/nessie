@@ -7,6 +7,18 @@ const Discord = require('discord.js');
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
 const { defaultPrefix, token } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
+const { getBattleRoyalePubs } = require('./adapters');
+
+const setCurrentMapStatus = (data) => {
+  const fiveSecondsBuffer = 5000;
+  let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
+  const intervalRequest = async () => {
+    const updatedBrPubsData = await getBattleRoyalePubs();
+    currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
+    setTimeout(intervalRequest, currentTimer);
+  }
+  setTimeout(intervalRequest, currentTimer);
+}
 
 nessie.login(token); //Login to discord with bot's token
 //------
@@ -17,8 +29,11 @@ nessie.once('ready', async () => {
   try {
     const testChannel = nessie.channels.cache.get('889212328539725824');
     testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)");
+    const brPubsData = await getBattleRoyalePubs();
+    nessie.user.setActivity(brPubsData.current.map);
+    setCurrentMapStatus(brPubsData);
   } catch(e){
-    console.log(e);
+    console.log(e); //Add proper error handling
   }
 })
 //------
