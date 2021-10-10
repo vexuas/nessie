@@ -14,7 +14,7 @@ const { getArenasPubs, getArenasRanked } = require('../../adapters');
 /**
  * Embed design for Arenas Pubs
  * Added a hack to display the time for next map regardless of timezone
- * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
+ * As discord embed has a timestamp property, I added the remianing milliseconds to the current date
  * Make reusable?
  */
 const generatePubsEmbed = (data) => {
@@ -22,7 +22,7 @@ const generatePubsEmbed = (data) => {
     title : "Arenas | Pubs",
     color : 3066993,
     image: {
-      url: data.current.asset
+      url: data.current.asset //Using the scuffed saturated images as it'll be a chore adding custom images for each arenas map(some use areas of br maps)
     },
     timestamp: Date.now() + data.current.remainingSecs*1000,
     footer: {
@@ -45,13 +45,15 @@ const generatePubsEmbed = (data) => {
 }
 /**
  * Embed design for Arenas Ranked
+ * Slighly different from BR ranked and similar to its Pubs counterpart
+ * Might want to make all of these reusable, a lot of repeats
  */
  const generateRankedEmbed = (data) => {
   const embedData = {
     title : "Arenas | Ranked",
     color : 7419530,
     image: {
-      url: data.current.asset
+      url: data.current.asset //Using the scuffed saturated images as it'll be a chore adding custom images for each arenas map(some use areas of br maps)
     },
     timestamp: Date.now() + data.current.remainingSecs*1000,
     footer: {
