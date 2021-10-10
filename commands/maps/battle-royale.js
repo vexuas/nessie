@@ -2,6 +2,7 @@ const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters')
 
 /**
  * Gets url link image for each br map
+ * Using custom images as the image links sent by API are desaturated for some reason
  * Currently hosted scuffly in discord itself; might want to think of hosting it in cloudfront in the future
  */
 const getMapUrl = (map) => {
@@ -31,7 +32,7 @@ const getMapUrl = (map) => {
 const getCountdown = (timer) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
-  return `${isOverAnHour ? `${countdown[0]} hrs ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
+  return `${isOverAnHour ? `${countdown[0]} hr ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
 }
 /**
  * Embed design for BR Pubs
