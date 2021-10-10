@@ -72,7 +72,7 @@ const generatePubsEmbed = (data) => {
  const generateRankedEmbed = (data) => {
   const embedData = {
     title : "Battle Royale | Ranked",
-    color : 3066993,
+    color : 7419530,
     image: {
       url: getMapUrl(data.current.map)
     },
