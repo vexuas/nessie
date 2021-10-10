@@ -9,6 +9,12 @@ const { defaultPrefix, token } = require('./config/nessie.json'); //Get config d
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 
+/**
+ * In charge of correctly displaying current battle royale pubs rotation in nessie's activity status
+ * As the maps have varying durations, needed to figure out a way to dynamically change the timeout after each call
+ * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
+ * Inside the interval function we can then properly get the current timer and update accordingly
+ */
 const setCurrentMapStatus = (data) => {
   const fiveSecondsBuffer = 5000;
   let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
@@ -17,7 +23,7 @@ const setCurrentMapStatus = (data) => {
     currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
     setTimeout(intervalRequest, currentTimer);
   }
-  setTimeout(intervalRequest, currentTimer);
+  setTimeout(intervalRequest, currentTimer); //Start initial timer
 }
 
 nessie.login(token); //Login to discord with bot's token
