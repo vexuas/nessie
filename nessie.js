@@ -7,6 +7,24 @@ const Discord = require('discord.js');
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
 const { defaultPrefix, token } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
+const { getBattleRoyalePubs } = require('./adapters');
+
+/**
+ * In charge of correctly displaying current battle royale pubs rotation in nessie's activity status
+ * As the maps have varying durations, needed to figure out a way to dynamically change the timeout after each call
+ * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
+ * Inside the interval function we can then properly get the current timer and update accordingly
+ */
+const setCurrentMapStatus = (data) => {
+  const fiveSecondsBuffer = 5000;
+  let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
+  const intervalRequest = async () => {
+    const updatedBrPubsData = await getBattleRoyalePubs();
+    currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
+    setTimeout(intervalRequest, currentTimer);
+  }
+  setTimeout(intervalRequest, currentTimer); //Start initial timer
+}
 
 nessie.login(token); //Login to discord with bot's token
 //------
@@ -17,8 +35,11 @@ nessie.once('ready', async () => {
   try {
     const testChannel = nessie.channels.cache.get('889212328539725824');
     testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)");
+    const brPubsData = await getBattleRoyalePubs();
+    nessie.user.setActivity(brPubsData.current.map);
+    setCurrentMapStatus(brPubsData);
   } catch(e){
-    console.log(e);
+    console.log(e); //Add proper error handling
   }
 })
 //------
