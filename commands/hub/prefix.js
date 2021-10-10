@@ -3,7 +3,7 @@ const { defaultPrefix } = require('../../config/nessie.json');
 
 const generateEmbed = (prefix) => {
   const embed = {
-    color: 16776960,
+    color: 3447003,
     fields: [
       {
         name: 'Current Prefix',
