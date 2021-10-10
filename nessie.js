@@ -21,6 +21,7 @@ const setCurrentMapStatus = (data) => {
   const intervalRequest = async () => {
     const updatedBrPubsData = await getBattleRoyalePubs();
     currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
+    nessie.user.setActivity(updatedBrPubsData.current.map);
     setTimeout(intervalRequest, currentTimer);
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
