@@ -31,6 +31,16 @@ const sendInfoEmbed = ({message, nessie, prefix}) => {
         name: 'Library',
         value: 'discord.js',
         inline: true
+      },
+      {
+        name: 'Last Update',
+        value: '10-Oct-2021',
+        inline: true
+      },
+      {
+        name: 'Source Code',
+        value: '[Github](https://github.com/vexuas/nessie)',
+        inline: true 
       }
     ]
   };
