@@ -4,10 +4,13 @@
  * Basically need to explicitly tell discord which events our bot needs
  **/
 const Discord = require('discord.js');
+const Mixpanel = require('mixpanel');
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
-const { defaultPrefix, token } = require('./config/nessie.json'); //Get config data from config folder
+const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
+const { sendMixpanelEvent } = require('./analytics');
+let mixpanel;
 
 /**
  * In charge of correctly displaying current battle royale pubs rotation in nessie's activity status
@@ -26,8 +29,16 @@ const setCurrentMapStatus = (data) => {
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
 }
-
-nessie.login(token); //Login to discord with bot's token
+//----------
+/**
+ * Initialize nessie to log in and establish a connection to Discord
+ * Wrapped in an async function as we want to wait for the promise to end so that our mixpanel instance knows which project to initialize in
+ */
+const initialize = async () => {
+  await nessie.login(token);
+  mixpanel = Mixpanel.init(nessie.user.id === '889208189017538572' ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
+}
+initialize();
 //------
 /**
  * Event handler that fires once when nessie boots up and succesfully logs in
@@ -51,7 +62,6 @@ nessie.on('messageCreate', async (message) => {
   if (message.author.bot) return; //Ignore messages made by nessie
   const nessiePrefix = defaultPrefix;
 
-  
   try {
     /**
      * Nessie checks if messages contains any mentions
@@ -75,6 +85,7 @@ nessie.on('messageCreate', async (message) => {
           await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
         } else {
           await commands[command].execute({message, arguments, nessie}); //Executes command
+          sendMixpanelEvent(message.author, message.channel, message.channel.guild, command, mixpanel, arguments); //Send tracking event to mixpanel
         }
       } else {
         await message.channel.send("I'm not sure what you meant by that! （・□・；）"); //Sends error reply if command doesn't exist
