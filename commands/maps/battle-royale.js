@@ -1,6 +1,9 @@
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
-const { MessageAttachment, MessageEmbed } = require('discord.js');
 
+/**
+ * Gets url link image for each br map
+ * Currently hosted scuffly in discord itself; might want to think of hosting it in cloudfront in the future
+ */
 const getMapUrl = (map) => {
   switch(map){
     case 'kings_canyon_rotation':
@@ -13,22 +16,27 @@ const getMapUrl = (map) => {
       return '';
   }
 }
+/**
+ * Display the time left in a more aethestically manner
+ * API returns in the form hr:min:sec (01:02:03)
+ * Function returns hr hrs min mins sec secs (01 hrs 02 mins 03 secs);
+ * Might want to think of using the number of remaining seconds instead of splitting the timer string in the future
+ */
 const getCountdown = (timer) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
   return `${isOverAnHour ? `${countdown[0]} hrs ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
 }
-const generateEmbed = ({message, data}) => {
+/**
+ * Embed design for BR Pubs
+ * Added a hack to display the time for next map regardless of timezone
+ * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
+ * Make reusable?
+ */
+const generateEmbed = (data) => {
   const embedData = {
-    // title : "Battle Royale Pubs | Map Rotation",
-    // title : "Map Rotation | Battle Royale Pubs",
     title : "Battle Royale Pubs",
-    // title : "Map Rotation",
-    // description: `${message.author} **| Battle Royale Pubs**`,
     color : 3066993,
-    // thumbnail: {
-    //   url: "https://cdn.discordapp.com/attachments/248430185463021569/894987994921046046/sir_nessie.jpeg"
-    // },
     image: {
       url: getMapUrl(data.current.code)
     },
@@ -47,11 +55,6 @@ const generateEmbed = ({message, data}) => {
         value: "```xl\n\n" + getCountdown(data.current.remainingTimer) + "```",
         inline: true
       },
-      // {
-      //   name: 'Next map',
-      //   value: "```\n\n" + data.next.map + "```"
-      //   // inline: true
-      // }
     ]
   };
   return [embedData];
@@ -66,8 +69,7 @@ module.exports = {
     try {
       if(!arguments){
         const data = await getBattleRoyalePubs();
-        const embedToSend = generateEmbed({message, data});
-        console.log(embedToSend);
+        const embedToSend = generateEmbed(data);
         return message.channel.send({ embeds: embedToSend });
       } else{
         if(arguments === 'ranked'){
