@@ -7,5 +7,6 @@ module.exports = {
   br: require('./commands/maps/battle-royale'),
   arenas: require('./commands/maps/arenas'),
   //Hub
+  info: require('./commands/hub/info'),
   prefix: require('./commands/hub/prefix')
 }

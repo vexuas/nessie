@@ -74,7 +74,7 @@ nessie.on('messageCreate', async (message) => {
         if(arguments.length > 0 && !commands[command].hasArguments){
           await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
         } else {
-          await commands[command].execute({message, arguments}); //Executes command
+          await commands[command].execute({message, arguments, nessie}); //Executes command
         }
       } else {
         await message.channel.send("I'm not sure what you meant by that! （・□・；）"); //Sends error reply if command doesn't exist
