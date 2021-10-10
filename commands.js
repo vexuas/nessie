@@ -9,5 +9,6 @@ module.exports = {
   //Hub
   info: require('./commands/hub/info'),
   help: require('./commands/hub/help'),
-  prefix: require('./commands/hub/prefix')
+  prefix: require('./commands/hub/prefix'),
+  invite: require('./commands/hub/invite')
 }
