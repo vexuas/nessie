@@ -51,23 +51,27 @@ exports.getBattleRoyalePubs = async () => {
   const data = await axios.get(url).then(response => {
     return response.data.battle_royale;
   })
+  console.log(data);
   return data;
 }
 exports.getBattleRoyaleRanked = async () => {
   const data = await axios.get(url).then(response => {
     return response.data.ranked;
   })
+  console.log(data);
   return data;
 }
 exports.getArenasPubs = async () => {
   const data = await axios.get(url).then(response => {
     return response.data.arenas;
   })
+  console.log(data);
   return data;
 }
 exports.getArenasRanked = async () => {
   const data = await axios.get(url).then(response => {
     return response.data.arenasRanked;
   })
+  console.log(data);
   return data;
 }
