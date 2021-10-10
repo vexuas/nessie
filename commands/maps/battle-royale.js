@@ -8,9 +8,15 @@ const getMapUrl = (map) => {
   switch(map){
     case 'kings_canyon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
+    case 'Kings Canyon':
+      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
     case 'worlds_edge_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544195488129034/worlds_edge.jpg';
+    case `World's Edge`:
+      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544195488129034/worlds_edge.jpg';
     case 'olympus_rotation':
+      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
+    case 'Olympus':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
     default:
       return '';
@@ -33,9 +39,9 @@ const getCountdown = (timer) => {
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  * Make reusable?
  */
-const generateEmbed = (data) => {
+const generatePubsEmbed = (data) => {
   const embedData = {
-    title : "Battle Royale Pubs",
+    title : "Battle Royale | Pubs",
     color : 3066993,
     image: {
       url: getMapUrl(data.current.code)
@@ -59,6 +65,32 @@ const generateEmbed = (data) => {
   };
   return [embedData];
 }
+/**
+ * Embed design for BR Ranked
+ * Fairly simple, don't need any fancy timers and footers
+ */
+ const generateRankedEmbed = (data) => {
+  const embedData = {
+    title : "Battle Royale | Ranked",
+    color : 3066993,
+    image: {
+      url: getMapUrl(data.current.map)
+    },
+    fields: [
+      {
+        name: "Current map",
+        value: "```fix\n\n" + data.current.map + "```",
+        inline: true
+      },
+      {
+        name: "Time left",
+        value: "```xl\n\nRunning till end of split```",
+        inline: true
+      }
+    ]
+  };
+  return [embedData];
+}
 
 module.exports = {
   name: 'br',
@@ -69,13 +101,13 @@ module.exports = {
     try {
       if(!arguments){
         const data = await getBattleRoyalePubs();
-        const embedToSend = generateEmbed(data);
+        const embedToSend = generatePubsEmbed(data);
         return message.channel.send({ embeds: embedToSend });
       } else{
         if(arguments === 'ranked'){
           const data = await getBattleRoyaleRanked();
-          const dataToSend = `Current Map: ${data.current.map}\nNext Map: ${data.next.map}`;
-          return message.channel.send(dataToSend);
+          const embedToSend = generateRankedEmbed(data);
+          return message.channel.send({ embeds: embedToSend });
         }
         return message.channel.send("I don't understand that argument （・□・；）");
       }
