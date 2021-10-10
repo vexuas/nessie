@@ -3,7 +3,7 @@
  * Learning from past mistakes so adding this pre-launch
  * For reference: https://developer.mixpanel.com/docs/nodejs
  */
- const sendMixpanelEvent = ({user, channel, guild, command, client, arguments}) => {
+ const sendMixpanelEvent = (user, channel, guild, command, client, arguments) => {
   const eventToSend = `Use ${command} command`; //Name of event; string interpolated with command as best to write an event as an action a user is doing
   /**
    * Creates and updates a user profile
@@ -39,21 +39,13 @@
      * Useful for first time stuff
      */
     client.people.set_once(user.id, {
-      first_used: (new Date()).toISOString(), //Unfortunately this is only after v2.5
+      first_used: (new Date()).toISOString(),
       first_command: command,
       first_used_in_guild: guild.name,
       first_used_in_channel: channel.name
     })
   } else {
-    /**
-     * Separate tracking for dms
-     * Currently this is just to see if people actually message yagi privately instead of through a channel
-     */
-    client.track('Use command in private message', {
-      distinct_id: user.id,
-      user: user.tag,
-      user_name: user.username
-    })
+   //Maybe look into dms someday; dropping this for now from Yagi
   }
 }
 
