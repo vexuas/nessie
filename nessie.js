@@ -87,8 +87,6 @@ nessie.on('messageCreate', async (message) => {
           await commands[command].execute({message, arguments, nessie}); //Executes command
           sendMixpanelEvent(message.author, message.channel, message.channel.guild, command, mixpanel, arguments); //Send tracking event to mixpanel
         }
-      } else {
-        await message.channel.send("I'm not sure what you meant by that! （・□・；）"); //Sends error reply if command doesn't exist
       }
     }
   } catch(e){
