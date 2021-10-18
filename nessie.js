@@ -10,6 +10,7 @@ const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./co
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
+const { sendHealthLog } = require('./helpers');
 let mixpanel;
 
 /**
@@ -25,6 +26,7 @@ const setCurrentMapStatus = (data, channel) => {
     const updatedBrPubsData = await getBattleRoyalePubs();
     currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
     nessie.user.setActivity(updatedBrPubsData.current.map);
+    sendHealthLog(updatedBrPubsData, channel);
     setTimeout(intervalRequest, currentTimer);
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
@@ -50,7 +52,7 @@ nessie.once('ready', async () => {
     testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)");
     const brPubsData = await getBattleRoyalePubs();
     nessie.user.setActivity(brPubsData.current.map);
-    logChannel.send(`Current Map: ${brPubsData.current.map}, Next Map: ${brPubsData.next.map}`)
+    sendHealthLog(brPubsData, logChannel);
     setCurrentMapStatus(brPubsData, logChannel);
   } catch(e){
     console.log(e); //Add proper error handling
