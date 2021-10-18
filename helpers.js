@@ -1,6 +1,6 @@
 const { format } = require('date-fns');
 
-exports.sendHealthLog = (data, channel) => {
+exports.sendHealthLog = (data, channel, isAccurate) => {
   const utcStart = new Date(data.current.readableDate_start);
   const sgtStart = new Date(utcStart.getTime() + 28800000)
   const utcEnd = new Date(data.current.readableDate_end);
@@ -9,7 +9,7 @@ exports.sendHealthLog = (data, channel) => {
   const embed = {
     title: 'Nessie | Status Health Log',
     description: 'Requested data from API',
-    color: 3066993,
+    color: isAccurate ? 3066993 : 16776960,
     thumbnail: {
       url:
         'https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png'
@@ -31,9 +31,14 @@ exports.sendHealthLog = (data, channel) => {
         name: 'Requested At',
         value: codeBlock(format(new Date(), 'hh:mm:ss aa, dd MMM yyyy')),
       },
+      {
+        name: 'Accurate',
+        value: isAccurate ? 'Yes' : 'No'
+      }
     ]
   }
-  channel.send({embeds: [embed]});
+  isAccurate ? channel.send({ embeds: [embed] }) : channel.send({ content: '<@183444648360935424>', embeds: [embed] });
+  
 }
 //----------
 /**

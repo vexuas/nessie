@@ -24,9 +24,10 @@ const setCurrentMapStatus = (data, channel) => {
   let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
   const intervalRequest = async () => {
     const updatedBrPubsData = await getBattleRoyalePubs();
+    const isAccurate = data.next.code === updatedBrPubsData.current.code;
     currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
     nessie.user.setActivity(updatedBrPubsData.current.map);
-    sendHealthLog(updatedBrPubsData, channel);
+    sendHealthLog(updatedBrPubsData, channel, isAccurate);
     setTimeout(intervalRequest, currentTimer);
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
@@ -52,7 +53,7 @@ nessie.once('ready', async () => {
     testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)");
     const brPubsData = await getBattleRoyalePubs();
     nessie.user.setActivity(brPubsData.current.map);
-    sendHealthLog(brPubsData, logChannel);
+    sendHealthLog(brPubsData, logChannel, true);
     setCurrentMapStatus(brPubsData, logChannel);
   } catch(e){
     console.log(e); //Add proper error handling
