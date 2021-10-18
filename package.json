@@ -12,7 +12,8 @@
     "discord.js": "^13.1.0",
     "mixpanel": "^0.13.0",
     "mocha": "^9.1.1",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "auto": "^10.32.0"
