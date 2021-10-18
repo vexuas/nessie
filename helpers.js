@@ -1,5 +1,12 @@
 const { format } = require('date-fns');
 
+//----------
+/**
+ * Function to send health status so that I can monitor how the status update for br pub maps is doing
+ * @data - br data object
+ * @channel - log channel in Nessie's Canyon (#health: 899620845436141609)
+ * @isAccurate - whether the data received is up-to-date
+ */
 exports.sendHealthLog = (data, channel, isAccurate) => {
   const utcStart = new Date(data.current.readableDate_start);
   const sgtStart = new Date(utcStart.getTime() + 28800000)
