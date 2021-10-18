@@ -5,6 +5,8 @@ node_modules
 /config/nessie.json
 
 #database
+/database/nessie.db
+/database/nessie.db-journal
 
 # system files
 .DS_Store

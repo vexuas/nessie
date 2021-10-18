@@ -5,6 +5,7 @@
  **/
 const Discord = require('discord.js');
 const Mixpanel = require('mixpanel');
+const sqlite = require('sqlite3').verbose();
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
 const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
@@ -13,31 +14,6 @@ const { sendMixpanelEvent } = require('./analytics');
 const { sendHealthLog } = require('./helpers');
 let mixpanel;
 
-/**
- * In charge of correctly displaying current battle royale pubs rotation in nessie's activity status
- * As the maps have varying durations, needed to figure out a way to dynamically change the timeout after each call
- * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
- * Inside the interval function we can then properly get the current timer and update accordingly
- */
-const setCurrentMapStatus = (data, channel) => {
-  const fiveSecondsBuffer = 5000;
-  let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
-  const intervalRequest = async () => {
-    const updatedBrPubsData = await getBattleRoyalePubs();
-    /**
-     * Checks to see if the data taken from API is accurate
-     * Was brought to my attention that the status was displaying the wrong map at one point
-     * Not sure why this is happening so just adding a notification when this happens again
-     * Don't really want to add extra code for now, if it happens again then i'll fix it
-     */
-    const isAccurate = data.next.code === updatedBrPubsData.current.code; 
-    currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
-    nessie.user.setActivity(updatedBrPubsData.current.map);
-    sendHealthLog(updatedBrPubsData, channel, isAccurate);
-    setTimeout(intervalRequest, currentTimer);
-  }
-  setTimeout(intervalRequest, currentTimer); //Start initial timer
-}
 //----------
 /**
  * Initialize nessie to log in and establish a connection to Discord
@@ -56,7 +32,17 @@ nessie.once('ready', async () => {
   try {
     const testChannel = nessie.channels.cache.get('889212328539725824');
     const logChannel = nessie.channels.cache.get('899620845436141609');
-    testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)");
+    testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
+    /**
+     * Initialise Database and its tables
+     * Will create them if they don't exist
+     * See relevant files under database/* for more information
+     */ 
+    const nessieDatabase = createNessieDatabase();
+    /**
+     * Changes Nessie's activity when the current map has switched over to the next
+     * Refer to the setCurrentMapStatus function for more information
+     */
     const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
     nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
     sendHealthLog(brPubsData, logChannel, true); //For logging purpose
@@ -104,3 +90,35 @@ nessie.on('messageCreate', async (message) => {
     console.log(e);
   }
 })
+//TODO: Maybe move these functions in their separate files at some point
+
+//Creates Nessie Database under database folder
+const createNessieDatabase = () => {
+  let db = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
+  return db;
+}
+/**
+ * In charge of correctly displaying current battle royale pubs rotation in nessie's activity status
+ * As the maps have varying durations, needed to figure out a way to dynamically change the timeout after each call
+ * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
+ * Inside the interval function we can then properly get the current timer and update accordingly
+ */
+ const setCurrentMapStatus = (data, channel) => {
+  const fiveSecondsBuffer = 5000;
+  let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
+  const intervalRequest = async () => {
+    const updatedBrPubsData = await getBattleRoyalePubs();
+    /**
+     * Checks to see if the data taken from API is accurate
+     * Was brought to my attention that the status was displaying the wrong map at one point
+     * Not sure why this is happening so just adding a notification when this happens again
+     * Don't really want to add extra code for now, if it happens again then i'll fix it
+     */
+    const isAccurate = data.next.code === updatedBrPubsData.current.code; 
+    currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
+    nessie.user.setActivity(updatedBrPubsData.current.map);
+    sendHealthLog(updatedBrPubsData, channel, isAccurate);
+    setTimeout(intervalRequest, currentTimer);
+  }
+  setTimeout(intervalRequest, currentTimer); //Start initial timer
+}
