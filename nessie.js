@@ -10,6 +10,7 @@ const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./co
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
+const { sendHealthLog } = require('./helpers');
 let mixpanel;
 
 /**
@@ -18,13 +19,21 @@ let mixpanel;
  * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
  * Inside the interval function we can then properly get the current timer and update accordingly
  */
-const setCurrentMapStatus = (data) => {
+const setCurrentMapStatus = (data, channel) => {
   const fiveSecondsBuffer = 5000;
   let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
   const intervalRequest = async () => {
     const updatedBrPubsData = await getBattleRoyalePubs();
+    /**
+     * Checks to see if the data taken from API is accurate
+     * Was brought to my attention that the status was displaying the wrong map at one point
+     * Not sure why this is happening so just adding a notification when this happens again
+     * Don't really want to add extra code for now, if it happens again then i'll fix it
+     */
+    const isAccurate = data.next.code === updatedBrPubsData.current.code; 
     currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
     nessie.user.setActivity(updatedBrPubsData.current.map);
+    sendHealthLog(updatedBrPubsData, channel, isAccurate);
     setTimeout(intervalRequest, currentTimer);
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
@@ -46,10 +55,12 @@ initialize();
 nessie.once('ready', async () => {
   try {
     const testChannel = nessie.channels.cache.get('889212328539725824');
+    const logChannel = nessie.channels.cache.get('899620845436141609');
     testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)");
-    const brPubsData = await getBattleRoyalePubs();
-    nessie.user.setActivity(brPubsData.current.map);
-    setCurrentMapStatus(brPubsData);
+    const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
+    nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
+    sendHealthLog(brPubsData, logChannel, true); //For logging purpose
+    setCurrentMapStatus(brPubsData, logChannel); //Calls status display function
   } catch(e){
     console.log(e); //Add proper error handling
   }
