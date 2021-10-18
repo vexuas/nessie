@@ -18,7 +18,7 @@ let mixpanel;
  * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
  * Inside the interval function we can then properly get the current timer and update accordingly
  */
-const setCurrentMapStatus = (data) => {
+const setCurrentMapStatus = (data, channel) => {
   const fiveSecondsBuffer = 5000;
   let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
   const intervalRequest = async () => {
@@ -46,10 +46,12 @@ initialize();
 nessie.once('ready', async () => {
   try {
     const testChannel = nessie.channels.cache.get('889212328539725824');
+    const logChannel = nessie.channels.cache.get('899620845436141609');
     testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)");
     const brPubsData = await getBattleRoyalePubs();
     nessie.user.setActivity(brPubsData.current.map);
-    setCurrentMapStatus(brPubsData);
+    logChannel.send(`Current Map: ${brPubsData.current.map}, Next Map: ${brPubsData.next.map}`)
+    setCurrentMapStatus(brPubsData, logChannel);
   } catch(e){
     console.log(e); //Add proper error handling
   }
