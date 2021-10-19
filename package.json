@@ -1,6 +1,6 @@
 {
   "name": "nessie",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Apex Legends Map Rotation Discord Bot",
   "scripts": {
     "auto:version": "yarn version --`auto version`"

@@ -1,3 +1,42 @@
+# v0.2.0 (Tue Oct 19 2021)
+
+### Release Notes
+
+#### Create guild table ([#18](https://github.com/vexuas/nessie/pull/18))
+
+Create guild database and add guild notifications
+
+#### Install sqlite3 ([#17](https://github.com/vexuas/nessie/pull/17))
+
+Install sqlite3
+
+#### Add logging for status call ([#16](https://github.com/vexuas/nessie/pull/16))
+
+Add logging for status call
+
+#### Remove reply when inputting wrong command ([#15](https://github.com/vexuas/nessie/pull/15))
+
+
+
+---
+
+#### 🚀 Enhancement
+
+- Create guild table [#18](https://github.com/vexuas/nessie/pull/18) ([@vexuas](https://github.com/vexuas))
+- Install sqlite3 [#17](https://github.com/vexuas/nessie/pull/17) ([@vexuas](https://github.com/vexuas))
+- Add logging for status call [#16](https://github.com/vexuas/nessie/pull/16) ([@vexuas](https://github.com/vexuas))
+- Remove reply when inputting wrong command [#15](https://github.com/vexuas/nessie/pull/15) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2021 10 10 [#13](https://github.com/vexuas/nessie/pull/13) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v0.1.0 (Sun Oct 10 2021)
 
 ### Release Notes
