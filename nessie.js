@@ -11,7 +11,8 @@ const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./co
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const { sendHealthLog } = require('./helpers');
+const { sendHealthLog, sendGuildUpdateNotification } = require('./helpers');
+const { createGuildTable, insertNewGuild } = require('./database/guild-db');
 let mixpanel;
 
 //----------
@@ -39,6 +40,7 @@ nessie.once('ready', async () => {
      * See relevant files under database/* for more information
      */ 
     const nessieDatabase = createNessieDatabase();
+    createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
     /**
      * Changes Nessie's activity when the current map has switched over to the next
      * Refer to the setCurrentMapStatus function for more information
@@ -51,6 +53,29 @@ nessie.once('ready', async () => {
     console.log(e); //Add proper error handling
   }
 })
+//------
+/**
+ * Event handlers for when nessie is invited to a new server and when he is kicked. Will be opting out of guild update as I don't really need to do anything with that
+ * Sends notification to channel in Nessie's Canyon
+ * guildCreate - called when Nessie is invited to a server
+ * guildDelete - called when Nessie is kicked from server
+ * More information about each function in their relevant database files
+ */
+ nessie.on('guildCreate', (guild) => {
+  try {
+    insertNewGuild(guild);
+    sendGuildUpdateNotification(nessie, guild, 'join');
+  } catch(e){
+    console.log(e); // Add proper handling
+  }
+});
+nessie.on('guildDelete', (guild) => {
+  try {
+    removeServerDataFromNessie(guild);
+  } catch(e){
+    console.log(e); // Add proper handling
+  }
+});
 //------
 /**
  * Event handler for when a message is sent in a channel that nessie is in
@@ -121,4 +146,18 @@ const createNessieDatabase = () => {
     setTimeout(intervalRequest, currentTimer);
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
+}
+/**
+ * Function to delete all the relevant data in our database when yagi is removed from a server
+ * Removes:
+ * Guild
+ * More stuff here when auto notifications gets developed
+ * @param guild - guild in which nessie was kicked in
+ */
+ const removeServerDataFromNessie = (guild) => {
+  let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
+  database.serialize(() => {
+    database.run(`DELETE FROM Guild WHERE uuid = "${guild.id}"`);
+    sendGuildUpdateNotification(nessie, guild, 'leave');
+  })
 }
