@@ -65,7 +65,6 @@ const serverEmbed = async (
   guild,
   status
 ) => {
-  console.log('hi');
   let embedTitle;
   let embedColor;
   const defaultIcon =

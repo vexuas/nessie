@@ -11,8 +11,8 @@ const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./co
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const { sendHealthLog } = require('./helpers');
-const { createGuildTable } = require('./database/guild-db');
+const { sendHealthLog, sendGuildUpdateNotification } = require('./helpers');
+const { createGuildTable, insertNewGuild } = require('./database/guild-db');
 let mixpanel;
 
 //----------
@@ -53,6 +53,29 @@ nessie.once('ready', async () => {
     console.log(e); //Add proper error handling
   }
 })
+//------
+/**
+ * Event handlers for when nessie is invited to a new server and when he is kicked. Will be opting out of guild update as I don't really need to do anything with that
+ * Sends notification to channel in Nessie's Canyon
+ * guildCreate - called when Nessie is invited to a server
+ * guildDelete - called when Nessie is kicked from server
+ * More information about each function in their relevant database files
+ */
+ nessie.on('guildCreate', (guild) => {
+  try {
+    insertNewGuild(guild);
+    sendGuildUpdateNotification(nessie, guild, 'join');
+  } catch(e){
+    console.log(e);
+  }
+});
+nessie.on('guildDelete', (guild) => {
+  try {
+    // removeServerDataFromYagi(guild, yagi);
+  } catch(e){
+    // sendErrorLog(yagi, e);//Add proper error handling
+  }
+});
 //------
 /**
  * Event handler for when a message is sent in a channel that nessie is in

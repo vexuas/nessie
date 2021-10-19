@@ -40,3 +40,21 @@ const { defaultPrefix } = require('../config/nessie.json');
     })
   })
 }
+/**
+ * Adds new guild to Guild table
+ * @param guild - guild that yagi is newly invited in
+ */
+ exports.insertNewGuild = (guild) => {
+  let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE);
+  database.run('INSERT INTO Guild (uuid, name, member_count, owner_id, prefix) VALUES ($uuid, $name, $member_count, $owner_id, $prefix)', {
+    $uuid: guild.id,
+    $name: guild.name,
+    $member_count: guild.memberCount,
+    $owner_id: guild.ownerId,
+    $prefix: defaultPrefix
+  }, err => {
+    if(err){
+      console.log(err);
+    }
+  })
+}
