@@ -92,7 +92,7 @@ const serverEmbed = async (
       },
       {
         name: 'Owner',
-        value: await guild.members.fetch(guild.ownerId).then(guildMember => guildMember.user.tag),
+        value: status === 'join' ? await guild.members.fetch(guild.ownerId).then(guildMember => guildMember.user.tag) : '-',
         inline: true
       },
       {

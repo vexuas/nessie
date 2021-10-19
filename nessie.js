@@ -66,14 +66,14 @@ nessie.once('ready', async () => {
     insertNewGuild(guild);
     sendGuildUpdateNotification(nessie, guild, 'join');
   } catch(e){
-    console.log(e);
+    console.log(e); // Add proper handling
   }
 });
 nessie.on('guildDelete', (guild) => {
   try {
-    // removeServerDataFromYagi(guild, yagi);
+    removeServerDataFromNessie(guild);
   } catch(e){
-    // sendErrorLog(yagi, e);//Add proper error handling
+    console.log(e); // Add proper handling
   }
 });
 //------
@@ -146,4 +146,18 @@ const createNessieDatabase = () => {
     setTimeout(intervalRequest, currentTimer);
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
+}
+/**
+ * Function to delete all the relevant data in our database when yagi is removed from a server
+ * Removes:
+ * Guild
+ * More stuff here when auto notifications gets developed
+ * @param guild - guild in which nessie was kicked in
+ */
+ const removeServerDataFromNessie = (guild) => {
+  let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
+  database.serialize(() => {
+    database.run(`DELETE FROM Guild WHERE uuid = "${guild.id}"`);
+    sendGuildUpdateNotification(nessie, guild, 'leave');
+  })
 }
