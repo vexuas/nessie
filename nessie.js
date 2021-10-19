@@ -12,6 +12,7 @@ const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
 const { sendHealthLog } = require('./helpers');
+const { createGuildTable } = require('./database/guild-db');
 let mixpanel;
 
 //----------
@@ -39,6 +40,7 @@ nessie.once('ready', async () => {
      * See relevant files under database/* for more information
      */ 
     const nessieDatabase = createNessieDatabase();
+    createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
     /**
      * Changes Nessie's activity when the current map has switched over to the next
      * Refer to the setCurrentMapStatus function for more information
