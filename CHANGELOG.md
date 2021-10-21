@@ -1,3 +1,28 @@
+# v0.2.2 (Fri Oct 22 2021)
+
+### Release Notes
+
+#### Update invite link ([#23](https://github.com/vexuas/nessie/pull/23))
+
+Update invite link
+
+---
+
+#### 🐛 Bug Fix
+
+- Update README.md [#24](https://github.com/vexuas/nessie/pull/24) ([@vexuas](https://github.com/vexuas))
+- Update invite link [#23](https://github.com/vexuas/nessie/pull/23) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2021 10 22 [#22](https://github.com/vexuas/nessie/pull/22) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v0.2.1 (Fri Oct 22 2021)
 
 ### Release Notes
