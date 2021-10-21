@@ -133,8 +133,9 @@ const createNessieDatabase = () => {
   let currentBrPubsData = data;
   let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
   const intervalRequest = async () => {
-    const updatedBrPubsData = await getBattleRoyalePubs();
-    /**
+    try {
+      const updatedBrPubsData = await getBattleRoyalePubs();
+       /**
      * Checks to see if the data taken from API is accurate
      * Was brought to my attention that the status was displaying the wrong map at one point
      * Not sure why this is happening so just adding a notification when this happens again
@@ -146,6 +147,9 @@ const createNessieDatabase = () => {
     nessie.user.setActivity(updatedBrPubsData.current.map);
     sendHealthLog(updatedBrPubsData, channel, isAccurate);
     setTimeout(intervalRequest, currentTimer);
+    } catch (e){
+      channel.send('<@183444648360935424> WHOOPS SOMETHING WENT WRONG');
+    }
   }
   setTimeout(intervalRequest, currentTimer); //Start initial timer
 }
