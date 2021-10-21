@@ -1,3 +1,32 @@
+# v0.2.1 (Fri Oct 22 2021)
+
+### Release Notes
+
+#### Add error ping ([#21](https://github.com/vexuas/nessie/pull/21))
+
+Add error ping when status function throws an error
+
+#### Fix health log ([#20](https://github.com/vexuas/nessie/pull/20))
+
+Fix health log
+
+---
+
+#### 🐛 Bug Fix
+
+- Add error ping [#21](https://github.com/vexuas/nessie/pull/21) ([@vexuas](https://github.com/vexuas))
+- Fix health log [#20](https://github.com/vexuas/nessie/pull/20) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2021 10 19 [#19](https://github.com/vexuas/nessie/pull/19) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v0.2.0 (Tue Oct 19 2021)
 
 ### Release Notes
