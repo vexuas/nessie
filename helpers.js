@@ -32,7 +32,7 @@ exports.sendHealthLog = (data, channel, isAccurate) => {
       },
       {
         name: 'Time left',
-        value: codeBlock(data.current.remainingTimer)
+        value: codeBlock(`${data.current.remainingTimer} | ${data.current.remainingSecs} secs`)
       },
       {
         name: 'Requested At',
