@@ -10,7 +10,7 @@ canyon kek. Will see what other possible implementations after that's done
 ## current version | v0.2.1
 
 No automatic notifications yet but nessie is now functional with commands! Nessie also displays the
-current battle royale pubs map in his activity status
+current battle royale pubs map in his activity status. Data extracted from https://apexlegendsapi.com/
 
 Prefix: `$nes-`
 
