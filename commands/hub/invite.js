@@ -5,7 +5,7 @@ module.exports = {
     const embed = {
       description: `${
         message.author
-      } | [Add me to your servers! (◕ᴗ◕✿)](https://tinyurl.com/apex-legends-map-rotation-bot)`,
+      } | [Add me to your servers! (◕ᴗ◕✿)](https://tinyurl.com/nessie-invite-v021)`,
       color: 3447003
     }
     message.channel.send({ embeds: [embed] });
