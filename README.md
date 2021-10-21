@@ -7,7 +7,7 @@ lately, had an idea to create a discord bot for it. For now current idea is to h
 automatic reminders, mainly since I'm lazy to go in and check and then be depressed that it's king's
 canyon kek. Will see what other possible implementations after that's done
 
-## current version | v0.2.0
+## current version | v0.2.1
 
 No automatic notifications yet but nessie is now functional with commands! Nessie also displays the
 current battle royale pubs map in his activity status
