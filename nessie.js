@@ -130,6 +130,7 @@ const createNessieDatabase = () => {
  */
  const setCurrentMapStatus = (data, channel) => {
   const fiveSecondsBuffer = 5000;
+  let currentBrPubsData = data;
   let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
   const intervalRequest = async () => {
     const updatedBrPubsData = await getBattleRoyalePubs();
@@ -139,7 +140,8 @@ const createNessieDatabase = () => {
      * Not sure why this is happening so just adding a notification when this happens again
      * Don't really want to add extra code for now, if it happens again then i'll fix it
      */
-    const isAccurate = data.next.code === updatedBrPubsData.current.code; 
+    const isAccurate = currentBrPubsData.next.code === updatedBrPubsData.current.code; 
+    currentBrPubsData = updatedBrPubsData;
     currentTimer = updatedBrPubsData.current.remainingSecs*1000 + fiveSecondsBuffer;
     nessie.user.setActivity(updatedBrPubsData.current.map);
     sendHealthLog(updatedBrPubsData, channel, isAccurate);
