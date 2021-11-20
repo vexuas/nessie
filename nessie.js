@@ -7,12 +7,13 @@ const Discord = require('discord.js');
 const Mixpanel = require('mixpanel');
 const sqlite = require('sqlite3').verbose();
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
-const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./config/nessie.json'); //Get config data from config folder
+const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const { sendHealthLog, sendGuildUpdateNotification } = require('./helpers');
+const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment } = require('./helpers');
 const { createGuildTable, insertNewGuild } = require('./database/guild-db');
+const { AutoPoster } = require('topgg-autoposter');
 let mixpanel;
 
 //----------
@@ -22,7 +23,8 @@ let mixpanel;
  */
 const initialize = async () => {
   await nessie.login(token);
-  mixpanel = Mixpanel.init(nessie.user.id === '889208189017538572' ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
+  mixpanel = Mixpanel.init(checkIfInDevelopment(nessie) ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
+  !checkIfInDevelopment(nessie) && AutoPoster(topggToken, nessie); //Check if this is a one time thing per reboot or it actually auto posts when stats change
 }
 initialize();
 //------
