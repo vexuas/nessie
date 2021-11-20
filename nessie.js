@@ -11,8 +11,9 @@ const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel } = require('./co
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const { sendHealthLog, sendGuildUpdateNotification } = require('./helpers');
+const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment } = require('./helpers');
 const { createGuildTable, insertNewGuild } = require('./database/guild-db');
+const { AutoPoster } = require('topgg-autoposter');
 let mixpanel;
 
 //----------
@@ -22,7 +23,7 @@ let mixpanel;
  */
 const initialize = async () => {
   await nessie.login(token);
-  mixpanel = Mixpanel.init(nessie.user.id === '889208189017538572' ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
+  mixpanel = Mixpanel.init(checkIfInDevelopment(nessie) ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
 }
 initialize();
 //------

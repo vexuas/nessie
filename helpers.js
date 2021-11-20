@@ -7,7 +7,7 @@ const { format } = require('date-fns');
  * @channel - log channel in Nessie's Canyon (#health: 899620845436141609)
  * @isAccurate - whether the data received is up-to-date
  */
-exports.sendHealthLog = (data, channel, isAccurate) => {
+const sendHealthLog = (data, channel, isAccurate) => {
   const utcStart = new Date(data.current.readableDate_start);
   const sgtStart = new Date(utcStart.getTime() + 28800000)
   const utcEnd = new Date(data.current.readableDate_end);
@@ -112,7 +112,7 @@ const serverEmbed = async (
  * @param client - initialising discord client
  * @param guild  - guild data
  */
-exports.sendGuildUpdateNotification = async (client, guild, type) => {
+const sendGuildUpdateNotification = async (client, guild, type) => {
   const embed = await serverEmbed(client, guild, type);
   const channelId = checkIfInDevelopment(client) ? '889212328539725824' : '896710863459844136';
   const channelToSend = client.channels.cache.get(channelId);
@@ -134,3 +134,10 @@ exports.sendGuildUpdateNotification = async (client, guild, type) => {
   return client.user.id === '889208189017538572'; //Lochnesss' id (Development Bot)
 }
 //----------
+module.exports = {
+  checkIfInDevelopment,
+  sendGuildUpdateNotification,
+  serverEmbed,
+  codeBlock,
+  sendHealthLog
+}
