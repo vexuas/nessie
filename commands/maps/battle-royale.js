@@ -19,6 +19,10 @@ const getMapUrl = (map) => {
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
     case 'Olympus':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
+    case 'Storm Point':
+      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
+    case 'storm_point_rotation':
+      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';  
     default:
       return '';
   }
