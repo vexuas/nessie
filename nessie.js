@@ -111,7 +111,7 @@ nessie.on('messageCreate', async (message) => {
         const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
         const command = args.shift().toLowerCase(); //gets command as a string from array
         const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
-  
+
         //Check if command exists in the command file
         if(commands[command]){
           //If it does check if there are any arguments passed and if the command expects an argument
