@@ -1,6 +1,3 @@
-//Reminder to add custom prefix before v3
-const { defaultPrefix } = require('../../config/nessie.json');
-
 const generateEmbed = (prefix) => {
   const embed = {
     color: 3447003,
@@ -24,8 +21,8 @@ module.exports = {
   name: 'prefix',
   description: 'Shows current prefix',
   hasArguments: false,
-  execute({message}) {
-    const currentPrefix = defaultPrefix;
+  execute({message, nessiePrefix}) {
+    const currentPrefix = nessiePrefix;
     const embed = generateEmbed(currentPrefix);
     message.channel.send({ embeds: embed });
   }

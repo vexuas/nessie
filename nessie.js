@@ -7,11 +7,11 @@ const Discord = require('discord.js');
 const Mixpanel = require('mixpanel');
 const sqlite = require('sqlite3').verbose();
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
-const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./config/nessie.json'); //Get config data from config folder
+const { token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment } = require('./helpers');
+const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment, codeBlock } = require('./helpers');
 const { createGuildTable, insertNewGuild } = require('./database/guild-db');
 const { AutoPoster } = require('topgg-autoposter');
 let mixpanel;
@@ -84,38 +84,49 @@ nessie.on('guildDelete', (guild) => {
  */
 nessie.on('messageCreate', async (message) => {
   if (message.author.bot) return; //Ignore messages made by nessie
-  const nessiePrefix = defaultPrefix;
+  let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE);
+  /**
+   * Opens the nessie database and finds the guild data where the message was used
+   * This is primarily to know the current prefix of the guild; important when users are using a custom prefix
+   */
+  database.get(`SELECT * FROM Guild WHERE uuid = ${message.guildId}`, async (error, row) => {
+    if(error){
+      console.log(error);
+    };
+    const nessiePrefix = row.prefix;
+    
+    //Refactor this into its own function and pass as a callback for better readability in the future
+    try {
+      /**
+       * Nessie checks if messages contains any mentions
+       * If it does and if one of the mentions contains nessie's user, returns a message with the current prefix i.e @Nessie
+       */
+      message.mentions.users.forEach((user) => {
+        if(user === nessie.user){
+          return message.channel.send('My current prefix is ' + '`' + `${nessiePrefix}` + '`' + '\nTo set a new custom prefix, type ' + ` ${codeBlock(`${nessiePrefix}setprefix`)}`);
+        }
+      });
+      //Ignores messages without a prefix
+      if(message.content.startsWith(nessiePrefix)){
+        const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
+        const command = args.shift().toLowerCase(); //gets command as a string from array
+        const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
 
-  try {
-    /**
-     * Nessie checks if messages contains any mentions
-     * If it does and if one of the mentions contains nessie's user, returns a message with the current prefix i.e @Nessie
-     */
-    message.mentions.users.forEach((user) => {
-      if(user === nessie.user){
-        return message.channel.send('My current prefix is ' + '`' + `${nessiePrefix}` + '`');
-      }
-    });
-    //Ignores messages without a prefix
-    if(message.content.startsWith(nessiePrefix)){
-      const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
-      const command = args.shift().toLowerCase(); //gets command as a string from array
-      const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
-
-      //Check if command exists in the command file
-      if(commands[command]){
-        //If it does check if there are any arguments passed and if the command expects an argument
-        if(arguments.length > 0 && !commands[command].hasArguments){
-          await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
-        } else {
-          await commands[command].execute({message, arguments, nessie}); //Executes command
-          sendMixpanelEvent(message.author, message.channel, message.channel.guild, command, mixpanel, arguments); //Send tracking event to mixpanel
+        //Check if command exists in the command file
+        if(commands[command]){
+          //If it does check if there are any arguments passed and if the command expects an argument
+          if(arguments.length > 0 && !commands[command].hasArguments){
+            await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
+          } else {
+            await commands[command].execute({message, arguments, nessie, nessiePrefix}); //Executes command
+            sendMixpanelEvent(message.author, message.channel, message.channel.guild, command, mixpanel, arguments); //Send tracking event to mixpanel
+          }
         }
       }
+    } catch(e){
+      console.log(e);
     }
-  } catch(e){
-    console.log(e);
-  }
+  })
 })
 //TODO: Maybe move these functions in their separate files at some point
 

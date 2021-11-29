@@ -1,15 +1,13 @@
-const { defaultPrefix } = require('../../config/nessie.json');
-
 module.exports = {
   name: 'help',
   description: 'directory hub of commands',
   hasArguments: false,
-  execute({message}) {
+  execute({message, nessiePrefix}) {
     const embed = {
       color: 3447003,
       description:
         'Below you can see all the commands that I know!\n\nMy current prefix is `' +
-        defaultPrefix +
+        nessiePrefix +
         '`',
       fields: [
         {
@@ -18,7 +16,7 @@ module.exports = {
         },
         {
           name: 'Information',
-          value: '`info`, `help`, `prefix`, `invite`'
+          value: '`info`, `help`, `prefix`, `setprefix`, `invite`'
         }
       ]
     };

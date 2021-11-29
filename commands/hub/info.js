@@ -1,7 +1,6 @@
 const { format } = require('date-fns');
 const { version } = require('../../package.json');
 const grvAcnt = '`';
-const { defaultPrefix } = require('../../config/nessie.json');
 
 const sendInfoEmbed = ({message, nessie, prefix}) => {
   const embed = {
@@ -50,8 +49,8 @@ const sendInfoEmbed = ({message, nessie, prefix}) => {
 module.exports = {
   name: 'info',
   description: 'The story and information hub of nessie',
-  execute({message, nessie}) {
-    const prefix = defaultPrefix;
+  execute({message, nessie, nessiePrefix}) {
+    const prefix = nessiePrefix;
     sendInfoEmbed({message, nessie, prefix});
   }
 };

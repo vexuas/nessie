@@ -10,5 +10,6 @@ module.exports = {
   info: require('./commands/hub/info'),
   help: require('./commands/hub/help'),
   prefix: require('./commands/hub/prefix'),
-  invite: require('./commands/hub/invite')
+  setprefix: require('./commands/hub/setPrefix'),
+  invite: require('./commands/hub/invite'),
 }
