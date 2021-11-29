@@ -2,6 +2,7 @@ const { codeBlock } = require('../../helpers');
 const { Permissions } = require('discord.js');
 const sqlite = require('sqlite3').verbose();
 
+//Embed to show when sending information about setprefix
 const generateInfoEmbed = (prefix) => {
   const embed = {
     color: 3447003,
@@ -14,6 +15,7 @@ const generateInfoEmbed = (prefix) => {
   };
   return [embed];
 };
+//Embed to show after setting new custom prefix
 const generateSuccessEmbed = (newPrefix) => {
   const embed = {
     color: 3066993,
@@ -31,6 +33,12 @@ const generateSuccessEmbed = (newPrefix) => {
   }
   return [embed];
 }
+/**
+ * Embeds to show when user wrongly uses the command
+ * 'empty': when setting a new prefix is empty ``
+ * 'incorrect': when setting a new prefix without ``
+ * 'admin': when setting a new prefix when user is not an admin
+ */
 const generateErrorEmbed = (type, prefix) => {
   let embed = {
     color: 16711680,
@@ -62,12 +70,20 @@ module.exports = {
   description: "Sets nessie's prefix to a custom one",
   hasArguments: true,
   execute({message, arguments, nessiePrefix}) {
+    //When user only types setprefix; shows information about command
     if(!arguments){
       return message.channel.send({embeds: generateInfoEmbed(nessiePrefix)});
     }
+    //When user is not an admin; shows admin error message
     if(!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)){
       return message.channel.send({ embeds: generateErrorEmbed('admin', nessiePrefix)})
     }
+    /**
+     * If user sets the new prefix correctly with ``
+     * - if the number of arguments are exactly 2, send error empty message
+     * - if the number of arguments are more than 2, parse out grave accents and update guild prefix with new prefix in our database
+     * Else send incorrect error message
+     */
     if(arguments.startsWith("`") && arguments.endsWith("`") && arguments.length >= 2){
       if(arguments.length === 2){
         return message.channel.send({embeds: generateErrorEmbed('empty', nessiePrefix)});
