@@ -1,6 +1,4 @@
-//Reminder to add custom prefix before v3
-const { defaultPrefix } = require('../../config/nessie.json');
-const {codeBlock} = require('../../helpers');
+const { codeBlock } = require('../../helpers');
 const { Permissions } = require('discord.js');
 const sqlite = require('sqlite3').verbose();
 
