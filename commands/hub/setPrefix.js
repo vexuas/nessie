@@ -81,6 +81,7 @@ module.exports = {
         database.run(`UPDATE Guild SET prefix = "${newPrefix}" WHERE uuid = ${message.guildId}`, err => {
           if(err){
             console.log(err);
+            return message.channel.send('Oops something went wrong! Try again!'); //Maybe add link to support server here?
           }
           return message.channel.send({embeds: generateSuccessEmbed(newPrefix)});
         });
