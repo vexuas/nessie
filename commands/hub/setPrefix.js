@@ -1,5 +1,6 @@
 //Reminder to add custom prefix before v3
 const { defaultPrefix } = require('../../config/nessie.json');
+const {codeBlock} = require('../../helpers');
 
 const generateEmbed = (prefix) => {
   const embed = {
@@ -34,7 +35,8 @@ module.exports = {
         return message.channel.send('New prefix cannot be empty');
       }
       if(arguments.length > 2){
-        return message.channel.send('New prefix successfully set!');
+        const newPrefix = arguments.replace(/\`/g, '');
+        return message.channel.send('New prefix successfully set!' + ` ${codeBlock(newPrefix)}`);
       }
     } else {
       return message.channel.send('To set a new prefix, make sure to add your new prefix between ``')
