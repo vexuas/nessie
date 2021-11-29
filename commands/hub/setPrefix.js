@@ -3,21 +3,15 @@ const { defaultPrefix } = require('../../config/nessie.json');
 const {codeBlock} = require('../../helpers');
 const { Permissions } = require('discord.js');
 
-const generateEmbed = (prefix) => {
+const generateInfoEmbed = (prefix) => {
   const embed = {
     color: 3447003,
-    fields: [
-      {
-        name: 'Current Prefix',
-        value: prefix,
-        inline: true
-      },
-      {
-        name: 'Usage Example',
-        value: `${prefix}help`,
-        inline: true
-      }
-    ]
+    title: 'Custom Prefix',
+    description: 'To set a new prefix, add your new prefix between ``\n\nNote:\n1. Only users with Admin privileges can set a new custom prefix.\n2. Custom prefix cannot be empty.',
+    fields: [{
+      name: 'Example',
+      value: '```fix\n\n' + `${prefix}setprefix` +' `newPrefixHere`\n' + '```'
+    }],
   };
   return [embed];
 };
@@ -29,7 +23,7 @@ const generateErrorEmbed = (type, prefix) => {
     fields: [
       {
         name: 'Example',
-        value: '```fix\n\n' + `${prefix}setprefix` +' `newPrefix`\n' + '```'
+        value: '```fix\n\n' + `${prefix}setprefix` +' `newPrefixHere`\n' + '```'
       }
     ]
   }
@@ -52,9 +46,8 @@ module.exports = {
   description: "Sets nessie's prefix to a custom one",
   hasArguments: true,
   execute({message, arguments, nessiePrefix}) {
-    
     if(!arguments){
-      return message.channel.send('help embed go here');
+      return message.channel.send({embeds: generateInfoEmbed(nessiePrefix)});
     }
     if(!message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)){
       return message.channel.send({ embeds: generateErrorEmbed('admin', nessiePrefix)})
