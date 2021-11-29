@@ -1,3 +1,37 @@
+# v0.3.0 (Tue Nov 30 2021)
+
+### Release Notes
+
+#### Add custom prefix ([#28](https://github.com/vexuas/nessie/pull/28))
+
+Add custom prefix
+
+#### Post stats to topgg ([#27](https://github.com/vexuas/nessie/pull/27))
+
+Wire up posting of stats to top.gg
+
+#### Add storm point image ([#26](https://github.com/vexuas/nessie/pull/26))
+
+Add storm point image
+
+---
+
+#### 🚀 Enhancement
+
+- Add custom prefix [#28](https://github.com/vexuas/nessie/pull/28) ([@vexuas](https://github.com/vexuas))
+- Post stats to topgg [#27](https://github.com/vexuas/nessie/pull/27) ([@vexuas](https://github.com/vexuas))
+- Add storm point image [#26](https://github.com/vexuas/nessie/pull/26) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2021 10 22 [#25](https://github.com/vexuas/nessie/pull/25) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v0.2.2 (Fri Oct 22 2021)
 
 ### Release Notes
