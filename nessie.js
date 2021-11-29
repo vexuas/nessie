@@ -11,7 +11,7 @@ const { defaultPrefix, token, lochnessMixpanel, nessieMixpanel, topggToken } = r
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment } = require('./helpers');
+const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment, codeBlock } = require('./helpers');
 const { createGuildTable, insertNewGuild } = require('./database/guild-db');
 const { AutoPoster } = require('topgg-autoposter');
 let mixpanel;
@@ -103,7 +103,7 @@ nessie.on('messageCreate', async (message) => {
        */
       message.mentions.users.forEach((user) => {
         if(user === nessie.user){
-          return message.channel.send('My current prefix is ' + '`' + `${nessiePrefix}` + '`');
+          return message.channel.send('My current prefix is ' + '`' + `${nessiePrefix}` + '`' + '\nTo set a new custom prefix, type ' + ` ${codeBlock(`${nessiePrefix}setprefix`)}`);
         }
       });
       //Ignores messages without a prefix
