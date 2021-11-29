@@ -118,7 +118,7 @@ nessie.on('messageCreate', async (message) => {
           if(arguments.length > 0 && !commands[command].hasArguments){
             await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
           } else {
-            await commands[command].execute({message, arguments, nessie}); //Executes command
+            await commands[command].execute({message, arguments, nessie, nessiePrefix}); //Executes command
             sendMixpanelEvent(message.author, message.channel, message.channel.guild, command, mixpanel, arguments); //Send tracking event to mixpanel
           }
         }
