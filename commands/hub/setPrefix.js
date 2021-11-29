@@ -2,6 +2,7 @@
 const { defaultPrefix } = require('../../config/nessie.json');
 const {codeBlock} = require('../../helpers');
 const { Permissions } = require('discord.js');
+const sqlite = require('sqlite3').verbose();
 
 const generateInfoEmbed = (prefix) => {
   const embed = {
@@ -58,7 +59,14 @@ module.exports = {
       }
       if(arguments.length > 2){
         const newPrefix = arguments.replace(/\`/g, '');
-        return message.channel.send('New prefix successfully set!' + ` ${codeBlock(newPrefix)}`);
+        let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE);
+
+        database.run(`UPDATE Guild SET prefix = "${newPrefix}" WHERE uuid = ${message.guildId}`, err => {
+          if(err){
+            console.log(err);
+          }
+          return message.channel.send('New prefix successfully set!' + ` ${codeBlock(newPrefix)}`);
+        });
       }
     } else {
       return message.channel.send({embeds: generateErrorEmbed('incorrect', nessiePrefix)})
