@@ -9,7 +9,7 @@ const { format } = require('date-fns');
  */
 const sendHealthLog = (data, channel, isAccurate) => {
   const utcStart = new Date(data.current.readableDate_start);
-  const sgtStart = new Date(utcStart.getTime() + 28800000)
+  const sgtStart = new Date(utcStart.getTime() + 28800000);
   const utcEnd = new Date(data.current.readableDate_end);
   const sgtEnd = new Date(utcEnd.getTime() + 28800000);
 
@@ -18,8 +18,7 @@ const sendHealthLog = (data, channel, isAccurate) => {
     description: 'Requested data from API',
     color: isAccurate ? 3066993 : 16776960,
     thumbnail: {
-      url:
-        'https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png'
+      url: 'https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png',
     },
     fields: [
       {
@@ -32,7 +31,7 @@ const sendHealthLog = (data, channel, isAccurate) => {
       },
       {
         name: 'Time left',
-        value: codeBlock(`${data.current.remainingTimer} | ${data.current.remainingSecs} secs`)
+        value: codeBlock(`${data.current.remainingTimer} | ${data.current.remainingSecs} secs`),
       },
       {
         name: 'Requested At',
@@ -40,31 +39,28 @@ const sendHealthLog = (data, channel, isAccurate) => {
       },
       {
         name: 'Accurate',
-        value: isAccurate ? 'Yes' : 'No'
-      }
-    ]
-  }
-  isAccurate ? channel.send({ embeds: [embed] }) : channel.send({ content: '<@183444648360935424>', embeds: [embed] });
-  
-}
+        value: isAccurate ? 'Yes' : 'No',
+      },
+    ],
+  };
+  isAccurate
+    ? channel.send({ embeds: [embed] })
+    : channel.send({ content: '<@183444648360935424>', embeds: [embed] });
+};
 //----------
 /**
  * Function to create a text into a discord code block
  * @param text - text to transform
  */
- const codeBlock = (text) => {
-  return "`" + text + "`";
-}
+const codeBlock = (text) => {
+  return '`' + text + '`';
+};
 //----------
 /**
  * Server Embed for when bot joining and leaving a server
  * Add iconURL logic to always return a png extension
  */
-const serverEmbed = async (
-  client,
-  guild,
-  status
-) => {
+const serverEmbed = async (client, guild, status) => {
   let embedTitle;
   let embedColor;
   const defaultIcon =
@@ -88,19 +84,22 @@ const serverEmbed = async (
       {
         name: 'Name',
         value: guild.name,
-        inline: true
+        inline: true,
       },
       {
         name: 'Owner',
-        value: status === 'join' ? await guild.members.fetch(guild.ownerId).then(guildMember => guildMember.user.tag) : '-',
-        inline: true
+        value:
+          status === 'join'
+            ? await guild.members.fetch(guild.ownerId).then((guildMember) => guildMember.user.tag)
+            : '-',
+        inline: true,
       },
       {
         name: 'Members',
         value: `${guild.memberCount}`,
-        inline: true
-      }
-    ]
+        inline: true,
+      },
+    ],
   };
   return [embed];
 };
@@ -116,28 +115,30 @@ const sendGuildUpdateNotification = async (client, guild, type) => {
   const embed = await serverEmbed(client, guild, type);
   const channelId = checkIfInDevelopment(client) ? '889212328539725824' : '896710863459844136';
   const channelToSend = client.channels.cache.get(channelId);
-  
+
   channelToSend.send({ embeds: embed });
-  if(!checkIfInDevelopment(client)){
+  if (!checkIfInDevelopment(client)) {
     channelToSend.setTopic(`Servers: ${client.guilds.cache.size}`);
   }
-}
+};
 //----------
 /**
  * As I use Lochness for development and testing of new features, it is a bit annoying to clear testing notifications from channels that Nessie stores data in
- * This comes from hardcoding channels to log data in the event handlers. 
+ * This comes from hardcoding channels to log data in the event handlers.
  * To avoid dirtying the data and cluttering production channels, this function determines if the client is Bisolen and is being used for development
+ * *** Updating to use Shizuka Test for all bot development needs ***
  * Lochness ID - 889208189017538572
  * Nessie ID - 889135055430111252
+ * Shizuka Test ID - 929421200797626388
  */
- const checkIfInDevelopment = (client) => {
-  return client.user.id === '889208189017538572'; //Lochnesss' id (Development Bot)
-}
+const checkIfInDevelopment = (client) => {
+  return client.user.id === '929421200797626388'; //Lochnesss' id (Development Bot)
+};
 //----------
 module.exports = {
   checkIfInDevelopment,
   sendGuildUpdateNotification,
   serverEmbed,
   codeBlock,
-  sendHealthLog
-}
+  sendHealthLog,
+};
