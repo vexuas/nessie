@@ -7,13 +7,15 @@ const Discord = require('discord.js');
 const Mixpanel = require('mixpanel');
 const sqlite = require('sqlite3').verbose();
 const nessie = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING]});
-const { token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./config/nessie.json'); //Get config data from config folder
+const { token, lochnessMixpanel, nessieMixpanel, topggToken, guildIDs } = require('./config/nessie.json'); //Get config data from config folder
 const commands = require('./commands'); //Get list of commands
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
 const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment, codeBlock } = require('./helpers');
 const { createGuildTable, insertNewGuild } = require('./database/guild-db');
 const { AutoPoster } = require('topgg-autoposter');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 let mixpanel;
 
 //----------
@@ -32,6 +34,7 @@ initialize();
  * Event handler that fires once when nessie boots up and succesfully logs in
  */
 nessie.once('ready', async () => {
+  await registerApplicationCommands();
   try {
     const testChannel = nessie.channels.cache.get('889212328539725824');
     const logChannel = nessie.channels.cache.get('899620845436141609');
@@ -63,7 +66,7 @@ nessie.once('ready', async () => {
  * guildDelete - called when Nessie is kicked from server
  * More information about each function in their relevant database files
  */
- nessie.on('guildCreate', (guild) => {
+nessie.on('guildCreate', (guild) => {
   try {
     insertNewGuild(guild);
     sendGuildUpdateNotification(nessie, guild, 'join');
@@ -141,7 +144,7 @@ const createNessieDatabase = () => {
  * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
  * Inside the interval function we can then properly get the current timer and update accordingly
  */
- const setCurrentMapStatus = (data, channel) => {
+const setCurrentMapStatus = (data, channel) => {
   const fiveSecondsBuffer = 5000;
   let currentBrPubsData = data;
   let currentTimer = data.current.remainingSecs*1000 + fiveSecondsBuffer;
@@ -173,10 +176,20 @@ const createNessieDatabase = () => {
  * More stuff here when auto notifications gets developed
  * @param guild - guild in which nessie was kicked in
  */
- const removeServerDataFromNessie = (guild) => {
+const removeServerDataFromNessie = (guild) => {
   let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
   database.serialize(() => {
     database.run(`DELETE FROM Guild WHERE uuid = "${guild.id}"`);
     sendGuildUpdateNotification(nessie, guild, 'leave');
   })
+}
+const registerApplicationCommands = async () => {
+  const commandList = Object.keys(commands).map((key) => commands[key].data).filter(command => command).map(command => command.toJSON());
+  const rest = new REST({version: '9'}).setToken(token);
+  try {
+    await rest.put(Routes.applicationGuildCommands("929421200797626388", guildIDs), { body: commandList });
+    console.log('Successfully registered application commands');
+  } catch(e){
+    console.log(e);
+  }
 }
