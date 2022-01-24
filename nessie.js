@@ -130,7 +130,16 @@ nessie.on('messageCreate', async (message) => {
       console.log(e);
     }
   })
-})
+});
+
+nessie.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+  const { commandName } = interaction
+  await commands[commandName].execute({interaction, nessie});
+});
+
+
+
 //TODO: Maybe move these functions in their separate files at some point
 
 //Creates Nessie Database under database folder
