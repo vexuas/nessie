@@ -49,7 +49,7 @@ const sendAboutEmbed = ({ nessie, interaction }) => {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('about')
-    .setDescription('The story and information hub of nessie'),
+    .setDescription('Displays information about Nessie'),
   execute({ nessie, interaction }) {
     sendAboutEmbed({ nessie, interaction });
   },

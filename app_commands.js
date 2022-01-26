@@ -8,4 +8,5 @@
 module.exports = {
   //Hub
   about: require('./app_commands/hub/about'),
+  help: require('./app_commands/hub/help'),
 };
