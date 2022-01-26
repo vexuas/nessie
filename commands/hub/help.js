@@ -2,7 +2,7 @@ module.exports = {
   name: 'help',
   description: 'directory hub of commands',
   hasArguments: false,
-  execute({message, nessiePrefix}) {
+  execute({ message, nessiePrefix }) {
     const embed = {
       color: 3447003,
       description:
@@ -12,14 +12,14 @@ module.exports = {
       fields: [
         {
           name: 'Maps',
-          value: '`br`, `br ranked`, `arenas`, `arenas ranked`'
+          value: '`br`, `br ranked`, `arenas`, `arenas ranked`',
         },
         {
           name: 'Information',
-          value: '`info`, `help`, `prefix`, `setprefix`, `invite`'
-        }
-      ]
+          value: '`about`, `help`, `prefix`, `setprefix`, `invite`',
+        },
+      ],
     };
     return message.channel.send({ embeds: [embed] });
-  }
+  },
 };
