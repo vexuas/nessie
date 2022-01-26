@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const sendInfoEmbed = ({ message, nessie, prefix, interaction }) => {
+const sendAboutEmbed = ({ nessie, prefix, interaction }) => {
   const embed = {
-    title: 'Info',
-    description: `Hi there! I'm Nessie and I provide information about map rotations in Apex Legends! In my final form, I want to be able to automatically notify you which maps you want to play are currently active!\n\nCurrent version: No notifications yet but you can manually check the current map rotation with my commands! I also display the current br pubs map as my activity status. And custom prefixes!\n\nMy current prefix  is ${grvAcnt}${prefix}${grvAcnt} | For a detailed list of my commands, type ${grvAcnt}${prefix}help${grvAcnt}`, //Removed users for now
+    title: 'About',
+    description: `Hi there! I'm Nessie and I provide information about map rotations in Apex Legends! In my final form, I want to be able to automatically notify you which maps you want to play are currently active!\n\nCurrent version: No notifications yet but you can manually check the current map rotation with my commands! I also display the current br pubs map as my activity status\n\nFor a detailed list of my commands, use the help command!`,
     color: 3447003,
     thumbnail: {
       url: 'https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png',
@@ -41,19 +41,14 @@ const sendInfoEmbed = ({ message, nessie, prefix, interaction }) => {
       },
     ],
   };
-  return interaction
-    ? interaction.reply({ embeds: [embed] })
-    : message.channel.send({ embeds: [embed] });
+  return interaction.reply({ embeds: [embed] });
 };
 
 module.exports = {
-  name: 'info',
-  description: 'The story and information hub of nessie',
   data: new SlashCommandBuilder()
     .setName('info')
     .setDescription('The story and information hub of nessie'),
-  execute({ message, nessie, nessiePrefix, interaction }) {
-    const prefix = nessiePrefix;
-    sendInfoEmbed({ message, nessie, prefix, interaction });
+  execute({ nessie, interaction }) {
+    sendAboutEmbed({ message, nessie, prefix, interaction });
   },
 };

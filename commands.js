@@ -12,4 +12,4 @@ module.exports = {
   prefix: require('./commands/hub/prefix'),
   setprefix: require('./commands/hub/setPrefix'),
   invite: require('./commands/hub/invite'),
-}
+};
