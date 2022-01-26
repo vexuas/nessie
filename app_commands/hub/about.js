@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { format } = require('date-fns');
+const { version } = require('../../package.json');
 
-const sendAboutEmbed = ({ nessie, prefix, interaction }) => {
+const sendAboutEmbed = ({ nessie, interaction }) => {
   const embed = {
     title: 'About',
     description: `Hi there! I'm Nessie and I provide information about map rotations in Apex Legends! In my final form, I want to be able to automatically notify you which maps you want to play are currently active!\n\nCurrent version: No notifications yet but you can manually check the current map rotation with my commands! I also display the current br pubs map as my activity status\n\nFor a detailed list of my commands, use the help command!`,
@@ -46,9 +48,9 @@ const sendAboutEmbed = ({ nessie, prefix, interaction }) => {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('info')
+    .setName('about')
     .setDescription('The story and information hub of nessie'),
   execute({ nessie, interaction }) {
-    sendAboutEmbed({ message, nessie, prefix, interaction });
+    sendAboutEmbed({ nessie, interaction });
   },
 };
