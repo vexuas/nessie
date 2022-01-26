@@ -1,8 +1,6 @@
-const { format } = require('date-fns');
-const { version } = require('../../package.json');
-const grvAcnt = '`';
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const sendInfoEmbed = ({ message, nessie, prefix }) => {
+const sendInfoEmbed = ({ message, nessie, prefix, interaction }) => {
   const embed = {
     title: 'Info',
     description: `Hi there! I'm Nessie and I provide information about map rotations in Apex Legends! In my final form, I want to be able to automatically notify you which maps you want to play are currently active!\n\nCurrent version: No notifications yet but you can manually check the current map rotation with my commands! I also display the current br pubs map as my activity status. And custom prefixes!\n\nMy current prefix  is ${grvAcnt}${prefix}${grvAcnt} | For a detailed list of my commands, type ${grvAcnt}${prefix}help${grvAcnt}`, //Removed users for now
@@ -43,14 +41,19 @@ const sendInfoEmbed = ({ message, nessie, prefix }) => {
       },
     ],
   };
-  return message.channel.send({ embeds: [embed] });
+  return interaction
+    ? interaction.reply({ embeds: [embed] })
+    : message.channel.send({ embeds: [embed] });
 };
 
 module.exports = {
   name: 'info',
   description: 'The story and information hub of nessie',
-  execute({ message, nessie, nessiePrefix }) {
+  data: new SlashCommandBuilder()
+    .setName('info')
+    .setDescription('The story and information hub of nessie'),
+  execute({ message, nessie, nessiePrefix, interaction }) {
     const prefix = nessiePrefix;
-    sendInfoEmbed({ message, nessie, prefix });
+    sendInfoEmbed({ message, nessie, prefix, interaction });
   },
 };
