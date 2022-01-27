@@ -1,6 +1,6 @@
 module.exports = {
   name: 'help',
-  description: 'directory hub of commands',
+  description: 'directory of commands',
   hasArguments: false,
   execute({ message, nessiePrefix }) {
     const embed = {

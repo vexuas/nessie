@@ -8,4 +8,9 @@
 module.exports = {
   //Hub
   about: require('./app_commands/hub/about'),
+  help: require('./app_commands/hub/help'),
+  invite: require('./app_commands/hub/invite'),
+  // Maps
+  br: require('./app_commands/maps/battle-royale'),
+  arenas: require('./app_commands/maps/arenas'),
 };

@@ -167,7 +167,7 @@ nessie.on('messageCreate', async (message) => {
 nessie.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
   const { commandName } = interaction;
-  await appCommands[commandName].execute({ interaction, nessie });
+  return await appCommands[commandName].execute({ interaction, nessie });
 });
 
 //TODO: Maybe move these functions in their separate files at some point
