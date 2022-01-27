@@ -10,4 +10,6 @@ module.exports = {
   about: require('./app_commands/hub/about'),
   help: require('./app_commands/hub/help'),
   invite: require('./app_commands/hub/invite'),
+  // Maps
+  br: require('./app_commands/maps/battle-royale'),
 };

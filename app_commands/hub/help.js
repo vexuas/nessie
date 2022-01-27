@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
   data: new SlashCommandBuilder().setName('help').setDescription('Directory hub of commands'),
-  execute({ interaction }) {
+  async execute({ interaction }) {
     const embed = {
       color: 3447003,
       description: 'Below you can see all the commands that I know!',
@@ -17,6 +17,6 @@ module.exports = {
         },
       ],
     };
-    return interaction.reply({ embeds: [embed] });
+    return await interaction.reply({ embeds: [embed] });
   },
 };
