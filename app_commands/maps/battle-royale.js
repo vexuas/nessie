@@ -110,16 +110,16 @@ module.exports = {
         .addChoice('pubs', 'br_pubs')
         .addChoice('ranked', 'br_ranked')
     ),
+  /**
+   * Send correct game mode map information based on user option
+   * We want to defer interaction as discord invalidates token after 3 seconds and we're retrieving our data through the api
+   * This is pretty cool as discord will treat it as a normal response and we can do whatever we want with it within 15 minutes
+   * which is editing the reply with the relevant information after the promise resolves
+   **/
   async execute({ interaction }) {
     let data;
     let embed;
     try {
-      /**
-       * Send correct game mode map information based on user option
-       * We want to defer interaction as discord invalidates token after 3 seconds and we're retrieving our data through the api
-       * This is pretty cool as discord will treat it as a normal response and we can do whatever we want with it within 15 minutes
-       * which is editing the reply with the relevant information after the promise resolves
-       **/
       await interaction.deferReply();
       const optionMode = interaction.options.getString('mode');
       switch (optionMode) {
@@ -133,6 +133,8 @@ module.exports = {
           break;
       }
       return await interaction.editReply({ embeds: embed });
-    } catch (e) {}
+    } catch (e) {
+      console.log(e); //Add proper error handling someday
+    }
   },
 };

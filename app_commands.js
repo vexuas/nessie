@@ -12,4 +12,5 @@ module.exports = {
   invite: require('./app_commands/hub/invite'),
   // Maps
   br: require('./app_commands/maps/battle-royale'),
+  arenas: require('./app_commands/maps/arenas'),
 };
