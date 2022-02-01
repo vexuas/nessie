@@ -7,10 +7,10 @@
  */
 module.exports = {
   //Hub
-  about: require('./app_commands/hub/about'),
-  help: require('./app_commands/hub/help'),
-  invite: require('./app_commands/hub/invite'),
+  about: require('./commands/hub/_about'),
+  help: require('./commands/hub/_help'),
+  invite: require('./commands/hub/_invite'),
   // Maps
-  br: require('./app_commands/maps/battle-royale'),
-  arenas: require('./app_commands/maps/arenas'),
+  br: require('./commands/maps/_battle-royale'),
+  arenas: require('./commands/maps/_arenas'),
 };
