@@ -10,7 +10,11 @@ const { guildIDs, token } = require('./config/nessie.json');
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
 const { sendHealthLog, sendGuildUpdateNotification, codeBlock } = require('./helpers');
-const { createGuildTable, insertNewGuild } = require('./database/guild-db');
+const {
+  createGuildTable,
+  insertNewGuild,
+  migrateToUseApplicationCommands,
+} = require('./database/guild-db');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getPrefixCommands, getApplicationCommands } = require('./commands');
@@ -36,6 +40,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        */
       const nessieDatabase = createNessieDatabase();
       createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
+      migrateToUseApplicationCommands(nessieDatabase);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information
@@ -86,6 +91,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       if (error) {
         console.log(error);
       }
+      if (row.use_prefix === 0) return;
       const nessiePrefix = row.prefix;
 
       //Refactor this into its own function and pass as a callback for better readability in the future
@@ -182,7 +188,7 @@ const setCurrentMapStatus = (data, channel) => {
   setTimeout(intervalRequest, currentTimer); //Start initial timer
 };
 /**
- * Function to delete all the relevant data in our database when yagi is removed from a server
+ * Function to delete all the relevant data in our database when nessie is removed from a server
  * Removes:
  * Guild
  * More stuff here when auto notifications gets developed
