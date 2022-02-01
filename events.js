@@ -91,6 +91,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       if (error) {
         console.log(error);
       }
+      if (row.use_prefix === 0) return;
       const nessiePrefix = row.prefix;
 
       //Refactor this into its own function and pass as a callback for better readability in the future

@@ -53,13 +53,14 @@ exports.createGuildTable = (database, guilds, client) => {
 exports.insertNewGuild = (guild) => {
   let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE);
   database.run(
-    'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix) VALUES ($uuid, $name, $member_count, $owner_id, $prefix)',
+    'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($uuid, $name, $member_count, $owner_id, $prefix, $use_prefix)',
     {
       $uuid: guild.id,
       $name: guild.name,
       $member_count: guild.memberCount,
       $owner_id: guild.ownerId,
       $prefix: defaultPrefix,
+      $use_prefix: false,
     },
     (err) => {
       if (err) {
