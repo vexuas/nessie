@@ -188,7 +188,7 @@ const setCurrentMapStatus = (data, channel) => {
   setTimeout(intervalRequest, currentTimer); //Start initial timer
 };
 /**
- * Function to delete all the relevant data in our database when yagi is removed from a server
+ * Function to delete all the relevant data in our database when nessie is removed from a server
  * Removes:
  * Guild
  * More stuff here when auto notifications gets developed

@@ -3,11 +3,11 @@ const { sendGuildUpdateNotification } = require('../helpers');
 const { defaultPrefix } = require('../config/nessie.json');
 
 /**
- * Creates Guild table inside the Yagi Database
+ * Creates Guild table inside the Nessie Database
  * Gets called in the client.once("ready") hook
- * @param database - yagi database
- * @param guilds - guilds that yagi is in
- * @param client - yagi client
+ * @param database - nessie database
+ * @param guilds - guilds that nessie is in
+ * @param client - nessie client
  */
 exports.createGuildTable = (database, guilds, client) => {
   //Wrapped in a serialize to ensure that each method is called in order which its initialised
@@ -48,7 +48,7 @@ exports.createGuildTable = (database, guilds, client) => {
 };
 /**
  * Adds new guild to Guild table
- * @param guild - guild that yagi is newly invited in
+ * @param guild - guild that nessie is newly invited in
  */
 exports.insertNewGuild = (guild) => {
   let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE);
@@ -69,7 +69,16 @@ exports.insertNewGuild = (guild) => {
     }
   );
 };
-
+/**
+ * Script to migrate existing database table to have a new use_prefix column
+ * This is so the transition of using application commands for users is easier
+ * Guilds that joined after v1.0.0 will only be able to use application commands
+ * While existing guilds prior to that will be able to use prefix commands and app commands; until april 29 that is
+ * To be able to distinguish between the two, this script will create a new table with a new use_prefix column based on the data from existing guilds
+ * Then by using the use_prefix value, we'll be able to constrain guilds
+ * TODO: Since this is a one-time use, probably best to remove this after v1.0.0 is deployed
+ * @param database - nessie database
+ */
 exports.migrateToUseApplicationCommands = (database) => {
   database.get(
     'SELECT name FROM sqlite_master WHERE type="table" AND name="OldGuild"',
