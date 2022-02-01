@@ -10,7 +10,11 @@ const { guildIDs, token } = require('./config/nessie.json');
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
 const { sendHealthLog, sendGuildUpdateNotification, codeBlock } = require('./helpers');
-const { createGuildTable, insertNewGuild } = require('./database/guild-db');
+const {
+  createGuildTable,
+  insertNewGuild,
+  migrateToUseApplicationCommands,
+} = require('./database/guild-db');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getPrefixCommands, getApplicationCommands } = require('./commands');
@@ -36,6 +40,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        */
       const nessieDatabase = createNessieDatabase();
       createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
+      migrateToUseApplicationCommands(nessieDatabase);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information
