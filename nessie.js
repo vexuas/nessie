@@ -20,8 +20,7 @@ const {
   topggToken,
   guildIDs,
 } = require('./config/nessie.json'); //Get config data from config folder
-const commands = require('./commands'); //Get list of commands
-const appCommands = require('./app_commands'); //Get list of application commands
+const { getPrefixCommands, getApplicationCommands } = require('./commands');
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
 const {
@@ -35,6 +34,8 @@ const { AutoPoster } = require('topgg-autoposter');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 let mixpanel;
+let commands;
+let appCommands;
 
 //----------
 /**
@@ -45,6 +46,8 @@ const initialize = async () => {
   await nessie.login(token);
   mixpanel = Mixpanel.init(checkIfInDevelopment(nessie) ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
   !checkIfInDevelopment(nessie) && AutoPoster(topggToken, nessie); //Check if this is a one time thing per reboot or it actually auto posts when stats change
+  commands = getPrefixCommands(); //Get list of commands
+  appCommands = getApplicationCommands(); //Get list of application commands
 };
 initialize();
 //------
