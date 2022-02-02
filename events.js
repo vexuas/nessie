@@ -145,7 +145,16 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   nessie.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
     const { commandName } = interaction;
-    return await appCommands[commandName].execute({ interaction, nessie });
+    await appCommands[commandName].execute({ interaction, nessie });
+    sendMixpanelEvent(
+      interaction.user,
+      interaction.channel,
+      interaction.guild,
+      commandName,
+      mixpanel,
+      null,
+      true
+    );
   });
 };
 
