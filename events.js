@@ -71,7 +71,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   });
   nessie.on('guildDelete', (guild) => {
     try {
-      removeServerDataFromNessie(guild);
+      removeServerDataFromNessie(nessie, guild);
     } catch (e) {
       console.log(e); // Add proper handling
     }
@@ -195,7 +195,7 @@ const setCurrentMapStatus = (data, channel, nessie) => {
  * More stuff here when auto notifications gets developed
  * @param guild - guild in which nessie was kicked in
  */
-const removeServerDataFromNessie = (guild) => {
+const removeServerDataFromNessie = (nessie, guild) => {
   let database = new sqlite.Database(
     './database/nessie.db',
     sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE
