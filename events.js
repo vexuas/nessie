@@ -48,7 +48,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
       nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
       sendHealthLog(brPubsData, logChannel, true); //For logging purpose
-      setCurrentMapStatus(brPubsData, logChannel); //Calls status display function
+      setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
     } catch (e) {
       console.log(e); //Add proper error handling
     }
@@ -162,7 +162,7 @@ const createNessieDatabase = () => {
  * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
  * Inside the interval function we can then properly get the current timer and update accordingly
  */
-const setCurrentMapStatus = (data, channel) => {
+const setCurrentMapStatus = (data, channel, nessie) => {
   const fiveSecondsBuffer = 5000;
   let currentBrPubsData = data;
   let currentTimer = data.current.remainingSecs * 1000 + fiveSecondsBuffer;
@@ -182,6 +182,7 @@ const setCurrentMapStatus = (data, channel) => {
       sendHealthLog(updatedBrPubsData, channel, isAccurate);
       setTimeout(intervalRequest, currentTimer);
     } catch (e) {
+      console.log(e);
       channel.send('<@183444648360935424> WHOOPS SOMETHING WENT WRONG');
     }
   };
