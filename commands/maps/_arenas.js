@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getArenasPubs, getArenasRanked } = require('../../adapters');
 const { sendErrorLog, generateErrorEmbed } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
+const { sendMixpanelEvent } = require('../../analytics');
 
 /**
  * Display the time left in a more aethestically manner
@@ -96,7 +97,7 @@ module.exports = {
    * This is pretty cool as discord will treat it as a normal response and we can do whatever we want with it within 15 minutes
    * which is editing the reply with the relevant information after the promise resolves
    **/
-  async execute({ nessie, interaction }) {
+  async execute({ nessie, interaction, mixpanel }) {
     let data;
     let embed;
     try {
@@ -112,7 +113,16 @@ module.exports = {
           embed = generateRankedEmbed(data);
           break;
       }
-      return await interaction.editReply({ embeds: embed });
+      await interaction.editReply({ embeds: embed });
+      sendMixpanelEvent(
+        interaction.user,
+        interaction.channel,
+        interaction.guild,
+        'arenas',
+        mixpanel,
+        optionMode,
+        true
+      );
     } catch (error) {
       const uuid = uuidv4();
       const type = 'Battle Royale';

@@ -145,16 +145,18 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   nessie.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
     const { commandName } = interaction;
-    await appCommands[commandName].execute({ interaction, nessie });
-    sendMixpanelEvent(
-      interaction.user,
-      interaction.channel,
-      interaction.guild,
-      commandName,
-      mixpanel,
-      null,
-      true
-    );
+    await appCommands[commandName].execute({ interaction, nessie, mixpanel });
+    if (commandName !== 'br' && commandName !== 'arenas') {
+      sendMixpanelEvent(
+        interaction.user,
+        interaction.channel,
+        interaction.guild,
+        commandName,
+        mixpanel,
+        null,
+        true
+      );
+    }
   });
 };
 
