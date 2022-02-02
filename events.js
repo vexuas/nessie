@@ -71,7 +71,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   });
   nessie.on('guildDelete', (guild) => {
     try {
-      removeServerDataFromNessie(guild);
+      removeServerDataFromNessie(nessie, guild);
     } catch (e) {
       console.log(e); // Add proper handling
     }
@@ -145,7 +145,25 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   nessie.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
     const { commandName } = interaction;
-    return await appCommands[commandName].execute({ interaction, nessie });
+    await appCommands[commandName].execute({ interaction, nessie, mixpanel });
+    /**
+     * Send event information to mixpanel for application commands
+     * This is for general commands that do not require arguments
+     * We can't do this here as we can only get the options within the command execution itself
+     * Hence, we have a separate handler for these commands in their own files instead of here
+     * TODO: Refactor conditional in the future, probably a better way to check since this isn't scalable
+     */
+    if (commandName !== 'br' && commandName !== 'arenas') {
+      sendMixpanelEvent(
+        interaction.user,
+        interaction.channel,
+        interaction.guild,
+        commandName,
+        mixpanel,
+        null,
+        true
+      );
+    }
   });
 };
 
@@ -195,7 +213,7 @@ const setCurrentMapStatus = (data, channel, nessie) => {
  * More stuff here when auto notifications gets developed
  * @param guild - guild in which nessie was kicked in
  */
-const removeServerDataFromNessie = (guild) => {
+const removeServerDataFromNessie = (nessie, guild) => {
   let database = new sqlite.Database(
     './database/nessie.db',
     sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE
