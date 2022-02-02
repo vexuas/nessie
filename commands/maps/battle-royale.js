@@ -1,4 +1,5 @@
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
+const { sendErrorLog } = require('../../helpers');
 
 /**
  * Gets url link image for each br map
@@ -6,7 +7,7 @@ const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters')
  * Currently hosted scuffly in discord itself; might want to think of hosting it in cloudfront in the future
  */
 const getMapUrl = (map) => {
-  switch(map){
+  switch (map) {
     case 'kings_canyon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
     case 'Kings Canyon':
@@ -22,11 +23,11 @@ const getMapUrl = (map) => {
     case 'Storm Point':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
     case 'storm_point_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';  
+      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
     default:
       return '';
   }
-}
+};
 /**
  * Display the time left in a more aethestically manner
  * API returns in the form hr:min:sec (01:02:03)
@@ -37,7 +38,7 @@ const getCountdown = (timer) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
   return `${isOverAnHour ? `${countdown[0]} hr ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
-}
+};
 /**
  * Embed design for BR Pubs
  * Added a hack to display the time for next map regardless of timezone
@@ -46,78 +47,81 @@ const getCountdown = (timer) => {
  */
 const generatePubsEmbed = (data) => {
   const embedData = {
-    title : "Battle Royale | Pubs",
-    color : 3066993,
+    title: 'Battle Royale | Pubs',
+    color: 3066993,
     image: {
-      url: getMapUrl(data.current.code)
+      url: getMapUrl(data.current.code),
     },
-    timestamp: Date.now() + data.current.remainingSecs*1000,
+    timestamp: Date.now() + data.current.remainingSecs * 1000,
     footer: {
-      text: `Next Map: ${data.next.map}`
+      text: `Next Map: ${data.next.map}`,
     },
     fields: [
       {
-        name: "Current map",
-        value: "```fix\n\n" + data.current.map + "```",
-        inline: true
+        name: 'Current map',
+        value: '```fix\n\n' + data.current.map + '```',
+        inline: true,
       },
       {
-        name: "Time left",
-        value: "```xl\n\n" + getCountdown(data.current.remainingTimer) + "```",
-        inline: true
+        name: 'Time left',
+        value: '```xl\n\n' + getCountdown(data.current.remainingTimer) + '```',
+        inline: true,
       },
-    ]
+    ],
   };
   return [embedData];
-}
+};
 /**
  * Embed design for BR Ranked
  * Fairly simple, don't need any fancy timers and footers
  */
- const generateRankedEmbed = (data) => {
+const generateRankedEmbed = (data) => {
   const embedData = {
-    title : "Battle Royale | Ranked",
-    color : 7419530,
+    title: 'Battle Royale | Ranked',
+    color: 7419530,
     image: {
-      url: getMapUrl(data.current.map)
+      url: getMapUrl(data.current.map),
     },
     fields: [
       {
-        name: "Current map",
-        value: "```fix\n\n" + data.current.map + "```",
-        inline: true
+        name: 'Current map',
+        value: '```fix\n\n' + data.current.map + '```',
+        inline: true,
       },
       {
-        name: "Time left",
-        value: "```xl\n\nRunning till end of split```",
-        inline: true
-      }
-    ]
+        name: 'Time left',
+        value: '```xl\n\nRunning till end of split```',
+        inline: true,
+      },
+    ],
   };
   return [embedData];
-}
+};
 
 module.exports = {
   name: 'br',
   description: 'Shows currrent map rotation for battle royale mode',
   hasArguments: true,
-  async execute({message, arguments}){
+  async execute({ nessie, message, arguments }) {
     message.channel.sendTyping();
     try {
-      if(!arguments){
+      throw new Error('Test Error');
+      if (!arguments) {
         const data = await getBattleRoyalePubs();
         const embedToSend = generatePubsEmbed(data);
         return message.channel.send({ embeds: embedToSend });
-      } else{
-        if(arguments === 'ranked'){
+      } else {
+        if (arguments === 'ranked') {
           const data = await getBattleRoyaleRanked();
           const embedToSend = generateRankedEmbed(data);
           return message.channel.send({ embeds: embedToSend });
         }
         return message.channel.send("I don't understand that argument （・□・；）");
       }
-    } catch(e){
-      console.log(e); //Add proper error handling someday
+    } catch (error) {
+      console.log(error); //Add proper error handling someday
+      const type = 'Battle Royale';
+      await sendErrorLog({ nessie, error, type, message });
     }
-  }
-}
+  },
+};

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
+const { sendErrorLog } = require('../../helpers');
 
 /**
  * Gets url link image for each br map
@@ -116,10 +117,11 @@ module.exports = {
    * This is pretty cool as discord will treat it as a normal response and we can do whatever we want with it within 15 minutes
    * which is editing the reply with the relevant information after the promise resolves
    **/
-  async execute({ interaction }) {
+  async execute({ nessie, interaction }) {
     let data;
     let embed;
     try {
+      throw new Error('Test Error');
       await interaction.deferReply();
       const optionMode = interaction.options.getString('mode');
       switch (optionMode) {
@@ -133,8 +135,10 @@ module.exports = {
           break;
       }
       return await interaction.editReply({ embeds: embed });
-    } catch (e) {
-      console.log(e); //Add proper error handling someday
+    } catch (error) {
+      const type = 'Battle Royale';
+      console.log(error); //Add proper error handling someday
+      sendErrorLog({ nessie, error, interaction, type });
     }
   },
 };
