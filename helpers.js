@@ -134,11 +134,80 @@ const sendGuildUpdateNotification = async (client, guild, type) => {
 const checkIfInDevelopment = (client) => {
   return client.user.id === '929421200797626388'; //Lochnesss' id (Development Bot)
 };
+//---------
+/**
+ * Generates an error embed to be replied to the user when an error occurs with a command
+ * Mainly used for failed promises
+ * @param message - error description/message
+ * @param uuid - error uuid
+ */
+const generateErrorEmbed = (message, uuid) => {
+  const embed = {
+    description: `${message}\n\nError ID: ${uuid}\nAlternatively, you can also report issue through the [support server](https://discord.com/invite/47Ccgz9jA4)`,
+    color: 16711680,
+  };
+  return [embed];
+};
 //----------
+/**
+ * Send error log with relevant information to the error-logs channel in the support server
+ * Mainly used for failed promises
+ * Probably think of a more efficient way of handling these errors; right now it does the job but looks to be cluttered
+ * @param nessie - client
+ * @param error - error object
+ * @param message - discord message object
+ * @param interaction - discord interaction object
+ * @param type - which command the error originated from
+ * @param uuid - error uuid
+ */
+const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid }) => {
+  const errorChannel = nessie.channels.cache.get('938441853542465548');
+  const embed = {
+    title: message ? `Error | ${type} Prefix Command` : `Error | ${type} Application Command`,
+    color: 16711680,
+    description: `uuid: ${uuid}\nError: ${error.message ? error.message : 'Unexpected Error'}`,
+    fields: [
+      {
+        name: 'User',
+        value: message ? message.author.username : interaction.user.username,
+        inline: true,
+      },
+      {
+        name: 'User ID',
+        value: message ? message.author.id : interaction.user.id,
+        inline: true,
+      },
+      {
+        name: 'Channel',
+        value: message ? message.channel.name : interaction.channel.name,
+        inline: true,
+      },
+      {
+        name: 'Channel ID',
+        value: message ? message.channel.id : interaction.channelId,
+        inline: true,
+      },
+      {
+        name: 'Guild',
+        value: message ? message.guild.name : interaction.guild.name,
+        inline: true,
+      },
+      {
+        name: 'Guild ID',
+        value: message ? message.guild.id : interaction.guildId,
+        inline: true,
+      },
+    ],
+  };
+  return await errorChannel.send({ embeds: [embed] });
+};
+//---------
 module.exports = {
   checkIfInDevelopment,
   sendGuildUpdateNotification,
   serverEmbed,
   codeBlock,
   sendHealthLog,
+  sendErrorLog,
+  generateErrorEmbed,
 };
