@@ -1,5 +1,6 @@
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
-const { sendErrorLog } = require('../../helpers');
+const { sendErrorLog, generateErrorEmbed } = require('../../helpers');
+const { v4: uuidv4 } = require('uuid');
 
 /**
  * Gets url link image for each br map
@@ -105,7 +106,6 @@ module.exports = {
   async execute({ nessie, message, arguments }) {
     message.channel.sendTyping();
     try {
-      throw new Error('Test Error');
       if (!arguments) {
         const data = await getBattleRoyalePubs();
         const embedToSend = generatePubsEmbed(data);
@@ -119,9 +119,14 @@ module.exports = {
         return message.channel.send("I don't understand that argument （・□・；）");
       }
     } catch (error) {
-      console.log(error); //Add proper error handling someday
+      const uuid = uuidv4();
       const type = 'Battle Royale';
-      await sendErrorLog({ nessie, error, type, message });
+      const errorEmbed = generateErrorEmbed(
+        'Oops something went wrong! D: Try again in a bit!',
+        uuid
+      );
+      await message.channel.send({ embeds: [errorEmbed] });
+      await sendErrorLog({ nessie, error, type, message, uuid });
     }
   },
 };

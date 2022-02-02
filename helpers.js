@@ -1,5 +1,4 @@
 const { format } = require('date-fns');
-const { v4: uuidv4 } = require('uuid');
 
 //----------
 /**
@@ -135,13 +134,20 @@ const sendGuildUpdateNotification = async (client, guild, type) => {
 const checkIfInDevelopment = (client) => {
   return client.user.id === '929421200797626388'; //Lochnesss' id (Development Bot)
 };
+const generateErrorEmbed = (message, uuid) => {
+  const embed = {
+    description: `${message}\n\nError ID: ${uuid}\nAlternatively, you can also report issue through the [support server](https://discord.com/invite/47Ccgz9jA4)`,
+    color: 16711680,
+  };
+  return embed;
+};
 //----------
-const sendErrorLog = async ({ nessie, error, message, interaction, type }) => {
+const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid }) => {
   const errorChannel = nessie.channels.cache.get('938441853542465548');
   const embed = {
     title: message ? `Error | ${type} Prefix Command` : `Error | ${type} Application Command`,
     color: 16711680,
-    description: `uuid: ${uuidv4()}\nError: ${error.message ? error.message : 'Unexpected Error'}`,
+    description: `uuid: ${uuid}\nError: ${error.message ? error.message : 'Unexpected Error'}`,
     fields: [
       {
         name: 'User',
@@ -184,4 +190,5 @@ module.exports = {
   codeBlock,
   sendHealthLog,
   sendErrorLog,
+  generateErrorEmbed,
 };

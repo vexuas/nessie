@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
-const { sendErrorLog } = require('../../helpers');
+const { sendErrorLog, generateErrorEmbed } = require('../../helpers');
+const { v4: uuidv4 } = require('uuid');
 
 /**
  * Gets url link image for each br map
@@ -121,7 +122,6 @@ module.exports = {
     let data;
     let embed;
     try {
-      throw new Error('Test Error');
       await interaction.deferReply();
       const optionMode = interaction.options.getString('mode');
       switch (optionMode) {
@@ -136,9 +136,14 @@ module.exports = {
       }
       return await interaction.editReply({ embeds: embed });
     } catch (error) {
+      const uuid = uuidv4();
       const type = 'Battle Royale';
-      console.log(error); //Add proper error handling someday
-      sendErrorLog({ nessie, error, interaction, type });
+      const errorEmbed = generateErrorEmbed(
+        'Oops something went wrong! D: Try again in a bit!',
+        uuid
+      );
+      await interaction.editReply({ embeds: [errorEmbed] });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
   },
 };
