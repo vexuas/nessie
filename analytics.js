@@ -40,7 +40,7 @@ const sendMixpanelEvent = (
       guild_id: guild.id,
       command: command,
       arguments: arguments ? arguments : 'none',
-      isApplicationCommand: isApplicationCommand,
+      isApplicationCommand: isApplicationCommand, //undefined if command is a prefix command
     });
     /**
      * Sets a user profile properties only once
@@ -53,6 +53,7 @@ const sendMixpanelEvent = (
       first_used_in_guild: guild.name,
       first_used_in_channel: channel.name,
     });
+    // Only set the user profilce once for when they first used an application command
     isApplicationCommand &&
       client.people.set_once(user.id, {
         first_used_application_command: new Date().toISOString(),
