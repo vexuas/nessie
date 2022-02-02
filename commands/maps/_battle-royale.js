@@ -142,7 +142,7 @@ module.exports = {
         'Oops something went wrong! D: Try again in a bit!',
         uuid
       );
-      await interaction.editReply({ embeds: [errorEmbed] });
+      await interaction.editReply({ embeds: errorEmbed });
       await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
   },

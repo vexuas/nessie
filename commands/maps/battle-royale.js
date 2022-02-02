@@ -125,7 +125,7 @@ module.exports = {
         'Oops something went wrong! D: Try again in a bit!',
         uuid
       );
-      await message.channel.send({ embeds: [errorEmbed] });
+      await message.channel.send({ embeds: errorEmbed });
       await sendErrorLog({ nessie, error, type, message, uuid });
     }
   },

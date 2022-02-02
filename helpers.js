@@ -139,7 +139,7 @@ const generateErrorEmbed = (message, uuid) => {
     description: `${message}\n\nError ID: ${uuid}\nAlternatively, you can also report issue through the [support server](https://discord.com/invite/47Ccgz9jA4)`,
     color: 16711680,
   };
-  return embed;
+  return [embed];
 };
 //----------
 const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid }) => {
