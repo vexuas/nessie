@@ -1,4 +1,5 @@
 const { format } = require('date-fns');
+const { v4: uuidv4 } = require('uuid');
 
 //----------
 /**
@@ -136,12 +137,11 @@ const checkIfInDevelopment = (client) => {
 };
 //----------
 const sendErrorLog = async ({ nessie, error, message, interaction, type }) => {
-  console.log(error);
   const errorChannel = nessie.channels.cache.get('938441853542465548');
   const embed = {
     title: message ? `Error | ${type} Prefix Command` : `Error | ${type} Application Command`,
     color: 16711680,
-    description: `${error.message ? error.message : 'Unexpected Error'}`,
+    description: `uuid: ${uuidv4()}\nError: ${error.message ? error.message : 'Unexpected Error'}`,
     fields: [
       {
         name: 'User',
