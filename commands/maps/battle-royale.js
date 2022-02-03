@@ -1,5 +1,5 @@
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
-const { sendErrorLog, generateErrorEmbed } = require('../../helpers');
+const { sendErrorLog, generateErrorEmbed, generateAnnouncementMessage } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 
 /**
@@ -46,10 +46,11 @@ const getCountdown = (timer) => {
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  * Make reusable?
  */
-const generatePubsEmbed = (data) => {
+const generatePubsEmbed = (data, prefix) => {
   const embedData = {
     title: 'Battle Royale | Pubs',
     color: 3066993,
+    description: generateAnnouncementMessage(prefix),
     image: {
       url: getMapUrl(data.current.code),
     },
@@ -76,10 +77,11 @@ const generatePubsEmbed = (data) => {
  * Embed design for BR Ranked
  * Fairly simple, don't need any fancy timers and footers
  */
-const generateRankedEmbed = (data) => {
+const generateRankedEmbed = (data, prefix) => {
   const embedData = {
     title: 'Battle Royale | Ranked',
     color: 7419530,
+    description: generateAnnouncementMessage(prefix),
     image: {
       url: getMapUrl(data.current.map),
     },
@@ -103,17 +105,17 @@ module.exports = {
   name: 'br',
   description: 'Shows currrent map rotation for battle royale mode',
   hasArguments: true,
-  async execute({ nessie, message, arguments }) {
+  async execute({ nessie, message, arguments, nessiePrefix }) {
     message.channel.sendTyping();
     try {
       if (!arguments) {
         const data = await getBattleRoyalePubs();
-        const embedToSend = generatePubsEmbed(data);
+        const embedToSend = generatePubsEmbed(data, nessiePrefix);
         return message.channel.send({ embeds: embedToSend });
       } else {
         if (arguments === 'ranked') {
           const data = await getBattleRoyaleRanked();
-          const embedToSend = generateRankedEmbed(data);
+          const embedToSend = generateRankedEmbed(data, nessiePrefix);
           return message.channel.send({ embeds: embedToSend });
         }
         return message.channel.send("I don't understand that argument （・□・；）");

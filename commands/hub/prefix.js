@@ -1,18 +1,21 @@
+const { generateAnnouncementMessage } = require('../../helpers');
+
 const generateEmbed = (prefix) => {
   const embed = {
     color: 3447003,
+    description: generateAnnouncementMessage(prefix),
     fields: [
       {
         name: 'Current Prefix',
         value: prefix,
-        inline: true
+        inline: true,
       },
       {
         name: 'Usage Example',
         value: `${prefix}help`,
-        inline: true
-      }
-    ]
+        inline: true,
+      },
+    ],
   };
   return [embed];
 };
@@ -21,9 +24,9 @@ module.exports = {
   name: 'prefix',
   description: 'Shows current prefix',
   hasArguments: false,
-  execute({message, nessiePrefix}) {
+  execute({ message, nessiePrefix }) {
     const currentPrefix = nessiePrefix;
     const embed = generateEmbed(currentPrefix);
     message.channel.send({ embeds: embed });
-  }
+  },
 };

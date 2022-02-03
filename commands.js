@@ -17,6 +17,7 @@ exports.getPrefixCommands = () => {
     prefix: require('./commands/hub/prefix'),
     setprefix: require('./commands/hub/setPrefix'),
     invite: require('./commands/hub/invite'),
+    announcement: require('./commands/hub/announcement'),
   };
 };
 exports.getApplicationCommands = () => {
