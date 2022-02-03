@@ -1,3 +1,5 @@
+const { generateAnnouncementMessage } = require('../../helpers');
+
 module.exports = {
   name: 'help',
   description: 'directory of commands',
@@ -6,6 +8,7 @@ module.exports = {
     const embed = {
       color: 3447003,
       description:
+        generateAnnouncementMessage(nessiePrefix) +
         'Below you can see all the commands that I know!\n\nMy current prefix is `' +
         nessiePrefix +
         '`',
@@ -16,7 +19,7 @@ module.exports = {
         },
         {
           name: 'Information',
-          value: '`about`, `help`, `prefix`, `setprefix`, `invite`',
+          value: '`announcement`, `about`, `help`, `prefix`, `setprefix`, `invite`',
         },
       ],
     };
