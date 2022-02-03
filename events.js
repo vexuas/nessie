@@ -238,7 +238,6 @@ const removeServerDataFromNessie = (nessie, guild) => {
  * Basicailly guild commands can only be used in that server it was registered in
  * While global commands can be used to every server that bot is in
  * Main difference between the two apart from server constraints are that app commands are instantly registered in guilds while global would take up to an hour for changes to appear
- * TODO: Add handler for global register, below only handles guilds
  */
 const registerApplicationCommands = async (nessie) => {
   const isInDevelopment = checkIfInDevelopment(nessie);
@@ -249,6 +248,7 @@ const registerApplicationCommands = async (nessie) => {
   const rest = new REST({ version: '9' }).setToken(token);
 
   if (isInDevelopment) {
+    //Guild register
     try {
       await rest.put(Routes.applicationGuildCommands('929421200797626388', guildIDs), {
         body: appCommandList,
@@ -258,6 +258,8 @@ const registerApplicationCommands = async (nessie) => {
       console.log(e);
     }
   } else {
+    //Global Register
+    //TODO: Maybe create a script one day to delete global commands for test bot
     try {
       await rest.put(Routes.applicationCommands('929421200797626388'), { body: appCommandList });
       console.log('Successfully registered global application commands');
