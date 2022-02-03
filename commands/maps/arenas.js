@@ -1,5 +1,5 @@
 const { getArenasPubs, getArenasRanked } = require('../../adapters');
-const { sendErrorLog, generateErrorEmbed } = require('../../helpers');
+const { sendErrorLog, generateErrorEmbed, generateAnnouncementMessage } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 
 /**
@@ -19,10 +19,11 @@ const getCountdown = (timer) => {
  * As discord embed has a timestamp property, I added the remianing milliseconds to the current date
  * Make reusable?
  */
-const generatePubsEmbed = (data) => {
+const generatePubsEmbed = (data, prefix) => {
   const embedData = {
     title: 'Arenas | Pubs',
     color: 3066993,
+    description: generateAnnouncementMessage(prefix),
     image: {
       url: data.current.asset, //Using the scuffed saturated images as it'll be a chore adding custom images for each arenas map(some use areas of br maps)
     },
@@ -50,10 +51,11 @@ const generatePubsEmbed = (data) => {
  * Slighly different from BR ranked and similar to its Pubs counterpart
  * Might want to make all of these reusable, a lot of repeats
  */
-const generateRankedEmbed = (data) => {
+const generateRankedEmbed = (data, prefix) => {
   const embedData = {
     title: 'Arenas | Ranked',
     color: 7419530,
+    description: generateAnnouncementMessage(prefix),
     image: {
       url: data.current.asset, //Using the scuffed saturated images as it'll be a chore adding custom images for each arenas map(some use areas of br maps)
     },
@@ -81,17 +83,17 @@ module.exports = {
   name: 'arenas',
   description: 'Shows currrent map rotation for arenas mode',
   hasArguments: true,
-  async execute({ nessie, message, arguments }) {
+  async execute({ nessie, message, arguments, nessiePrefix }) {
     message.channel.sendTyping();
     try {
       if (!arguments) {
         const data = await getArenasPubs();
-        const embedToSend = generatePubsEmbed(data);
+        const embedToSend = generatePubsEmbed(data, nessiePrefix);
         return message.channel.send({ embeds: embedToSend });
       } else {
         if (arguments === 'ranked') {
           const data = await getArenasRanked();
-          const embedToSend = generateRankedEmbed(data);
+          const embedToSend = generateRankedEmbed(data, nessiePrefix);
           return message.channel.send({ embeds: embedToSend });
         }
         return message.channel.send("I don't understand that argument （・□・；）");
