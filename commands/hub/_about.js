@@ -37,7 +37,7 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
         inline: true,
       },
       {
-        name: 'Source Code',
+        name: 'Support Server',
         value: '[Link](https://discord.com/invite/47Ccgz9jA4)',
         inline: true,
       },
