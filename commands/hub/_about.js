@@ -38,7 +38,7 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
       },
       {
         name: 'Source Code',
-        value: '[Github](https://github.com/vexuas/nessie)',
+        value: '[Link](https://discord.com/invite/47Ccgz9jA4)',
         inline: true,
       },
     ],
