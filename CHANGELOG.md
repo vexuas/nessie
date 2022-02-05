@@ -1,3 +1,78 @@
+# v1.0.0 (Sat Feb 05 2022)
+
+### Release Notes
+
+#### Update information for v1.0.0 ([#40](https://github.com/vexuas/nessie/pull/40))
+
+Update information for v1.0.0
+
+#### Create verified announcement ([#39](https://github.com/vexuas/nessie/pull/39))
+
+Create verified announcement
+
+#### Set PSA for application commands ([#38](https://github.com/vexuas/nessie/pull/38))
+
+Set PSA for application commands
+
+#### Register global application commands ([#37](https://github.com/vexuas/nessie/pull/37))
+
+Register application commands
+
+#### Add mixpanel support for application commands ([#36](https://github.com/vexuas/nessie/pull/36))
+
+Add mixpanel support for application commands
+
+#### Add error handling ([#35](https://github.com/vexuas/nessie/pull/35))
+
+Add error handling
+
+#### Commands Usage Migration ([#34](https://github.com/vexuas/nessie/pull/34))
+
+Commands Usage Migration
+
+#### New Year cleanup ([#33](https://github.com/vexuas/nessie/pull/33))
+
+New Year Cleanup
+
+#### Migrate to application commands ([#32](https://github.com/vexuas/nessie/pull/32))
+
+Migrate to use application commands
+
+#### Investigate application commands ([#31](https://github.com/vexuas/nessie/pull/31))
+
+Investigate application commands
+
+---
+
+#### 💥 Breaking Change
+
+- Update information for v1.0.0 [#40](https://github.com/vexuas/nessie/pull/40) ([@vexuas](https://github.com/vexuas))
+
+#### 🚀 Enhancement
+
+- Create verified announcement [#39](https://github.com/vexuas/nessie/pull/39) ([@vexuas](https://github.com/vexuas))
+- Set PSA for application commands [#38](https://github.com/vexuas/nessie/pull/38) ([@vexuas](https://github.com/vexuas))
+- Register global application commands [#37](https://github.com/vexuas/nessie/pull/37) ([@vexuas](https://github.com/vexuas))
+- Add mixpanel support for application commands [#36](https://github.com/vexuas/nessie/pull/36) ([@vexuas](https://github.com/vexuas))
+- Add error handling [#35](https://github.com/vexuas/nessie/pull/35) ([@vexuas](https://github.com/vexuas))
+- Commands Usage Migration [#34](https://github.com/vexuas/nessie/pull/34) ([@vexuas](https://github.com/vexuas))
+- Migrate to application commands [#32](https://github.com/vexuas/nessie/pull/32) ([@vexuas](https://github.com/vexuas))
+- Investigate application commands [#31](https://github.com/vexuas/nessie/pull/31) ([@vexuas](https://github.com/vexuas))
+
+#### 🐛 Bug Fix
+
+- New Year cleanup [#33](https://github.com/vexuas/nessie/pull/33) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2021 11 30 [#30](https://github.com/vexuas/nessie/pull/30) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v0.3.0 (Tue Nov 30 2021)
 
 ### Release Notes
