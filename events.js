@@ -260,8 +260,9 @@ const registerApplicationCommands = async (nessie) => {
   } else {
     //Global Register
     //TODO: Maybe create a script one day to delete global commands for test bot
+    //TODO: Make fetching of bot id dynamic as it will either use production or testing id
     try {
-      await rest.put(Routes.applicationCommands('929421200797626388'), { body: appCommandList });
+      await rest.put(Routes.applicationCommands('889135055430111252'), { body: appCommandList });
       console.log('Successfully registered global application commands');
     } catch (e) {
       console.log(e);
