@@ -7,7 +7,7 @@ module.exports = {
     const embed = {
       description:
         generateAnnouncementMessage(nessiePrefix) +
-        `${message.author} | [Add me to your servers! (◕ᴗ◕✿)](https://tinyurl.com/nessie-invite-v021)`,
+        `${message.author} | [Add me to your servers! (◕ᴗ◕✿)](https://discord.com/api/oauth2/authorize?client_id=889135055430111252&permissions=85008&scope=applications.commands%20bot)`,
       color: 3447003,
     };
     message.channel.send({ embeds: [embed] });
