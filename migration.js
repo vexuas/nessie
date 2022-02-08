@@ -13,11 +13,16 @@ exports.runMigration = (guilds) => {
       const insertNewGuild =
         'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)';
       const updateUsePrefix = 'UPDATE Guild SET use_prefix = ($1) WHERE uuid = ($2)';
+
       client.query(createTable);
+      // -----
+      // Update to not use prefix commands
       // client.query(updateUsePrefix, [false, '491143168352452608'], (err, res) => {
       //   console.log(err);
       //   console.log(res);
       // });
+      // ----
+      // Add each guild to database
       // guilds.forEach((guild) => {
       //   const insertGuildValues = [
       //     guild.id,
@@ -32,10 +37,14 @@ exports.runMigration = (guilds) => {
       //     console.log(res);
       //   });
       // });
+      // ----
+      // Commit changes to database
       // client.query('COMMIT', (err) => {
       //   console.log(err);
       //   done();
       // });
+      // ----
+      // Gets all guilds
       client.query(selectGuilds, (err, res) => {
         console.log(res.rows);
         done();
