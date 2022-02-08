@@ -45,8 +45,8 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * See relevant files under database/* for more information
        */
       runMigration(nessie.guilds.cache);
-      const nessieDatabase = createNessieDatabase();
-      createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
+      // const nessieDatabase = createNessieDatabase();
+      // createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
       migrateToUseApplicationCommands(nessieDatabase);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
