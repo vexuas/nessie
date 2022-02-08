@@ -38,15 +38,14 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     try {
       const testChannel = nessie.channels.cache.get('889212328539725824');
       const logChannel = nessie.channels.cache.get('899620845436141609');
-      // testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
+      testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
       /**
        * Initialise Database and its tables
        * Will create them if they don't exist
        * See relevant files under database/* for more information
        */
-      runMigration(nessie.guilds.cache);
-      // const nessieDatabase = createNessieDatabase();
-      // createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
+      const nessieDatabase = createNessieDatabase();
+      createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
       migrateToUseApplicationCommands(nessieDatabase);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
