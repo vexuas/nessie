@@ -23,6 +23,7 @@ const {
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getPrefixCommands, getApplicationCommands } = require('./commands');
+const { runMigration } = require('./migration');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands

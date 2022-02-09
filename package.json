@@ -17,6 +17,7 @@
     "mixpanel": "^0.13.0",
     "mocha": "^9.1.1",
     "nodemon": "^2.0.12",
+    "pg": "^8.7.3",
     "sqlite3": "^5.0.2",
     "topgg-autoposter": "^2.0.0",
     "uuid": "^8.3.2"
