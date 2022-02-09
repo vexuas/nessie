@@ -3,7 +3,7 @@ const { databaseConfig } = require('../config/database');
 const { sendGuildUpdateNotification, generateSuccessEmbed } = require('../helpers');
 const { defaultPrefix } = require('../config/nessie.json');
 
-const pool = new Pool(databaseConfig); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling
+exports.pool = new Pool(databaseConfig); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling
 /**
  * Creates Guild table inside the nessie database in digital ocean
  * Gets called in the client.once("ready") hook
@@ -16,7 +16,7 @@ const pool = new Pool(databaseConfig); //Intialise pool to connect to our cloud 
  */
 exports.createGuildTable = (guilds, nessie) => {
   // Starts a transaction; similar to sqlite's serialize so we can group all the relevant queries and call them in order
-  pool.connect((err, client, done) => {
+  this.pool.connect((err, client, done) => {
     //Maybe put an error handler here someday
     client.query('BEGIN', (err) => {
       // Creates Guilds Table with the relevant columns if it does not exists
@@ -68,7 +68,7 @@ exports.createGuildTable = (guilds, nessie) => {
  * @param guild - guild that nessie is newly invited in
  */
 exports.insertNewGuild = (guild) => {
-  pool.connect((err, client, done) => {
+  this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
         'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)',
@@ -96,7 +96,7 @@ exports.insertNewGuild = (guild) => {
  * @param guild - guild in which nessie was kicked in
  */
 exports.removeServerDataFromNessie = (nessie, guild) => {
-  pool.connect((err, client, done) => {
+  this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query('DELETE FROM Guild WHERE uuid = ($1)', [`${guild.id}`], (err) => {
         if (err) {
@@ -114,7 +114,7 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
   });
 };
 exports.setCustomPrefix = (message, newPrefix) => {
-  pool.connect((err, client, done) => {
+  this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
         'UPDATE Guild SET prefix = ($1) WHERE uuid = ($2)',

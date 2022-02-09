@@ -25,10 +25,13 @@ exports.runMigration = (guilds) => {
       // client.query(createTable);
       // -----
       // Update to not use prefix commands
-      // client.query(updateUsePrefix, [false, '806202826547134525'], (err, res) => {
-      //   console.log(err);
-      //   console.log(res);
-      // });
+      client.query(updateUsePrefix, [true, '889134541615292456'], (err, res) => {
+        console.log(err);
+        console.log(res);
+        client.query('COMMIT', (err) => {
+          console.log(err);
+        });
+      });
       // -----
       // Update to custom prefix
       // client.query(updateSetPrefix, ['nes', '935574827614482462'], (err, res) => {
@@ -74,4 +77,4 @@ exports.runMigration = (guilds) => {
   });
 };
 
-// this.runMigration();
+this.runMigration();
