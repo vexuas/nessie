@@ -1,3 +1,37 @@
+# v1.1.0 (Thu Feb 10 2022)
+
+### Release Notes
+
+#### Replace sqlite queries with postgres ([#45](https://github.com/vexuas/nessie/pull/45))
+
+Replace sqlite queries with postgres
+
+#### Add control map command ([#43](https://github.com/vexuas/nessie/pull/43))
+
+Add control map command
+
+#### Migrate to digitalocean database cluster ([#42](https://github.com/vexuas/nessie/pull/42))
+
+Migrate to digitalocean database cluster
+
+---
+
+#### 🚀 Enhancement
+
+- Replace sqlite queries with postgres [#45](https://github.com/vexuas/nessie/pull/45) ([@vexuas](https://github.com/vexuas))
+- Add control map command [#43](https://github.com/vexuas/nessie/pull/43) ([@vexuas](https://github.com/vexuas))
+- Migrate to digitalocean database cluster [#42](https://github.com/vexuas/nessie/pull/42) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 02 05 [#41](https://github.com/vexuas/nessie/pull/41) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.0.0 (Sat Feb 05 2022)
 
 ### Release Notes
