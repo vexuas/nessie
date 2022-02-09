@@ -202,11 +202,12 @@ const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid })
   return await errorChannel.send({ embeds: [embed] });
 };
 const generateAnnouncementMessage = (prefix) => {
-  return (
-    '```diff\n' +
-    `- Prefix commands will no longer be supported\n- Full information: ${prefix}announcement` +
-    '```\n'
-  );
+  return '';
+  // return (
+  //   '```diff\n' +
+  //   `- Prefix commands will no longer be supported\n- Full information: ${prefix}announcement` +
+  //   '```\n'
+  // );
 };
 //---------
 module.exports = {
