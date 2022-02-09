@@ -45,6 +45,27 @@ exports.createGuildTable = (guilds, nessie) => {
     });
   });
 };
+exports.insertNewGuild = (guild) => {
+  pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query(
+        'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)',
+        [guild.id, guild.name, guild.memberCount, guild.ownerId, defaultPrefix, false],
+        (err, res) => {
+          if (err) {
+            console.log(err);
+          }
+          client.query('COMMIT', (err) => {
+            if (err) {
+              console.log(err);
+            }
+            done();
+          });
+        }
+      );
+    });
+  });
+};
 /**
  * Function to delete all the relevant data in our database when nessie is removed from a server
  * Removes:

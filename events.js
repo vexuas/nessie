@@ -15,11 +15,14 @@ const {
   codeBlock,
   checkIfInDevelopment,
 } = require('./helpers');
-const { insertNewGuild } = require('./database/guild-db');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getPrefixCommands, getApplicationCommands } = require('./commands');
-const { createGuildTable, removeServerDataFromNessie } = require('./database/_guild-db');
+const {
+  createGuildTable,
+  insertNewGuild,
+  removeServerDataFromNessie,
+} = require('./database/_guild-db');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands
