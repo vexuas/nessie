@@ -4,6 +4,13 @@ const { sendErrorLog, generateErrorEmbed } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { sendMixpanelEvent } = require('../../analytics');
 
+/**
+ * TODO: Figure out a system to show custom map images for map commands
+ * Aside from br, the rest of the modes rely on the assets return by the API
+ * These assets don't look good however I've decided to use them for now as it's direct
+ * Manually wiring them up to our images isn't scalable either
+ * I'll just leave this comment so I get reminded about it in the future
+ */
 const getCountdown = (timer) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
