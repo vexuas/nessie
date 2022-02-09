@@ -37,7 +37,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     try {
       const testChannel = nessie.channels.cache.get('889212328539725824');
       const logChannel = nessie.channels.cache.get('899620845436141609');
-      // testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
+      testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
       /**
        * Initialise Database and its tables
        * Will create them if they don't exist
@@ -48,10 +48,10 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information
        */
-      // const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
-      // nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
-      // sendHealthLog(brPubsData, logChannel, true); //For logging purpose
-      // setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
+      const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
+      nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
+      sendHealthLog(brPubsData, logChannel, true); //For logging purpose
+      setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
     } catch (e) {
       console.log(e); //Add proper error handling
     }
