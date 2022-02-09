@@ -1,10 +1,19 @@
-const { Pool, Client } = require('pg');
+const { Pool } = require('pg');
 const { databaseConfig } = require('../config/database');
 const { sendGuildUpdateNotification } = require('../helpers');
 const { defaultPrefix } = require('../config/nessie.json');
 
-const pool = new Pool(databaseConfig);
-
+const pool = new Pool(databaseConfig); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling
+/**
+ * Creates Guild table inside the nessie database in digital ocean
+ * Gets called in the client.once("ready") hook
+ * Seems quite scuffed atm but I'm prioritizing speed over elegance
+ * Also doesn't help I only have a day's experience with posgres orz
+ * But hey this seems to be working and as far as my manual testing goes, it doesn't seem to be breaking anything and looks as normal as it was in sqlite :shrug:
+ * Tho might want to revisit these in the future; definitely need error handling and better readability
+ * @param guilds - guilds that nessie is in
+ * @param nessie - nessie client
+ */
 exports.createGuildTable = (guilds, nessie) => {
   // Starts a transaction; similar to sqlite's serialize so we can group all the relevant queries and call them in order
   pool.connect((err, client, done) => {
@@ -14,6 +23,14 @@ exports.createGuildTable = (guilds, nessie) => {
       client.query(
         'CREATE TABLE IF NOT EXISTS Guild(uuid TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, member_count INTEGER NOT NULL, owner_id TEXT NOT NULL, prefix TEXT NOT NULL, use_prefix BOOLEAN NOT NULL DEFAULT TRUE)'
       );
+      /**
+       * Before we were iterating through each guild of nessie and making a query to the database
+       * This doesn't seem like a good idea moving forward as performance will definitely take a hit with bigger guild size
+       * To refactor this, we only query once for all the guilds in our database and based on the response
+       * - We iterate through each guild nessie is in
+       * - For each guild, we will check if it exists in the response
+       * - If it doesn't, we insert the relevant guild to the database
+       */
       client.query('SELECT * FROM Guild', (err, res) => {
         if (err) {
           console.log(err);
@@ -32,6 +49,7 @@ exports.createGuildTable = (guilds, nessie) => {
                 }
                 sendGuildUpdateNotification(nessie, guild, 'join');
                 client.query('COMMIT', (err) => {
+                  // Permanently saves changes in database; without this changes won't be reflected the next time a connection opens
                   if (err) {
                     console.log(err);
                   }
@@ -40,11 +58,15 @@ exports.createGuildTable = (guilds, nessie) => {
             );
           }
         });
-        done();
+        done(); //Closes connection with database
       });
     });
   });
 };
+/**
+ * Adds new guild to Guild table
+ * @param guild - guild that nessie is newly invited in
+ */
 exports.insertNewGuild = (guild) => {
   pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
