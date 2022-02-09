@@ -15,15 +15,11 @@ const {
   codeBlock,
   checkIfInDevelopment,
 } = require('./helpers');
-const {
-  createGuildTable,
-  insertNewGuild,
-  migrateToUseApplicationCommands,
-} = require('./database/guild-db');
+const { insertNewGuild } = require('./database/guild-db');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getPrefixCommands, getApplicationCommands } = require('./commands');
-const { runMigration } = require('./migration');
+const { createGuildTable } = require('./database/_guild-db');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -38,23 +34,21 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     try {
       const testChannel = nessie.channels.cache.get('889212328539725824');
       const logChannel = nessie.channels.cache.get('899620845436141609');
-      testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
+      // testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
       /**
        * Initialise Database and its tables
        * Will create them if they don't exist
        * See relevant files under database/* for more information
        */
-      const nessieDatabase = createNessieDatabase();
-      createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
-      migrateToUseApplicationCommands(nessieDatabase);
+      createGuildTable(nessie.guilds.cache);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information
        */
-      const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
-      nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
-      sendHealthLog(brPubsData, logChannel, true); //For logging purpose
-      setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
+      // const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
+      // nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
+      // sendHealthLog(brPubsData, logChannel, true); //For logging purpose
+      // setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
     } catch (e) {
       console.log(e); //Add proper error handling
     }
