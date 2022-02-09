@@ -25,9 +25,12 @@ exports.runMigration = (guilds) => {
       // client.query(createTable);
       // -----
       // Update to not use prefix commands
-      // client.query(updateUsePrefix, [false, '806202826547134525'], (err, res) => {
+      // client.query(updateUsePrefix, [true, '889134541615292456'], (err, res) => {
       //   console.log(err);
       //   console.log(res);
+      //   client.query('COMMIT', (err) => {
+      //     console.log(err);
+      //   });
       // });
       // -----
       // Update to custom prefix
@@ -67,6 +70,7 @@ exports.runMigration = (guilds) => {
       // client.query(deleteGuilds, (err, res) => {
       //   console.log(err);
       //   console.log(res);
+      //   client.query('COMMIT');
       // });
       // ----
     });

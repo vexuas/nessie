@@ -5,7 +5,6 @@
  * The next good move is to separate each event handler on its own file and have this as the main initialisation
  * But that would be in another time heh
  */
-const sqlite = require('sqlite3').verbose();
 const { guildIDs, token } = require('./config/nessie.json');
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
@@ -15,15 +14,15 @@ const {
   codeBlock,
   checkIfInDevelopment,
 } = require('./helpers');
-const {
-  createGuildTable,
-  insertNewGuild,
-  migrateToUseApplicationCommands,
-} = require('./database/guild-db');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getPrefixCommands, getApplicationCommands } = require('./commands');
-const { runMigration } = require('./migration');
+const {
+  createGuildTable,
+  insertNewGuild,
+  removeServerDataFromNessie,
+  pool,
+} = require('./database/handler');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -44,9 +43,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Will create them if they don't exist
        * See relevant files under database/* for more information
        */
-      const nessieDatabase = createNessieDatabase();
-      createGuildTable(nessieDatabase, nessie.guilds.cache, nessie);
-      migrateToUseApplicationCommands(nessieDatabase);
+      createGuildTable(nessie.guilds.cache, nessie);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information
@@ -88,64 +85,61 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
    */
   nessie.on('messageCreate', async (message) => {
     if (message.author.bot) return; //Ignore messages made by nessie
-    let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE);
-    /**
-     * Opens the nessie database and finds the guild data where the message was used
-     * This is primarily to know the current prefix of the guild; important when users are using a custom prefix
-     */
-    database.get(`SELECT * FROM Guild WHERE uuid = ${message.guildId}`, async (error, row) => {
-      if (error) {
-        console.log(error);
-      }
-      if (row.use_prefix === 0) return;
-      const nessiePrefix = row.prefix;
+    try {
+      /**
+       * Opens the nessie database and finds the guild data where the message was used
+       * This is primarily to know the current prefix of the guild; important when users are using a custom prefix
+       */
+      const response = await pool.query('SELECT * FROM Guild WHERE uuid = ($1)', [
+        `${message.guildId}`,
+      ]);
+      const currentGuild = response.rows[0];
 
-      //Refactor this into its own function and pass as a callback for better readability in the future
-      try {
-        /**
-         * Nessie checks if messages contains any mentions
-         * If it does and if one of the mentions contains nessie's user, returns a message with the current prefix i.e @Nessie
-         */
-        message.mentions.users.forEach((user) => {
-          if (user === nessie.user) {
-            return message.channel.send(
-              'My current prefix is ' +
-                '`' +
-                `${nessiePrefix}` +
-                '`' +
-                '\nTo set a new custom prefix, type ' +
-                ` ${codeBlock(`${nessiePrefix}setprefix`)}`
-            );
-          }
-        });
-        //Ignores messages without a prefix
-        if (message.content.startsWith(nessiePrefix)) {
-          const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
-          const command = args.shift().toLowerCase(); //gets command as a string from array
-          const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
+      if (currentGuild && !currentGuild.use_prefix) return; //Only respond to guilds that have prefix commands support
+      const nessiePrefix = currentGuild.prefix;
+      /**
+       * Nessie checks if messages contains any mentions
+       * If it does and if one of the mentions contains nessie's user, returns a message with the current prefix i.e @Nessie
+       */
+      message.mentions.users.forEach((user) => {
+        if (user === nessie.user) {
+          return message.channel.send(
+            'My current prefix is ' +
+              '`' +
+              `${nessiePrefix}` +
+              '`' +
+              '\nTo set a new custom prefix, type ' +
+              ` ${codeBlock(`${nessiePrefix}setprefix`)}`
+          );
+        }
+      });
+      //Ignores messages without a prefix
+      if (message.content.startsWith(nessiePrefix)) {
+        const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
+        const command = args.shift().toLowerCase(); //gets command as a string from array
+        const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
 
-          //Check if command exists in the command file
-          if (commands[command]) {
-            //If it does check if there are any arguments passed and if the command expects an argument
-            if (arguments.length > 0 && !commands[command].hasArguments) {
-              await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
-            } else {
-              await commands[command].execute({ message, arguments, nessie, nessiePrefix }); //Executes command
-              sendMixpanelEvent(
-                message.author,
-                message.channel,
-                message.channel.guild,
-                command,
-                mixpanel,
-                arguments
-              ); //Send tracking event to mixpanel
-            }
+        //Check if command exists in the command file
+        if (commands[command]) {
+          //If it does check if there are any arguments passed and if the command expects an argument
+          if (arguments.length > 0 && !commands[command].hasArguments) {
+            await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
+          } else {
+            await commands[command].execute({ message, arguments, nessie, nessiePrefix }); //Executes command
+            sendMixpanelEvent(
+              message.author,
+              message.channel,
+              message.channel.guild,
+              command,
+              mixpanel,
+              arguments
+            ); //Send tracking event to mixpanel
           }
         }
-      } catch (e) {
-        console.log(e);
       }
-    });
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   nessie.on('interactionCreate', async (interaction) => {
@@ -174,12 +168,6 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
 };
 
 //TODO: Maybe move these functions in their separate files at some point
-
-//Creates Nessie Database under database folder
-const createNessieDatabase = () => {
-  let db = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE);
-  return db;
-};
 /**
  * In charge of correctly displaying current battle royale pubs rotation in nessie's activity status
  * As the maps have varying durations, needed to figure out a way to dynamically change the timeout after each call
@@ -211,23 +199,6 @@ const setCurrentMapStatus = (data, channel, nessie) => {
     }
   };
   setTimeout(intervalRequest, currentTimer); //Start initial timer
-};
-/**
- * Function to delete all the relevant data in our database when nessie is removed from a server
- * Removes:
- * Guild
- * More stuff here when auto notifications gets developed
- * @param guild - guild in which nessie was kicked in
- */
-const removeServerDataFromNessie = (nessie, guild) => {
-  let database = new sqlite.Database(
-    './database/nessie.db',
-    sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE
-  );
-  database.serialize(() => {
-    database.run(`DELETE FROM Guild WHERE uuid = "${guild.id}"`);
-    sendGuildUpdateNotification(nessie, guild, 'leave');
-  });
 };
 /**
  * Function to register application commands
