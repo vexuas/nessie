@@ -19,7 +19,7 @@ const { insertNewGuild } = require('./database/guild-db');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getPrefixCommands, getApplicationCommands } = require('./commands');
-const { createGuildTable } = require('./database/_guild-db');
+const { createGuildTable, removeServerDataFromNessie } = require('./database/_guild-db');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -205,23 +205,6 @@ const setCurrentMapStatus = (data, channel, nessie) => {
     }
   };
   setTimeout(intervalRequest, currentTimer); //Start initial timer
-};
-/**
- * Function to delete all the relevant data in our database when nessie is removed from a server
- * Removes:
- * Guild
- * More stuff here when auto notifications gets developed
- * @param guild - guild in which nessie was kicked in
- */
-const removeServerDataFromNessie = (nessie, guild) => {
-  let database = new sqlite.Database(
-    './database/nessie.db',
-    sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE
-  );
-  database.serialize(() => {
-    database.run(`DELETE FROM Guild WHERE uuid = "${guild.id}"`);
-    sendGuildUpdateNotification(nessie, guild, 'leave');
-  });
 };
 /**
  * Function to register application commands

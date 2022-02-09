@@ -19,6 +19,7 @@ exports.createGuildTable = (guilds, nessie) => {
           console.log(err);
         }
         const guildsInDatabase = res.rows;
+        console.log(guildsInDatabase);
         guilds.forEach((guild) => {
           const isInDatabase = guildsInDatabase.find((guildDb) => guildDb.uuid === guild.id);
           if (!isInDatabase) {
@@ -40,6 +41,31 @@ exports.createGuildTable = (guilds, nessie) => {
           }
         });
         done();
+      });
+    });
+  });
+};
+/**
+ * Function to delete all the relevant data in our database when nessie is removed from a server
+ * Removes:
+ * Guild
+ * @param nessie - discord client
+ * @param guild - guild in which nessie was kicked in
+ */
+exports.removeServerDataFromNessie = (nessie, guild) => {
+  pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query('DELETE FROM Guild WHERE uuid = ($1)', [`${guild.id}`], (err) => {
+        if (err) {
+          console.log(err);
+        }
+        client.query('COMMIT', (err) => {
+          if (err) {
+            console.log(err);
+          }
+          sendGuildUpdateNotification(nessie, guild, 'leave');
+          done();
+        });
       });
     });
   });
