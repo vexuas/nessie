@@ -22,7 +22,7 @@ const {
   createGuildTable,
   insertNewGuild,
   removeServerDataFromNessie,
-} = require('./database/_guild-db');
+} = require('./database/handler');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands

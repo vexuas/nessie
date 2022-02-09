@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 const { databaseConfig } = require('../config/database');
-const { sendGuildUpdateNotification } = require('../helpers');
+const { sendGuildUpdateNotification, generateSuccessEmbed } = require('../helpers');
 const { defaultPrefix } = require('../config/nessie.json');
 
 const pool = new Pool(databaseConfig); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling
@@ -110,6 +110,29 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
           done();
         });
       });
+    });
+  });
+};
+exports.setCustomPrefix = (message, newPrefix) => {
+  pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query(
+        'UPDATE Guild SET prefix = ($1) WHERE uuid = ($2)',
+        [`${newPrefix}`, `${message.guildId}`],
+        (err) => {
+          if (err) {
+            console.log(err);
+            return message.channel.send('Oops something went wrong! Try again!'); //Maybe add link to support server here?
+          }
+          client.query('COMMIT', () => {
+            if (err) {
+              console.log(err);
+            }
+            message.channel.send({ embeds: generateSuccessEmbed(newPrefix) });
+            done();
+          });
+        }
+      );
     });
   });
 };
