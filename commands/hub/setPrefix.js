@@ -1,5 +1,6 @@
 const { codeBlock, generateAnnouncementMessage } = require('../../helpers');
 const { Permissions } = require('discord.js');
+const { setCustomPrefix } = require('../../database/handler');
 const sqlite = require('sqlite3').verbose();
 
 //Embed to show when sending information about setprefix
@@ -95,18 +96,8 @@ module.exports = {
       }
       if (arguments.length > 2) {
         const newPrefix = arguments.replace(/\`/g, '');
-        let database = new sqlite.Database('./database/nessie.db', sqlite.OPEN_READWRITE);
-
-        database.run(
-          `UPDATE Guild SET prefix = "${newPrefix}" WHERE uuid = ${message.guildId}`,
-          (err) => {
-            if (err) {
-              console.log(err);
-              return message.channel.send('Oops something went wrong! Try again!'); //Maybe add link to support server here?
-            }
-            return message.channel.send({ embeds: generateSuccessEmbed(newPrefix) });
-          }
-        );
+        const successEmbed = generateSuccessEmbed(newPrefix);
+        setCustomPrefix(message, newPrefix, successEmbed);
       }
     } else {
       return message.channel.send({ embeds: generateErrorEmbed('incorrect', nessiePrefix) });
