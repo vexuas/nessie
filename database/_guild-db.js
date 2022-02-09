@@ -1,9 +1,11 @@
 const { Pool, Client } = require('pg');
 const { databaseConfig } = require('../config/database');
+const { sendGuildUpdateNotification } = require('../helpers');
+const { defaultPrefix } = require('../config/nessie.json');
 
 const pool = new Pool(databaseConfig);
 
-exports.createGuildTable = (guilds) => {
+exports.createGuildTable = (guilds, nessie) => {
   // Starts a transaction; similar to sqlite's serialize so we can group all the relevant queries and call them in order
   pool.connect((err, client, done) => {
     //Maybe put an error handler here someday
@@ -20,9 +22,24 @@ exports.createGuildTable = (guilds) => {
         guilds.forEach((guild) => {
           const isInDatabase = guildsInDatabase.find((guildDb) => guildDb.uuid === guild.id);
           if (!isInDatabase) {
-            console.log('wtf');
+            client.query(
+              'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)',
+              [guild.id, guild.name, guild.memberCount, guild.ownerId, defaultPrefix, false],
+              (err, res) => {
+                if (err) {
+                  console.log(err);
+                }
+                sendGuildUpdateNotification(nessie, guild, 'join');
+                client.query('COMMIT', (err) => {
+                  if (err) {
+                    console.log(err);
+                  }
+                });
+              }
+            );
           }
         });
+        done();
       });
     });
   });

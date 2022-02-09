@@ -40,7 +40,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Will create them if they don't exist
        * See relevant files under database/* for more information
        */
-      createGuildTable(nessie.guilds.cache);
+      createGuildTable(nessie.guilds.cache, nessie);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information

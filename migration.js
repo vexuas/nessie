@@ -67,6 +67,7 @@ exports.runMigration = (guilds) => {
       // client.query(deleteGuilds, (err, res) => {
       //   console.log(err);
       //   console.log(res);
+      //   client.query('COMMIT');
       // });
       // ----
     });
