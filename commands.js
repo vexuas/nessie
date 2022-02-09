@@ -30,5 +30,6 @@ exports.getApplicationCommands = () => {
     // Maps
     br: require('./commands/maps/_battle-royale'),
     arenas: require('./commands/maps/_arenas'),
+    control: require('./commands/maps/_control'),
   };
 };
