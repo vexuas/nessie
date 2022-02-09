@@ -113,6 +113,13 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
     });
   });
 };
+/**
+ * Updates prefix with the new custom prefix provided by the user
+ * This will be deprecated in april but might as well migrate it along with the rest of the queries
+ * @param message - discord message object
+ * @param newPrefix - new custom prefix
+ * @param embed - embed message to send back to user after successfully updating
+ */
 exports.setCustomPrefix = (message, newPrefix, embed) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
