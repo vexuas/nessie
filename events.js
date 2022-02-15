@@ -23,6 +23,7 @@ const {
   removeServerDataFromNessie,
   pool,
 } = require('./database/handler');
+const { temporaryPrefixGuilds } = require('./config/database');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -43,7 +44,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Will create them if they don't exist
        * See relevant files under database/* for more information
        */
-      createGuildTable(nessie.guilds.cache, nessie);
+      // createGuildTable(nessie.guilds.cache, nessie);
       /**
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information
@@ -84,7 +85,10 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
    * Event handler for when a message is sent in a channel that nessie is in
    */
   nessie.on('messageCreate', async (message) => {
-    if (message.author.bot) return; //Ignore messages made by nessie
+    const isUsingPrefix = temporaryPrefixGuilds.find((guild) => {
+      return message.guildId === guild;
+    });
+    if (message.author.bot || !isUsingPrefix) return; //Ignore messages made by nessie
     try {
       /**
        * Opens the nessie database and finds the guild data where the message was used
