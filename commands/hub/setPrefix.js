@@ -71,11 +71,23 @@ const generateErrorEmbed = (type, prefix) => {
   }
   return [embed];
 };
+const generateDeprecationEmbed = (prefix) => {
+  const embed = {
+    color: 16711680,
+    description:
+      'Whoops! This command is no longer supported\n\n' + generateAnnouncementMessage(prefix),
+  };
+  return [embed];
+};
 module.exports = {
   name: 'setprefix',
   description: "Sets nessie's prefix to a custom one",
   hasArguments: true,
   execute({ message, arguments, nessiePrefix }) {
+    // Temporary check; to ease the transition we don't want to support custom prefix for prefix users that have never used it before
+    if (nessiePrefix === '$nes-') {
+      return message.channel.send({ embeds: generateDeprecationEmbed(nessiePrefix) });
+    }
     //When user only types setprefix; shows information about command
     if (!arguments) {
       return message.channel.send({ embeds: generateInfoEmbed(nessiePrefix) });

@@ -23,6 +23,7 @@ const {
   removeServerDataFromNessie,
   pool,
 } = require('./database/handler');
+const { temporaryPrefixGuilds } = require('./config/database');
 
 const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -84,7 +85,17 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
    * Event handler for when a message is sent in a channel that nessie is in
    */
   nessie.on('messageCreate', async (message) => {
-    if (message.author.bot) return; //Ignore messages made by nessie
+    /**
+     * Adding this temporary check for servers that are still using prefix commands
+     * Previously we query our database for every message created regardless of which commands they're using
+     * However I've realised this is inefficient and cost extensive as nessie will still open a connection for application-only servers everytime a message is created
+     * To fix this, we only check the database if they're prefix commands users
+     * Will deprecate at April 29
+     */
+    const isUsingPrefix = temporaryPrefixGuilds.find((guild) => {
+      return message.guildId === guild;
+    });
+    if (message.author.bot || !isUsingPrefix) return; //Ignore messages made by nessie or if server is an application-only commands server
     try {
       /**
        * Opens the nessie database and finds the guild data where the message was used
@@ -103,14 +114,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        */
       message.mentions.users.forEach((user) => {
         if (user === nessie.user) {
-          return message.channel.send(
-            'My current prefix is ' +
-              '`' +
-              `${nessiePrefix}` +
-              '`' +
-              '\nTo set a new custom prefix, type ' +
-              ` ${codeBlock(`${nessiePrefix}setprefix`)}`
-          );
+          return message.channel.send(`My prefix is ${codeBlock(nessiePrefix)}`);
         }
       });
       //Ignores messages without a prefix
@@ -143,7 +147,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   });
 
   nessie.on('interactionCreate', async (interaction) => {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isCommand() || !interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
     const { commandName } = interaction;
     await appCommands[commandName].execute({ interaction, nessie, mixpanel });
     /**

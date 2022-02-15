@@ -14,7 +14,7 @@ exports.runMigration = (guilds) => {
     client.query('BEGIN', (err) => {
       const createTable =
         'CREATE TABLE IF NOT EXISTS Guild(uuid TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, member_count INTEGER NOT NULL, owner_id TEXT NOT NULL, prefix TEXT NOT NULL, use_prefix BOOLEAN NOT NULL DEFAULT TRUE)';
-      const selectGuilds = 'SELECT * FROM Guild WHERE prefix != ($1)';
+      const selectGuilds = 'SELECT uuid FROM Guild WHERE use_prefix = ($1)';
       const insertNewGuild =
         'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)';
       const updateUsePrefix = 'UPDATE Guild SET use_prefix = ($1) WHERE uuid = ($2)';
@@ -61,7 +61,7 @@ exports.runMigration = (guilds) => {
       // });
       // ----
       // Gets all guilds
-      // client.query(selectGuilds, ['$nes-'], (err, res) => {
+      // client.query(selectGuilds, [true], (err, res) => {
       //   console.log(res.rows);
       //   done();
       // });
