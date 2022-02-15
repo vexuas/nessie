@@ -114,14 +114,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        */
       message.mentions.users.forEach((user) => {
         if (user === nessie.user) {
-          return message.channel.send(
-            'My current prefix is ' +
-              '`' +
-              `${nessiePrefix}` +
-              '`' +
-              '\nTo set a new custom prefix, type ' +
-              ` ${codeBlock(`${nessiePrefix}setprefix`)}`
-          );
+          return message.channel.send(`My prefix is ${codeBlock(nessiePrefix)}`);
         }
       });
       //Ignores messages without a prefix
