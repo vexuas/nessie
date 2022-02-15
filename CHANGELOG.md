@@ -1,3 +1,19 @@
+# v1.1.1 (Wed Feb 16 2022)
+
+#### 🐛 Bug Fix
+
+- Add limitations to messageCreate event [#47](https://github.com/vexuas/nessie/pull/47) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 02 10 [#46](https://github.com/vexuas/nessie/pull/46) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.1.0 (Thu Feb 10 2022)
 
 ### Release Notes
