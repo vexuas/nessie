@@ -1,3 +1,20 @@
+# v1.2.0 (Tue Mar 15 2022)
+
+#### 🚀 Enhancement
+
+- Delete control command [#50](https://github.com/vexuas/nessie/pull/50) ([@vexuas](https://github.com/vexuas))
+- Spike auto status [#49](https://github.com/vexuas/nessie/pull/49) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 02 16 [#48](https://github.com/vexuas/nessie/pull/48) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.1.1 (Wed Feb 16 2022)
 
 #### 🐛 Bug Fix
