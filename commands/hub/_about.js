@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { format } = require('date-fns');
 const { version } = require('../../package.json');
-const { codeBlock } = require('../../helpers');
 
 const sendAboutEmbed = async ({ nessie, interaction }) => {
   const embed = {
@@ -34,7 +33,7 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
       },
       {
         name: 'Last Update',
-        value: '16-Feb-2022',
+        value: '15-Mar-2022',
         inline: true,
       },
       {
