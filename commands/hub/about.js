@@ -37,7 +37,7 @@ const sendAboutEmbed = ({ message, nessie, prefix }) => {
       },
       {
         name: 'Last Update',
-        value: '16-Feb-2022',
+        value: '15-Mar-2022',
         inline: true,
       },
       {
