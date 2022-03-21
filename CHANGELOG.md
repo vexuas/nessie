@@ -1,3 +1,19 @@
+# v1.3.0 (Tue Mar 22 2022)
+
+#### 🚀 Enhancement
+
+- Add updates command [#52](https://github.com/vexuas/nessie/pull/52) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 03 15 [#51](https://github.com/vexuas/nessie/pull/51) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.2.0 (Tue Mar 15 2022)
 
 #### 🚀 Enhancement
