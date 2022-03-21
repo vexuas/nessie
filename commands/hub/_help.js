@@ -13,7 +13,7 @@ module.exports = {
         },
         {
           name: 'Information',
-          value: '`about`, `help`, `invite`',
+          value: '`about`, `help`, `invite`, `updates`',
         },
       ],
     };

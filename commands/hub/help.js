@@ -19,7 +19,7 @@ module.exports = {
         },
         {
           name: 'Information',
-          value: '`announcement`, `about`, `help`, `prefix`, `setprefix`, `invite`',
+          value: '`announcement`, `about`, `help`, `prefix`, `setprefix`, `invite`, `updates`',
         },
       ],
     };
