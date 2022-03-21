@@ -10,7 +10,9 @@ const sendAboutEmbed = ({ message, nessie, prefix }) => {
       generateAnnouncementMessage(prefix) +
       `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nUpcoming feature: **Automatic Map Status Updates**\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!\n\nMy current prefix is ${codeBlock(
         prefix
-      )} | For a detailed list of my commands, type ${codeBlock(`${prefix}help`)}`,
+      )} | For a detailed list of my commands, type ${codeBlock(
+        `${prefix}help`
+      )}\n\nFor the latest news, check out \`updates\`!`,
     color: 3447003,
     thumbnail: {
       url: nessieLogo,
@@ -38,7 +40,7 @@ const sendAboutEmbed = ({ message, nessie, prefix }) => {
       },
       {
         name: 'Last Update',
-        value: '15-Mar-2022',
+        value: '22-Mar-2022',
         inline: true,
       },
       {
