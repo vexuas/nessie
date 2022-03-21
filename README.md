@@ -1,8 +1,8 @@
 <div align="center">
-  <img src="https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png" width=120px/>
+  <img src="https://cdn.discordapp.com/attachments/248430185463021569/955497690735738900/Nessie_Logo_v2.png" width=120px/>
 </div>
 
-# nessie | v1.2.0 <br>Apex Legends Discord Bot | Map Status
+# nessie | v1.3.0 <br>Apex Legends Discord Bot | Map Status
 
 Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/
 
@@ -16,6 +16,7 @@ Instead of prefixes, Nessie uses Discord's new [Slash Commands](https://support.
 - `about`: information hub of Nessie
 - `help`: list of commands and how to use them
 - `invite`: generates Nessie's invite link
+- `updates`: shows the latest news and current update of Nessie
 
 ## TODO
 - Automatic Map Status Updates
