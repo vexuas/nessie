@@ -1,6 +1,7 @@
 const { format } = require('date-fns');
 const { version } = require('../../package.json');
 const { generateAnnouncementMessage, codeBlock } = require('../../helpers');
+const { nessieLogo } = require('../../constants');
 
 const sendAboutEmbed = ({ message, nessie, prefix }) => {
   const embed = {
@@ -12,7 +13,7 @@ const sendAboutEmbed = ({ message, nessie, prefix }) => {
       )} | For a detailed list of my commands, type ${codeBlock(`${prefix}help`)}`,
     color: 3447003,
     thumbnail: {
-      url: 'https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png',
+      url: nessieLogo,
     },
     fields: [
       {

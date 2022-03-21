@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { format } = require('date-fns');
+const { nessieLogo } = require('../../constants');
 const { version } = require('../../package.json');
 
 const sendAboutEmbed = async ({ nessie, interaction }) => {
@@ -8,7 +9,7 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
     description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nUpcoming feature: **Automatic Map Status Updates**\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!`,
     color: 3447003,
     thumbnail: {
-      url: 'https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png',
+      url: nessieLogo,
     },
     fields: [
       {

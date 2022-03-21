@@ -1,4 +1,5 @@
 const { format } = require('date-fns');
+const { nessieLogo } = require('./constants');
 
 //----------
 /**
@@ -18,7 +19,7 @@ const sendHealthLog = (data, channel, isAccurate) => {
     description: 'Requested data from API',
     color: isAccurate ? 3066993 : 16776960,
     thumbnail: {
-      url: 'https://cdn.discordapp.com/attachments/889134541615292459/896698383593517066/sir_nessie.png',
+      url: nessieLogo,
     },
     fields: [
       {
