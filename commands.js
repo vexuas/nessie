@@ -11,6 +11,7 @@ exports.getPrefixCommands = () => {
     //Maps
     br: require('./commands/maps/battle-royale'),
     arenas: require('./commands/maps/arenas'),
+    control: require('./commands/maps/control'),
     // status: require('./commands/maps/status'),
     //Hub
     about: require('./commands/hub/about'),
@@ -32,5 +33,6 @@ exports.getApplicationCommands = () => {
     // Maps
     br: require('./commands/maps/_battle-royale'),
     arenas: require('./commands/maps/_arenas'),
+    control: require('./commands/maps/_control'),
   };
 };
