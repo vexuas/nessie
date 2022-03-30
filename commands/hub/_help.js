@@ -9,7 +9,7 @@ module.exports = {
       fields: [
         {
           name: 'Maps',
-          value: '`br`, `arenas`',
+          value: '`br`, `arenas`, `control`',
         },
         {
           name: 'Information',
