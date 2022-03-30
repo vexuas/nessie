@@ -2,7 +2,7 @@
   <img src="https://cdn.discordapp.com/attachments/248430185463021569/955497690735738900/Nessie_Logo_v2.png" width=120px/>
 </div>
 
-# nessie | v1.3.0 <br>Apex Legends Discord Bot | Map Status
+# nessie | v1.4.0 <br>Apex Legends Discord Bot | Map Status
 
 Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/
 
@@ -13,6 +13,7 @@ Simple discord bot that provides an easy way to get status updates of map rotati
 Instead of prefixes, Nessie uses Discord's new [Slash Commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ) `/`
 - `br`: map rotation for battle royale
 - `arenas`: map rotation for arenas
+- `control`: map rotation for control
 - `about`: information hub of Nessie
 - `help`: list of commands and how to use them
 - `invite`: generates Nessie's invite link
