@@ -1,3 +1,19 @@
+# v1.5.0 (Fri Apr 15 2022)
+
+#### 🚀 Enhancement
+
+- Add current timer to br ranked [#56](https://github.com/vexuas/nessie/pull/56) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 03 30 [#55](https://github.com/vexuas/nessie/pull/55) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.4.0 (Wed Mar 30 2022)
 
 #### 🚀 Enhancement
