@@ -40,12 +40,22 @@ const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${apiKey}`;
  *  }
  * }
  * And brRanked = {
- *  current: {
+    current: {
+      start: 1649178000,
+      end: 1652202000,
+      readableDate_start: '2022-04-05 17:00:00',
+      readableDate_end: '2022-05-10 17:00:00',
       map: 'Kings Canyon',
-      asset: 'https://apexlegendsstatus.com/assets/maps/Kings_Canyon.png'
+      code: 'kings_canyon_rotation',
+      DurationInSecs: 3024000,
+      DurationInMinutes: 50400,
+      asset: 'https://apexlegendsstatus.com/assets/maps/Kings_Canyon.png',
+      remainingSecs: 2197532,
+      remainingMins: 36626,
+      remainingTimer: '610:25:32'
     },
-    next: { map: 'Olympus' }
- * }
+    next: { map: 'Unknown' }
+}
  */
 
 exports.getBattleRoyalePubs = async () => {

@@ -93,7 +93,7 @@ const generateRankedEmbed = (data) => {
       },
       {
         name: 'Time left',
-        value: '```xl\n\nRunning till end of split```',
+        value: '```xl\n\n' + getCountdown(data.current.remainingTimer) + '```',
         inline: true,
       },
     ],
