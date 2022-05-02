@@ -83,68 +83,12 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   //------
   /**
    * Event handler for when a message is sent in a channel that nessie is in
+   * As of May 22 2022, removed any implementations for this event
+   * Discord would be limiting this event for special applications and only be used on a per request basis
+   * As nessie doesn't need this, we're deprecating the need of listening to messages and instead using interactions
+   * Keeping this in for now until it's officially gone in August
    */
-  nessie.on('messageCreate', async (message) => {
-    /**
-     * Adding this temporary check for servers that are still using prefix commands
-     * Previously we query our database for every message created regardless of which commands they're using
-     * However I've realised this is inefficient and cost extensive as nessie will still open a connection for application-only servers everytime a message is created
-     * To fix this, we only check the database if they're prefix commands users
-     * Will deprecate at April 29
-     */
-    const isUsingPrefix = temporaryPrefixGuilds.find((guild) => {
-      return message.guildId === guild;
-    });
-    if (message.author.bot || !isUsingPrefix) return; //Ignore messages made by nessie or if server is an application-only commands server
-    try {
-      /**
-       * Opens the nessie database and finds the guild data where the message was used
-       * This is primarily to know the current prefix of the guild; important when users are using a custom prefix
-       */
-      const response = await pool.query('SELECT * FROM Guild WHERE uuid = ($1)', [
-        `${message.guildId}`,
-      ]);
-      const currentGuild = response.rows[0];
-
-      if (currentGuild && !currentGuild.use_prefix) return; //Only respond to guilds that have prefix commands support
-      const nessiePrefix = currentGuild.prefix;
-      /**
-       * Nessie checks if messages contains any mentions
-       * If it does and if one of the mentions contains nessie's user, returns a message with the current prefix i.e @Nessie
-       */
-      message.mentions.users.forEach((user) => {
-        if (user === nessie.user) {
-          return message.channel.send(`My prefix is ${codeBlock(nessiePrefix)}`);
-        }
-      });
-      //Ignores messages without a prefix
-      if (message.content.startsWith(nessiePrefix)) {
-        const args = message.content.slice(nessiePrefix.length).split(' ', 1); //takes off prefix and returns first word as an array
-        const command = args.shift().toLowerCase(); //gets command as a string from array
-        const arguments = message.content.slice(nessiePrefix.length + command.length + 1); //gets arguments if there are any
-
-        //Check if command exists in the command file
-        if (commands[command]) {
-          //If it does check if there are any arguments passed and if the command expects an argument
-          if (arguments.length > 0 && !commands[command].hasArguments) {
-            await message.channel.send("That command doesn't accept arguments （・□・；）"); //Sends error reply if it doesn't
-          } else {
-            await commands[command].execute({ message, arguments, nessie, nessiePrefix }); //Executes command
-            sendMixpanelEvent(
-              message.author,
-              message.channel,
-              message.channel.guild,
-              command,
-              mixpanel,
-              arguments
-            ); //Send tracking event to mixpanel
-          }
-        }
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  });
+  nessie.on('messageCreate', async (message) => {});
 
   nessie.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand() || !interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
