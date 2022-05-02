@@ -6,13 +6,13 @@
 exports.getApplicationCommands = () => {
   return {
     //Hub
-    about: require('./commands/hub/_about'),
-    help: require('./commands/hub/_help'),
-    invite: require('./commands/hub/_invite'),
-    updates: require('./commands/hub/_updates'),
+    about: require('./commands/hub/about'),
+    help: require('./commands/hub/help'),
+    invite: require('./commands/hub/invite'),
+    updates: require('./commands/hub/updates'),
     // Maps
-    br: require('./commands/maps/_battle-royale'),
-    arenas: require('./commands/maps/_arenas'),
-    control: require('./commands/maps/_control'),
+    br: require('./commands/maps/battle-royale'),
+    arenas: require('./commands/maps/arenas'),
+    control: require('./commands/maps/control'),
   };
 };
