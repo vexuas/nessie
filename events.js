@@ -16,16 +16,14 @@ const {
 } = require('./helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { getPrefixCommands, getApplicationCommands } = require('./commands');
+const { getApplicationCommands } = require('./commands');
 const {
   createGuildTable,
   insertNewGuild,
   removeServerDataFromNessie,
   pool,
 } = require('./database/handler');
-const { temporaryPrefixGuilds } = require('./config/database');
 
-const commands = getPrefixCommands(); //Get list of commands
 const appCommands = getApplicationCommands(); //Get list of application commands
 
 exports.registerEventHandlers = ({ nessie, mixpanel }) => {
