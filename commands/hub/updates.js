@@ -1,7 +1,8 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { nessieLogo } = require('../../constants');
 const { version } = require('../../package.json');
 
-const sendUpdatesEmbed = async ({ message }) => {
+const sendUpdatesEmbed = async ({ interaction }) => {
   const embed = {
     title: `v${version} | 15 April 2022`,
     color: 3447003,
@@ -11,12 +12,13 @@ const sendUpdatesEmbed = async ({ message }) => {
       url: nessieLogo,
     },
   };
-  return await message.channel.send({ embeds: [embed] });
+  return await interaction.reply({ embeds: [embed] });
 };
 module.exports = {
-  name: 'updates',
-  description: 'Displays latest news and updates of Nessie',
-  async execute({ message }) {
-    sendUpdatesEmbed({ message });
+  data: new SlashCommandBuilder()
+    .setName('updates')
+    .setDescription('Displays latest news and updates of Nessie'),
+  async execute({ interaction }) {
+    sendUpdatesEmbed({ interaction });
   },
 };

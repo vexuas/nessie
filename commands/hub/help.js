@@ -1,28 +1,22 @@
-const { generateAnnouncementMessage } = require('../../helpers');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-  name: 'help',
-  description: 'directory of commands',
-  hasArguments: false,
-  execute({ message, nessiePrefix }) {
+  data: new SlashCommandBuilder().setName('help').setDescription('Directory hub of commands'),
+  async execute({ interaction }) {
     const embed = {
       color: 3447003,
-      description:
-        generateAnnouncementMessage(nessiePrefix) +
-        'Below you can see all the commands that I know!\n\nMy current prefix is `' +
-        nessiePrefix +
-        '`',
+      description: 'Below you can see all the commands that I know!',
       fields: [
         {
           name: 'Maps',
-          value: '`br`, `br ranked`, `arenas`, `arenas ranked`, `control`',
+          value: '`br`, `arenas`, `control`',
         },
         {
           name: 'Information',
-          value: '`announcement`, `about`, `help`, `prefix`, `setprefix`, `invite`, `updates`',
+          value: '`about`, `help`, `invite`, `updates`',
         },
       ],
     };
-    return message.channel.send({ embeds: [embed] });
+    return await interaction.reply({ embeds: [embed] });
   },
 };

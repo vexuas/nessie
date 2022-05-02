@@ -1,15 +1,14 @@
-const { generateAnnouncementMessage } = require('../../helpers');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-  name: 'invite',
-  description: 'Generates an invite link for Nessie',
-  execute({ message, nessiePrefix }) {
+  data: new SlashCommandBuilder()
+    .setName('invite')
+    .setDescription('Generates an invite link for Nessie'),
+  async execute({ interaction }) {
     const embed = {
-      description:
-        generateAnnouncementMessage(nessiePrefix) +
-        `${message.author} | [Add me to your servers! (◕ᴗ◕✿)](https://discord.com/api/oauth2/authorize?client_id=889135055430111252&permissions=3088&scope=applications.commands%20bot)`,
+      description: `<@${interaction.user.id}> | [Add me to your servers! (◕ᴗ◕✿)](https://discord.com/api/oauth2/authorize?client_id=889135055430111252&permissions=3088&scope=applications.commands%20bot)`,
       color: 3447003,
     };
-    message.channel.send({ embeds: [embed] });
+    return await interaction.reply({ embeds: [embed] });
   },
 };

@@ -1,18 +1,12 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { format } = require('date-fns');
-const { version } = require('../../package.json');
-const { generateAnnouncementMessage, codeBlock } = require('../../helpers');
 const { nessieLogo } = require('../../constants');
+const { version } = require('../../package.json');
 
-const sendAboutEmbed = ({ message, nessie, prefix }) => {
+const sendAboutEmbed = async ({ nessie, interaction }) => {
   const embed = {
     title: 'About',
-    description:
-      generateAnnouncementMessage(prefix) +
-      `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nUpcoming feature: **Automatic Map Status Updates**\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!\n\nMy current prefix is ${codeBlock(
-        prefix
-      )} | For a detailed list of my commands, type ${codeBlock(
-        `${prefix}help`
-      )}\n\nFor the latest news, check out \`updates\`!`,
+    description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nUpcoming feature: **Automatic Map Status Updates**\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!\n\nFor the latest news, check out \`/updates\`!`,
     color: 3447003,
     thumbnail: {
       url: nessieLogo,
@@ -50,14 +44,14 @@ const sendAboutEmbed = ({ message, nessie, prefix }) => {
       },
     ],
   };
-  return message.channel.send({ embeds: [embed] });
+  return await interaction.reply({ embeds: [embed] });
 };
 
 module.exports = {
-  name: 'about',
-  description: 'The story and information hub of nessie',
-  execute({ message, nessie, nessiePrefix }) {
-    const prefix = nessiePrefix;
-    sendAboutEmbed({ message, nessie, prefix });
+  data: new SlashCommandBuilder()
+    .setName('about')
+    .setDescription('Displays information about Nessie'),
+  async execute({ nessie, interaction }) {
+    return await sendAboutEmbed({ nessie, interaction });
   },
 };
