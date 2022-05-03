@@ -40,6 +40,14 @@ const getMapUrl = (map) => {
 const getCountdown = (timer) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
+  const isOverADay = countdown[0] && parseInt(countdown[0]) >= 24;
+
+  //Since ranked br is usually one map for the whole split, good to show days as well rather than just the usual hours
+  if (isOverADay) {
+    const countdownDays = parseInt(countdown[0]) / 24;
+    const countdownHours = parseInt(countdown[0]) % 24;
+    return `${Math.floor(countdownDays)} days ${countdownHours} hrs ${countdown[1]} mins`;
+  }
   return `${isOverAnHour ? `${countdown[0]} hr ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
 };
 /**

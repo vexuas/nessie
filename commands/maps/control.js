@@ -78,7 +78,7 @@ module.exports = {
       );
     } catch (error) {
       const uuid = uuidv4();
-      const type = 'Battle Royale';
+      const type = 'Control';
       const errorEmbed = generateErrorEmbed(
         'Oops something went wrong! D: Try again in a bit!',
         uuid
