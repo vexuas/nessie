@@ -58,24 +58,45 @@ const generatePubsEmbed = (data) => {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('status')
-    .setDescription('Creates an automated channel to show map status'),
+    .setDescription('Creates an automated channel to show map status')
+    .addSubcommand((subCommand) =>
+      subCommand.setName('help').setDescription('Displays information about automatic map status')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('start').setDescription('Starts the automated map status')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('stop').setDescription('Stops an existing automated status')
+    ),
 
   async execute({ nessie, interaction, mixpanel }) {
+    const statusOption = interaction.options.getSubcommand();
+    console.log(statusOption);
     try {
       await interaction.deferReply();
-      const data = await getBattleRoyalePubs();
-      const embedToSend = generatePubsEmbed(data);
-      console.log(interaction);
-      // //Creates a category channel for better readability
-      const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
-        type: 'GUILD_CATEGORY',
-      });
-      // //Creates the status channnel for br
-      const statusChannel = await interaction.guild.channels.create('apex-pubs', {
-        parent: statusCategory,
-      });
-      const statusMessage = await statusChannel.send({ embeds: embedToSend }); //Sends initial br embed in status channel
-      await interaction.editReply(`Created map status at ${statusChannel}`); //Sends success message in channel where command got instantiated
+      switch (statusOption) {
+        case 'help':
+          await interaction.editReply('Status Help Command');
+          break;
+        case 'start':
+          await interaction.editReply('Status Start Command');
+          // const data = await getBattleRoyalePubs();
+          // const embedToSend = generatePubsEmbed(data);
+          // // //Creates a category channel for better readability
+          // const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
+          //   type: 'GUILD_CATEGORY',
+          // });
+          // //Creates the status channnel for br
+          // const statusChannel = await interaction.guild.channels.create('apex-pubs', {
+          //   parent: statusCategory,
+          // });
+          // const statusMessage = await statusChannel.send({ embeds: embedToSend }); //Sends initial br embed in status channel
+          // await interaction.editReply(`Created map status at ${statusChannel}`); //Sends success message in channel where command got instantiated
+          break;
+        case 'stop':
+          await interaction.editReply('Status Stop Command');
+          break;
+      }
     } catch (error) {
       console.log(error);
     }
