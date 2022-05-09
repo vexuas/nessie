@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getBattleRoyalePubs } = require('../../adapters');
+const { nessieLogo } = require('../../constants');
 const Scheduler = require('../../scheduler');
 
 const getMapUrl = (map) => {
@@ -28,6 +29,15 @@ const getCountdown = (timer) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
   return `${isOverAnHour ? `${countdown[0]} hr ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
+};
+const generateHelpEmbed = () => {
+  const embedData = {
+    title: 'Status | Help',
+    description:
+      'This command will send automatic updates about Apex Legends Map Status in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
+    color: 3447003,
+  };
+  return [embedData];
 };
 const generatePubsEmbed = (data) => {
   const embedData = {
@@ -71,12 +81,12 @@ module.exports = {
 
   async execute({ nessie, interaction, mixpanel }) {
     const statusOption = interaction.options.getSubcommand();
-    console.log(statusOption);
     try {
       await interaction.deferReply();
       switch (statusOption) {
         case 'help':
-          await interaction.editReply('Status Help Command');
+          const embedToSend = generateHelpEmbed();
+          await interaction.editReply({ embeds: embedToSend });
           break;
         case 'start':
           await interaction.editReply('Status Start Command');
