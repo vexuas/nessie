@@ -89,26 +89,29 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
   nessie.on('messageCreate', async (message) => {});
 
   nessie.on('interactionCreate', async (interaction) => {
-    if (!interaction.isCommand() || !interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
-    const { commandName } = interaction;
-    await appCommands[commandName].execute({ interaction, nessie, mixpanel });
-    /**
-     * Send event information to mixpanel for application commands
-     * This is for general commands that do not require arguments
-     * We can't do this here as we can only get the options within the command execution itself
-     * Hence, we have a separate handler for these commands in their own files instead of here
-     * TODO: Refactor conditional in the future, probably a better way to check since this isn't scalable
-     */
-    if (commandName !== 'br' && commandName !== 'arenas') {
-      sendMixpanelEvent(
-        interaction.user,
-        interaction.channel,
-        interaction.guild,
-        commandName,
-        mixpanel,
-        null,
-        true
-      );
+    if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
+
+    if (interaction.isCommand()) {
+      const { commandName } = interaction;
+      await appCommands[commandName].execute({ interaction, nessie, mixpanel });
+      /**
+       * Send event information to mixpanel for application commands
+       * This is for general commands that do not require arguments
+       * We can't do this here as we can only get the options within the command execution itself
+       * Hence, we have a separate handler for these commands in their own files instead of here
+       * TODO: Refactor conditional in the future, probably a better way to check since this isn't scalable
+       */
+      if (commandName !== 'br' && commandName !== 'arenas') {
+        sendMixpanelEvent(
+          interaction.user,
+          interaction.channel,
+          interaction.guild,
+          commandName,
+          mixpanel,
+          null,
+          true
+        );
+      }
     }
   });
 };

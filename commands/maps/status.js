@@ -1,95 +1,103 @@
-const { getBattleRoyalePubs } = require('../../adapters');
-const Scheduler = require('../../scheduler');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageActionRow, MessageButton } = require('discord.js');
 
-const getMapUrl = (map) => {
-  switch (map) {
-    case 'kings_canyon_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
-    case 'Kings Canyon':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
-    case 'worlds_edge_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544195488129034/worlds_edge.jpg';
-    case `World's Edge`:
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544195488129034/worlds_edge.jpg';
-    case 'olympus_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
-    case 'Olympus':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
-    case 'Storm Point':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
-    case 'storm_point_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
-    default:
-      return '';
-  }
-};
-const getCountdown = (timer) => {
-  const countdown = timer.split(':');
-  const isOverAnHour = countdown[0] && countdown[0] !== '00';
-  return `${isOverAnHour ? `${countdown[0]} hr ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
-};
-const generatePubsEmbed = (data) => {
+const sendHelpInteraction = async (interaction) => {
   const embedData = {
-    title: 'Battle Royale | Pubs',
-    color: 3066993,
-    image: {
-      url: getMapUrl(data.current.code),
-    },
-    timestamp: Date.now() + data.current.remainingSecs * 1000,
-    footer: {
-      text: `Next Map: ${data.next.map}`,
-    },
-    fields: [
-      {
-        name: 'Current map',
-        value: '```fix\n\n' + data.current.map + '```',
-        inline: true,
-      },
-      {
-        name: 'Time left',
-        value: '```xl\n\n' + getCountdown(data.current.remainingTimer) + '```',
-        inline: true,
-      },
-    ],
+    title: 'Status | Help',
+    description:
+      'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
+    color: 3447003,
   };
-  return [embedData];
+  return await interaction.editReply({ embeds: [embedData] });
 };
-module.exports = {
-  name: 'status',
-  description: 'Creates a channel to automatically show current map status',
-  hasArguments: false,
-  async execute({ nessie, message }) {
-    //EXPERIMENTAL FOR NOW; Just wanted to see how feasible it is to do automated updates
-    message.channel.sendTyping();
-    try {
-      const data = await getBattleRoyalePubs();
-      const embedToSend = generatePubsEmbed(data);
-      //Creates a category channel for better readability
-      const statusCategory = await message.guild.channels.create(
-        'Apex Legends Map Status [Nessie]',
-        {
-          type: 'GUILD_CATEGORY',
-        }
-      );
-      //Creates the status channnel for br
-      const statusChannel = await message.guild.channels.create('battle-royale', {
-        parent: statusCategory,
-      });
-      const statusMessage = await statusChannel.send({ embeds: embedToSend }); //Sends initial br embed in status channel
-      await message.channel.send(`Created map status at ${statusChannel}`); //Sends success message in channel where command got instantiated
+const sendStartInteraction = async (interaction) => {
+  const embedData = {
+    title: 'Status | Start',
+    color: 3447003,
+    description:
+      'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 15 minutes',
+  };
+  const row = new MessageActionRow()
+    .addComponents(
+      new MessageButton()
+        .setCustomId('statusStart__cancelButton')
+        .setLabel('Cancel')
+        .setStyle('SECONDARY')
+    )
+    .addComponents(
+      new MessageButton()
+        .setCustomId('statusStart__startButton')
+        .setLabel(`Let's go!`)
+        .setStyle('SUCCESS')
+    );
 
-      /**
-       * Creates a new scheduler instance that will fire the callback every minute from 0:00
-       * Callback:
-       * - Gets current data from API
-       * - Edits the status message with the updated embed data
-       */
-      const statusUpdate = new Scheduler('0 */1 * * * *', async () => {
-        const updatedData = await getBattleRoyalePubs();
-        const updatedEmbed = generatePubsEmbed(updatedData);
-        await statusMessage.edit({ embeds: updatedEmbed });
-      });
-      statusUpdate.start(); //Starts the scheduler
+  return await interaction.editReply({ components: [row], embeds: [embedData] });
+};
+const sendStopInteraction = async (interaction) => {
+  const embedData = {
+    title: 'Status | Stop',
+    color: 3447003,
+    description:
+      'By confirming below, Nessie will stop the existing map status and delete these channels:\n• Apex Map Status\n• #apex-pubs\n• #apex-ranked\n\nTo re-enable the automated map status after, simply use `/status start` again',
+  };
+  const row = new MessageActionRow()
+    .addComponents(
+      new MessageButton()
+        .setCustomId('statusStop__cancelButton')
+        .setLabel('Cancel')
+        .setStyle('SECONDARY')
+    )
+    .addComponents(
+      new MessageButton()
+        .setCustomId('statusStop__stopButton')
+        .setLabel(`Stop it!`)
+        .setStyle('DANGER')
+    );
+
+  return await interaction.editReply({ components: [row], embeds: [embedData] });
+};
+
+module.exports = {
+  /**
+   * Creates Status application command with relevant subcommands
+   * Apparently when you create a subcommand under a base command, the base command will no longer be called
+   * I.e /status becomes void and only '/status xyz' can be used as commands
+   * I'm not sure why Discord did it this way but their explanation is the base command now becomes a folder of sorts
+   * Was initially planning to have /status, /status start and /status stop with the former showing the command information
+   * Not really a problem anyway since now it's /status help
+   */
+  data: new SlashCommandBuilder()
+    .setName('status')
+    .setDescription('Creates an automated channel to show map status')
+    .addSubcommand((subCommand) =>
+      subCommand.setName('help').setDescription('Displays information about automatic map status')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('start').setDescription('Starts the automated map status')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('stop').setDescription('Stops an existing automated status')
+    ),
+  /**
+   * Send correct reply based on the user's subcommand input
+   * Since we're opting to use button components, the actual status implementation can't be placed here when an application command is called
+   * This is because buttons are also interactions similar to app commands (component interactions)
+   * Upon clicking a button, a new interaction is retrieved by the interactionCreate listener and would have to be treated there
+   * It's honestly going to be a maze trying to link things together here but it's the price of being trailblazers I guess
+   */
+  async execute({ nessie, interaction, mixpanel }) {
+    const statusOption = interaction.options.getSubcommand();
+    try {
+      await interaction.deferReply();
+      switch (statusOption) {
+        case 'help':
+          return await sendHelpInteraction(interaction);
+          break;
+        case 'start':
+          return await sendStartInteraction(interaction);
+        case 'stop':
+          return await sendStopInteraction(interaction);
+      }
     } catch (error) {
       console.log(error);
     }
