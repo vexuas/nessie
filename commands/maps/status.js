@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
 
-const generateHelpEmbed = () => {};
 const sendHelpInteraction = async (interaction) => {
   const embedData = {
     title: 'Status | Help',
@@ -34,6 +33,29 @@ const sendStartInteraction = async (interaction) => {
 
   return await interaction.editReply({ components: [row], embeds: [embedData] });
 };
+const sendStopInteraction = async (interaction) => {
+  const embedData = {
+    title: 'Status | Stop',
+    color: 3447003,
+    description:
+      'By confirming below, Nessie will stop the existing map status and delete these channels:\n• Apex Map Status\n• #apex-pubs\n• #apex-ranked\n\nTo re-enable the automated map status after, simply use `/status start` again',
+  };
+  const row = new MessageActionRow()
+    .addComponents(
+      new MessageButton()
+        .setCustomId('statusStop__cancelButton')
+        .setLabel('Cancel')
+        .setStyle('SECONDARY')
+    )
+    .addComponents(
+      new MessageButton()
+        .setCustomId('statusStop__stopButton')
+        .setLabel(`Stop it!`)
+        .setStyle('DANGER')
+    );
+
+  return await interaction.editReply({ components: [row], embeds: [embedData] });
+};
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('status')
@@ -59,7 +81,7 @@ module.exports = {
         case 'start':
           return await sendStartInteraction(interaction);
         case 'stop':
-          return await interaction.editReply('Status Stop Command');
+          return await sendStopInteraction(interaction);
       }
     } catch (error) {
       console.log(error);
