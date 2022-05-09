@@ -56,7 +56,16 @@ const sendStopInteraction = async (interaction) => {
 
   return await interaction.editReply({ components: [row], embeds: [embedData] });
 };
+
 module.exports = {
+  /**
+   * Creates Status application command with relevant subcommands
+   * Apparently when you create a subcommand under a base command, the base command will no longer be called
+   * I.e /status becomes void and only '/status xyz' can be used as commands
+   * I'm not sure why Discord did it this way but their explanation is the base command now becomes a folder of sorts
+   * Was initially planning to have /status, /status start and /status stop with the former showing the command information
+   * Not really a problem anyway since now it's /status help
+   */
   data: new SlashCommandBuilder()
     .setName('status')
     .setDescription('Creates an automated channel to show map status')
@@ -69,7 +78,13 @@ module.exports = {
     .addSubcommand((subCommand) =>
       subCommand.setName('stop').setDescription('Stops an existing automated status')
     ),
-
+  /**
+   * Send correct reply based on the user's subcommand input
+   * Since we're opting to use button components, the actual status implementation can't be placed here when an application command is called
+   * This is because buttons are also interactions similar to app commands (component interactions)
+   * Upon clicking a button, a new interaction is retrieved by the interactionCreate listener and would have to be treated there
+   * It's honestly going to be a maze trying to link things together here but it's the price of being trailblazers I guess
+   */
   async execute({ nessie, interaction, mixpanel }) {
     const statusOption = interaction.options.getSubcommand();
     try {
