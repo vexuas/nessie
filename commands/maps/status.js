@@ -1,3 +1,4 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getBattleRoyalePubs } = require('../../adapters');
 const Scheduler = require('../../scheduler');
 
@@ -55,41 +56,26 @@ const generatePubsEmbed = (data) => {
   return [embedData];
 };
 module.exports = {
-  name: 'status',
-  description: 'Creates a channel to automatically show current map status',
-  hasArguments: false,
-  async execute({ nessie, message }) {
-    //EXPERIMENTAL FOR NOW; Just wanted to see how feasible it is to do automated updates
-    message.channel.sendTyping();
+  data: new SlashCommandBuilder()
+    .setName('status')
+    .setDescription('Creates an automated channel to show map status'),
+
+  async execute({ nessie, interaction, mixpanel }) {
     try {
+      await interaction.deferReply();
       const data = await getBattleRoyalePubs();
       const embedToSend = generatePubsEmbed(data);
-      //Creates a category channel for better readability
-      const statusCategory = await message.guild.channels.create(
-        'Apex Legends Map Status [Nessie]',
-        {
-          type: 'GUILD_CATEGORY',
-        }
-      );
-      //Creates the status channnel for br
-      const statusChannel = await message.guild.channels.create('battle-royale', {
+      console.log(interaction);
+      // //Creates a category channel for better readability
+      const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
+        type: 'GUILD_CATEGORY',
+      });
+      // //Creates the status channnel for br
+      const statusChannel = await interaction.guild.channels.create('apex-pubs', {
         parent: statusCategory,
       });
       const statusMessage = await statusChannel.send({ embeds: embedToSend }); //Sends initial br embed in status channel
-      await message.channel.send(`Created map status at ${statusChannel}`); //Sends success message in channel where command got instantiated
-
-      /**
-       * Creates a new scheduler instance that will fire the callback every minute from 0:00
-       * Callback:
-       * - Gets current data from API
-       * - Edits the status message with the updated embed data
-       */
-      const statusUpdate = new Scheduler('0 */1 * * * *', async () => {
-        const updatedData = await getBattleRoyalePubs();
-        const updatedEmbed = generatePubsEmbed(updatedData);
-        await statusMessage.edit({ embeds: updatedEmbed });
-      });
-      statusUpdate.start(); //Starts the scheduler
+      await interaction.editReply(`Created map status at ${statusChannel}`); //Sends success message in channel where command got instantiated
     } catch (error) {
       console.log(error);
     }
