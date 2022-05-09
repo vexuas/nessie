@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getBattleRoyalePubs } = require('../../adapters');
+const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
 const { nessieLogo } = require('../../constants');
 const Scheduler = require('../../scheduler');
 
@@ -34,7 +34,7 @@ const generateHelpEmbed = () => {
   const embedData = {
     title: 'Status | Help',
     description:
-      'This command will send automatic updates about Apex Legends Map Status in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
+      'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
     color: 3447003,
   };
   return [embedData];
@@ -49,6 +49,28 @@ const generatePubsEmbed = (data) => {
     timestamp: Date.now() + data.current.remainingSecs * 1000,
     footer: {
       text: `Next Map: ${data.next.map}`,
+    },
+    fields: [
+      {
+        name: 'Current map',
+        value: '```fix\n\n' + data.current.map + '```',
+        inline: true,
+      },
+      {
+        name: 'Time left',
+        value: '```xl\n\n' + getCountdown(data.current.remainingTimer) + '```',
+        inline: true,
+      },
+    ],
+  };
+  return [embedData];
+};
+const generateRankedEmbed = (data) => {
+  const embedData = {
+    title: 'Battle Royale | Ranked',
+    color: 7419530,
+    image: {
+      url: getMapUrl(data.current.map),
     },
     fields: [
       {
@@ -89,19 +111,29 @@ module.exports = {
           await interaction.editReply({ embeds: embedToSend });
           break;
         case 'start':
-          await interaction.editReply('Status Start Command');
-          // const data = await getBattleRoyalePubs();
-          // const embedToSend = generatePubsEmbed(data);
-          // // //Creates a category channel for better readability
-          // const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
-          //   type: 'GUILD_CATEGORY',
-          // });
-          // //Creates the status channnel for br
-          // const statusChannel = await interaction.guild.channels.create('apex-pubs', {
-          //   parent: statusCategory,
-          // });
-          // const statusMessage = await statusChannel.send({ embeds: embedToSend }); //Sends initial br embed in status channel
-          // await interaction.editReply(`Created map status at ${statusChannel}`); //Sends success message in channel where command got instantiated
+          const pubsData = await getBattleRoyalePubs();
+          const rankedData = await getBattleRoyaleRanked();
+          const pubsEmbed = generatePubsEmbed(pubsData);
+          const rankedEmbed = generateRankedEmbed(rankedData);
+          // //Creates a category channel for better readability
+          const statusCategory = await interaction.guild.channels.create(
+            'Apex Legends Map Status',
+            {
+              type: 'GUILD_CATEGORY',
+            }
+          );
+          //Creates the status channnel for br
+          const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
+            parent: statusCategory,
+          });
+          const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
+            parent: statusCategory,
+          });
+          const statusPubsMessage = await statusPubsChannel.send({ embeds: pubsEmbed }); //Sends initial br embed in status channel
+          const statusRankedMessage = await statusRankedChannel.send({ embeds: rankedEmbed });
+          await interaction.editReply(
+            `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`
+          ); //Sends success message in channel where command got instantiated
           break;
         case 'stop':
           await interaction.editReply('Status Stop Command');
