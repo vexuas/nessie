@@ -260,12 +260,12 @@ const getCountdown = (timer) => {
  * Added a hack to display the time for next map regardless of timezone
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  */
-const generatePubsEmbed = (data) => {
+const generatePubsEmbed = (data, type = 'Battle Royale') => {
   const embedData = {
-    title: 'Battle Royale | Pubs',
+    title: `${type} | Pubs`,
     color: 3066993,
     image: {
-      url: getMapUrl(data.current.code),
+      url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
     timestamp: Date.now() + data.current.remainingSecs * 1000,
     footer: {
@@ -284,7 +284,7 @@ const generatePubsEmbed = (data) => {
       },
     ],
   };
-  return [embedData];
+  return embedData;
 };
 /**
  * Embed design for BR Ranked

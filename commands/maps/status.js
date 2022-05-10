@@ -64,6 +64,20 @@ const sendStopInteraction = async (interaction) => {
 
   return await interaction.editReply({ components: [row], embeds: [embedData] });
 };
+const generatePubsStatusEmbeds = (data) => {
+  const battleRoyaleEmbed = generatePubsEmbed(data.battle_royale);
+  const arenasEmbed = generatePubsEmbed(data.arenas, 'Arenas');
+  const informationEmbed = {
+    description:
+      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+    color: 3066993,
+    timestamp: Date.now(),
+    footer: {
+      text: 'Last Update',
+    },
+  };
+  return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
+};
 const createStatusChannel = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
   try {
@@ -73,7 +87,7 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     };
     await interaction.message.edit({ embeds: [embedLoading], components: [] });
     const rotationData = await getRotationData();
-    const pubsEmbed = generatePubsEmbed(rotationData.battle_royale);
+    const statusPubsEmbed = generatePubsStatusEmbeds(rotationData);
     const rankedEmbed = generateRankedEmbed(rotationData.ranked);
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
@@ -86,7 +100,7 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
       parent: statusCategory,
     });
-    const statusPubsMessage = await statusPubsChannel.send({ embeds: pubsEmbed }); //Sends initial br embed in status channel
+    const statusPubsMessage = await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial br embed in status channel
     const statusRankedMessage = await statusRankedChannel.send({ embeds: rankedEmbed });
     const embedSuccess = {
       description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
