@@ -1,7 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
-const { generatePubsEmbed, generateRankedEmbed } = require('../../helpers');
+const {
+  generatePubsEmbed,
+  generateRankedEmbed,
+  generateErrorEmbed,
+  sendErrorLog,
+} = require('../../helpers');
+const { v4: uuidv4 } = require('uuid');
 
 const sendHelpInteraction = async (interaction) => {
   const embedData = {
@@ -58,35 +64,46 @@ const sendStopInteraction = async (interaction) => {
 
   return await interaction.editReply({ components: [row], embeds: [embedData] });
 };
-const createStatusChannel = async (interaction) => {
+const createStatusChannel = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
-  const embedLoading = {
-    description: `Loading status channels...`,
-    color: 16776960,
-  };
-  await interaction.message.edit({ embeds: [embedLoading], components: [] }); //Sends success message in channel where command got instantiated
-  const pubsData = await getBattleRoyalePubs();
-  const rankedData = await getBattleRoyaleRanked();
-  const pubsEmbed = generatePubsEmbed(pubsData);
-  const rankedEmbed = generateRankedEmbed(rankedData);
-  // //Creates a category channel for better readability
-  const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
-    type: 'GUILD_CATEGORY',
-  });
-  //Creates the status channnel for br
-  const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
-    parent: statusCategory,
-  });
-  const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
-    parent: statusCategory,
-  });
-  const statusPubsMessage = await statusPubsChannel.send({ embeds: pubsEmbed }); //Sends initial br embed in status channel
-  const statusRankedMessage = await statusRankedChannel.send({ embeds: rankedEmbed });
-  const embedSuccess = {
-    description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
-    color: 3066993,
-  };
-  await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
+  try {
+    const embedLoading = {
+      description: `Loading status channels...`,
+      color: 16776960,
+    };
+    await interaction.message.edit({ embeds: [embedLoading], components: [] }); //Sends success message in channel where command got instantiated
+    const pubsData = await getBattleRoyalePubs();
+    const rankedData = await getBattleRoyaleRanked();
+    const pubsEmbed = generatePubsEmbed(pubsData);
+    const rankedEmbed = generateRankedEmbed(rankedData);
+    // //Creates a category channel for better readability
+    const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
+      type: 'GUILD_CATEGORY',
+    });
+    //Creates the status channnel for br
+    const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
+      parent: statusCategory,
+    });
+    const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
+      parent: statusCategory,
+    });
+    const statusPubsMessage = await statusPubsChannel.send({ embeds: pubsEmbed }); //Sends initial br embed in status channel
+    const statusRankedMessage = await statusRankedChannel.send({ embeds: rankedEmbed });
+    const embedSuccess = {
+      description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
+      color: 3066993,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Button';
+    const errorEmbed = generateErrorEmbed(
+      'Oops something went wrong! D: Try again in a bit!',
+      uuid
+    );
+    await interaction.message.edit({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
 };
 module.exports = {
   /**

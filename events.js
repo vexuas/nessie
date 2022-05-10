@@ -117,7 +117,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     if (interaction.isButton()) {
       switch (interaction.customId) {
         case 'statusStart__startButton':
-          await createStatusChannel(interaction);
+          await createStatusChannel({ nessie, interaction });
           break;
       }
     }
