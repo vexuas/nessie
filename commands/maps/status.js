@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
-const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
+const { getBattleRoyalePubs, getBattleRoyaleRanked, getRotationData } = require('../../adapters');
 const {
   generatePubsEmbed,
   generateRankedEmbed,
@@ -72,10 +72,9 @@ const createStatusChannel = async ({ nessie, interaction }) => {
       color: 16776960,
     };
     await interaction.message.edit({ embeds: [embedLoading], components: [] });
-    const pubsData = await getBattleRoyalePubs();
-    const rankedData = await getBattleRoyaleRanked();
-    const pubsEmbed = generatePubsEmbed(pubsData);
-    const rankedEmbed = generateRankedEmbed(rankedData);
+    const rotationData = await getRotationData();
+    const pubsEmbed = generatePubsEmbed(rotationData.battle_royale);
+    const rankedEmbed = generateRankedEmbed(rotationData.ranked);
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
