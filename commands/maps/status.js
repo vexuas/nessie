@@ -70,7 +70,21 @@ const generatePubsStatusEmbeds = (data) => {
   const informationEmbed = {
     description:
       '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
-    color: 3066993,
+    color: 16776960,
+    timestamp: Date.now(),
+    footer: {
+      text: 'Last Update',
+    },
+  };
+  return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
+};
+const generateRankedStatusEmbeds = (data) => {
+  const battleRoyaleEmbed = generateRankedEmbed(data.ranked);
+  const arenasEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
+  const informationEmbed = {
+    description:
+      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+    color: 16776960,
     timestamp: Date.now(),
     footer: {
       text: 'Last Update',
@@ -88,20 +102,20 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     await interaction.message.edit({ embeds: [embedLoading], components: [] });
     const rotationData = await getRotationData();
     const statusPubsEmbed = generatePubsStatusEmbeds(rotationData);
-    const rankedEmbed = generateRankedEmbed(rotationData.ranked);
+    const statusRankedEmbed = generateRankedStatusEmbeds(rotationData);
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
     });
-    //Creates the status channnel for br
+    //Creates the status channnel for pubs and ranked
     const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
       parent: statusCategory,
     });
     const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
       parent: statusCategory,
     });
-    const statusPubsMessage = await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial br embed in status channel
-    const statusRankedMessage = await statusRankedChannel.send({ embeds: rankedEmbed });
+    await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
+    await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
     const embedSuccess = {
       description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
       color: 3066993,

@@ -290,12 +290,12 @@ const generatePubsEmbed = (data, type = 'Battle Royale') => {
  * Embed design for BR Ranked
  * Fairly simple, don't need any fancy timers and footers
  */
-const generateRankedEmbed = (data) => {
+const generateRankedEmbed = (data, type = 'Battle Royale') => {
   const embedData = {
-    title: 'Battle Royale | Ranked',
+    title: `${type} | Ranked`,
     color: 7419530,
     image: {
-      url: getMapUrl(data.current.map),
+      url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
     fields: [
       {
@@ -310,7 +310,13 @@ const generateRankedEmbed = (data) => {
       },
     ],
   };
-  return [embedData];
+  if (type === 'Arenas') {
+    embedData.timestamp = Date.now() + data.current.remainingSecs * 1000;
+    embedData.footer = {
+      text: `Next Map: ${data.next.map}`,
+    };
+  }
+  return embedData;
 };
 //---------
 module.exports = {
