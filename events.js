@@ -23,6 +23,7 @@ const {
   removeServerDataFromNessie,
   pool,
 } = require('./database/handler');
+const { createStatusChannel } = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -111,6 +112,13 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           null,
           true
         );
+      }
+    }
+    if (interaction.isButton()) {
+      switch (interaction.customId) {
+        case 'statusStart__startButton':
+          await createStatusChannel(interaction);
+          break;
       }
     }
   });
