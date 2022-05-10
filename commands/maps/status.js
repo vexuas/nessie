@@ -70,7 +70,7 @@ const generatePubsStatusEmbeds = (data) => {
   const informationEmbed = {
     description:
       '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
-    color: 16776960,
+    color: 3447003,
     timestamp: Date.now(),
     footer: {
       text: 'Last Update',
@@ -84,7 +84,7 @@ const generateRankedStatusEmbeds = (data) => {
   const informationEmbed = {
     description:
       '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
-    color: 16776960,
+    color: 3447003,
     timestamp: Date.now(),
     footer: {
       text: 'Last Update',
