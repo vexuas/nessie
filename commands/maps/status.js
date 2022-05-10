@@ -71,7 +71,7 @@ const createStatusChannel = async ({ nessie, interaction }) => {
       description: `Loading status channels...`,
       color: 16776960,
     };
-    await interaction.message.edit({ embeds: [embedLoading], components: [] }); //Sends success message in channel where command got instantiated
+    await interaction.message.edit({ embeds: [embedLoading], components: [] });
     const pubsData = await getBattleRoyalePubs();
     const rankedData = await getBattleRoyaleRanked();
     const pubsEmbed = generatePubsEmbed(pubsData);
@@ -97,6 +97,25 @@ const createStatusChannel = async ({ nessie, interaction }) => {
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Button';
+    const errorEmbed = generateErrorEmbed(
+      'Oops something went wrong! D: Try again in a bit!',
+      uuid
+    );
+    await interaction.message.edit({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+const cancelStatusStart = async ({ nessie, interaction }) => {
+  interaction.deferUpdate();
+  try {
+    const embedSuccess = {
+      description: 'Cancelled automated map status setup',
+      color: 16711680,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Cancel Button';
     const errorEmbed = generateErrorEmbed(
       'Oops something went wrong! D: Try again in a bit!',
       uuid
@@ -150,4 +169,5 @@ module.exports = {
     }
   },
   createStatusChannel,
+  cancelStatusStart,
 };

@@ -23,7 +23,7 @@ const {
   removeServerDataFromNessie,
   pool,
 } = require('./database/handler');
-const { createStatusChannel } = require('./commands/maps/status');
+const { createStatusChannel, cancelStatusStart } = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -117,8 +117,9 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     if (interaction.isButton()) {
       switch (interaction.customId) {
         case 'statusStart__startButton':
-          await createStatusChannel({ nessie, interaction });
-          break;
+          return await createStatusChannel({ nessie, interaction });
+        case 'statusStart__cancelButton':
+          return await cancelStatusStart({ nessie, interaction });
       }
     }
   });
