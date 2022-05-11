@@ -256,7 +256,7 @@ const getCountdown = (timer) => {
   return `${isOverAnHour ? `${countdown[0]} hr ` : ''}${countdown[1]} mins ${countdown[2]} secs`;
 };
 /**
- * Embed design for BR Pubs
+ * Embed design for any pubs map
  * Added a hack to display the time for next map regardless of timezone
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  */
@@ -287,7 +287,7 @@ const generatePubsEmbed = (data, type = 'Battle Royale') => {
   return embedData;
 };
 /**
- * Embed design for BR Ranked
+ * Embed design for any ranked map
  * Fairly simple, don't need any fancy timers and footers
  */
 const generateRankedEmbed = (data, type = 'Battle Royale') => {

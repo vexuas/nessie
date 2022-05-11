@@ -9,6 +9,7 @@ const {
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 
+//----- Status Application Command Replies -----//
 const sendHelpInteraction = async (interaction) => {
   const embedData = {
     title: 'Status | Help',
@@ -64,6 +65,12 @@ const sendStopInteraction = async (interaction) => {
 
   return await interaction.editReply({ components: [row], embeds: [embedData] });
 };
+//----- Status Functions/Interactions -----//
+/**
+ * Generates relevant embeds for the status pubs channel
+ * Currently only showing battle royale and arenas
+ * Might put control in after double checking if it's still up in season 13
+ */
 const generatePubsStatusEmbeds = (data) => {
   const battleRoyaleEmbed = generatePubsEmbed(data.battle_royale);
   const arenasEmbed = generatePubsEmbed(data.arenas, 'Arenas');
@@ -78,6 +85,10 @@ const generatePubsStatusEmbeds = (data) => {
   };
   return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
 };
+/**
+ * Generates relevant embeds for the status ranked channel
+ * Currently only showing battle royale and arenas
+ */
 const generateRankedStatusEmbeds = (data) => {
   const battleRoyaleEmbed = generateRankedEmbed(data.ranked);
   const arenasEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
@@ -92,64 +103,52 @@ const generateRankedStatusEmbeds = (data) => {
   };
   return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
 };
-const generateStatusEmbeds = (data) => {
-  const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
-  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
-  const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
-  const informationEmbed = {
-    description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
-    color: 3447003,
-    timestamp: Date.now(),
-    footer: {
-      text: 'Last Update',
-    },
-  };
-  return [
-    informationEmbed,
-    arenasRankedEmbed,
-    battleRoyaleRankedEmbed,
-    arenasPubsEmbed,
-    battleRoyalePubsEmbed,
-  ];
-};
+/**
+ * Handler for initialising the process of map status
+ * Gets called when a user clicks the confirm button of the /status start reply
+ * Main steps upon button click:
+ * - Edits initial message with a loading state
+ * - Calls the API for the rotation data
+ * - Create embeds for each status channel
+ * - Creates a category channel and 2 new text channels under it
+ * - Sends embeds to respective channels and edits initial message with a success message
+ * -
+ * TODO: Start the auto-update scheduler
+ * TODO: Create tables in database to store status data
+ */
 const createStatusChannel = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
   try {
+    /**
+     * Since we defer the update, discord's loading state isn't long enough to last until every promise is done
+     * To solve that, we'll edit the initial message with a loading embed
+     * This is so that we prevent any extra clicks from users on the buttons
+     **/
     const embedLoading = {
       description: `Loading status channels...`,
       color: 16776960,
     };
     await interaction.message.edit({ embeds: [embedLoading], components: [] });
-    const rotationData = await getRotationData();
 
+    const rotationData = await getRotationData();
     const statusPubsEmbed = generatePubsStatusEmbeds(rotationData);
     const statusRankedEmbed = generateRankedStatusEmbeds(rotationData);
+
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
     });
-    // //Creates the status channnel for pubs and ranked
-    // const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
-    //   parent: statusCategory,
-    // });
-    // const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
-    //   parent: statusCategory,
-    // });
-    // await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
-    // await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
-    // const embedSuccess = {
-    //   description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
-    //   color: 3066993,
-    // };
-    const statusChannel = await interaction.guild.channels.create('apex-maps-status', {
+    //Creates the status channnel for pubs and ranked
+    const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
       parent: statusCategory,
     });
-    const statusEmbed = generateStatusEmbeds(rotationData);
-    await statusChannel.send({ embeds: statusEmbed });
+    const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
+      parent: statusCategory,
+    });
+    await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
+    await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
     const embedSuccess = {
-      description: `Created map status at ${statusChannel}`,
+      description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
       color: 3066993,
     };
     await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
@@ -164,6 +163,11 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for cancelling the setup of /status start
+ * Gets called when a user clicks the cancel button of the /status start reply
+ * Pretty straightforward; we just edit the initial message with a cancel message
+ */
 const cancelStatusStart = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
   try {
