@@ -23,6 +23,7 @@ const {
   removeServerDataFromNessie,
   pool,
 } = require('./database/handler');
+const { createStatusChannel, cancelStatusStart } = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -111,6 +112,20 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           null,
           true
         );
+      }
+    }
+    /**
+     * Since components are also interactions, any user inputs from it go through this listener too
+     * This does prove to be a hassle code readability wise as the handlers for these interactions are now detached from their own files
+     * Tried to make it less ugly tho and house the implementations inside functions and call them here
+     * Will still have to check the customId for each of the buttons here though
+     */
+    if (interaction.isButton()) {
+      switch (interaction.customId) {
+        case 'statusStart__startButton':
+          return await createStatusChannel({ nessie, interaction });
+        case 'statusStart__cancelButton':
+          return await cancelStatusStart({ nessie, interaction });
       }
     }
   });

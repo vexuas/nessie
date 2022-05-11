@@ -93,3 +93,10 @@ exports.getControlPubs = async () => {
   console.log(data);
   return data;
 };
+exports.getRotationData = async () => {
+  const data = await axios.get(url).then((response) => {
+    return response.data;
+  });
+  console.log(data);
+  return data;
+};
