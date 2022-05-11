@@ -1,6 +1,5 @@
 const { format } = require('date-fns');
 const { nessieLogo } = require('./constants');
-
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
@@ -139,12 +138,32 @@ const checkIfInDevelopment = (client) => {
 /**
  * Generates an error embed to be replied to the user when an error occurs with a command
  * Mainly used for failed promises
+ * Added an extra layer of complication for the sake of easy announcements
+ * Ever since the disastrous outage of the API for a full day and the influx of users to the support server, I realised a generic message isn't gonna cut it
+ * Although we won't be able to fix the issues of the API on our end, we can at least let users know what's going on
+ * Instead of passing a message to the function, it now gets a specific message from the support server
+ * With this, I can edit that message to reflect the current situation and it'll be shown along with the error message
  * @param message - error description/message
  * @param uuid - error uuid
+ * @param nessie = client
  */
-const generateErrorEmbed = (message, uuid) => {
+const generateErrorEmbed = async (error, uuid, nessie) => {
+  //To get a specific message, we need to get the channel it's in before fetching it
+  const alertChannel = nessie.channels.cache.get('973977422699573258');
+  const messageObject = await alertChannel.messages.fetch('973981539731922946');
+  const errorMessage = messageObject.content;
+  //Since the message is inside a code block we want to trim everything outside of it; made a hack of wrapping it between [] to make it easier to trim
+  const errorAlert = errorMessage.substring(
+    errorMessage.indexOf('[') + 4,
+    errorMessage.lastIndexOf(']') - 3
+  );
+
   const embed = {
-    description: `${message}\n\nError ID: ${uuid}\nAlternatively, you can also report issue through the [support server](https://discord.com/invite/47Ccgz9jA4)`,
+    description: `${errorAlert}\n\nError: ${
+      error.message ? codeBlock(error.message) : codeBlock('Unexpected Error')
+    }\nError ID: ${codeBlock(
+      uuid
+    )}\nAlternatively, you can also report issue through the [support server](https://discord.com/invite/47Ccgz9jA4)`,
     color: 16711680,
   };
   return [embed];
