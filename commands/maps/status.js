@@ -92,6 +92,28 @@ const generateRankedStatusEmbeds = (data) => {
   };
   return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
 };
+const generateStatusEmbeds = (data) => {
+  const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
+  const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
+  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
+  const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
+  const informationEmbed = {
+    description:
+      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+    color: 3447003,
+    timestamp: Date.now(),
+    footer: {
+      text: 'Last Update',
+    },
+  };
+  return [
+    informationEmbed,
+    arenasRankedEmbed,
+    battleRoyaleRankedEmbed,
+    arenasPubsEmbed,
+    battleRoyalePubsEmbed,
+  ];
+};
 const createStatusChannel = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
   try {
@@ -101,23 +123,33 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     };
     await interaction.message.edit({ embeds: [embedLoading], components: [] });
     const rotationData = await getRotationData();
+
     const statusPubsEmbed = generatePubsStatusEmbeds(rotationData);
     const statusRankedEmbed = generateRankedStatusEmbeds(rotationData);
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
     });
-    //Creates the status channnel for pubs and ranked
-    const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
+    // //Creates the status channnel for pubs and ranked
+    // const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
+    //   parent: statusCategory,
+    // });
+    // const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
+    //   parent: statusCategory,
+    // });
+    // await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
+    // await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
+    // const embedSuccess = {
+    //   description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
+    //   color: 3066993,
+    // };
+    const statusChannel = await interaction.guild.channels.create('apex-maps-status', {
       parent: statusCategory,
     });
-    const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
-      parent: statusCategory,
-    });
-    await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
-    await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
+    const statusEmbed = generateStatusEmbeds(rotationData);
+    await statusChannel.send({ embeds: statusEmbed });
     const embedSuccess = {
-      description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
+      description: `Created map status at ${statusChannel}`,
       color: 3066993,
     };
     await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
