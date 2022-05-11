@@ -2,12 +2,31 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { nessieLogo } = require('../../constants');
 const { version } = require('../../package.json');
 
-const sendUpdatesEmbed = async ({ interaction }) => {
+/**
+ * Send the latest news and updates of Nessie
+ * Initially this was hardcoded here everytime before a release is made
+ * However following the change in error handling getting an alert message from a discord message, I want to carry that over there too
+ * Similar to the error handling, we get the specific message by fetching it through the channel it's in
+ * With that message, we then trim the content inside the code block
+ * An addition is that we also want to show the current update date so I've passed it in the message too wrapped in {}
+ */
+const sendUpdatesEmbed = async ({ nessie, interaction }) => {
+  const alertChannel = nessie.channels.cache.get('973977422699573258');
+  const messageObject = await alertChannel.messages.fetch('973978605044514826');
+
+  const updateMessage = messageObject.content;
+  const updateAlert = updateMessage.substring(
+    updateMessage.indexOf('[') + 4,
+    updateMessage.lastIndexOf(']') - 3
+  );
+  const updateDate = updateMessage.substring(
+    updateMessage.indexOf('{') + 1,
+    updateMessage.lastIndexOf('}')
+  );
   const embed = {
-    title: `v${version} | 15 April 2022`,
+    title: `v${version} | ${updateDate}`,
     color: 3447003,
-    description:
-      "**Battle Royale Ranked Timer**\nJust a quick small update. With the latest release of the apex legends api, it’s now possible to directly show the current timer of battle royale ranked from it. This is a pretty cool change as I’ve opted to not have the timer before as it’s a hassle to manually change the ending dates. However, Nessie’s battle royale ranked command will now show not only the map but also the remaining time left of the split! Go see it now through `/br ranked`\n\nSorry if the updates are not as consistent. Been having a rough couple of weeks mentally and it’s honestly draining trying to get stuff done. No worries though, I’ll get myself back up and running! Had a bad 2 weeks but won’t let it shape the rest of the month/year **(ง •̀ω•́)ง.** That being said, I’ve shelfed the website for now and currently working on the automatic status. Don’t want to give any deadlines but I’ll try to get this cool new feature out by the end of April! Wish me luck :D\n\nThat's about it for now. Stay Classy, Legends\n-----\nFor a full list of previous release notes, check it out [here](https://github.com/vexuas/nessie/releases)!",
+    description: updateAlert,
     thumbnail: {
       url: nessieLogo,
     },
@@ -18,7 +37,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('updates')
     .setDescription('Displays latest news and updates of Nessie'),
-  async execute({ interaction }) {
-    sendUpdatesEmbed({ interaction });
+  async execute({ nessie, interaction }) {
+    sendUpdatesEmbed({ nessie, interaction });
   },
 };
