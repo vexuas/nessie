@@ -142,9 +142,13 @@ const checkIfInDevelopment = (client) => {
  * @param message - error description/message
  * @param uuid - error uuid
  */
-const generateErrorEmbed = (message, uuid) => {
+const generateErrorEmbed = async (error, uuid) => {
   const embed = {
-    description: `${message}\n\nError ID: ${uuid}\nAlternatively, you can also report issue through the [support server](https://discord.com/invite/47Ccgz9jA4)`,
+    description: `\n\nError: ${
+      error.message ? codeBlock(error.message) : codeBlock('Unexpected Error')
+    }\nError ID: ${codeBlock(
+      uuid
+    )}\nAlternatively, you can also report issue through the [support server](https://discord.com/invite/47Ccgz9jA4)`,
     color: 16711680,
   };
   return [embed];

@@ -132,6 +132,7 @@ module.exports = {
     let embed;
     try {
       await interaction.deferReply();
+      throw new Error('Test Error');
       const optionMode = interaction.options.getString('mode');
       switch (optionMode) {
         case 'br_pubs':
@@ -156,10 +157,7 @@ module.exports = {
     } catch (error) {
       const uuid = uuidv4();
       const type = 'Battle Royale';
-      const errorEmbed = generateErrorEmbed(
-        'Oops something went wrong! D: Try again in a bit!',
-        uuid
-      );
+      const errorEmbed = await generateErrorEmbed(error, uuid);
       await interaction.editReply({ embeds: errorEmbed });
       await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
