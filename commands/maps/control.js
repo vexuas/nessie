@@ -79,10 +79,7 @@ module.exports = {
     } catch (error) {
       const uuid = uuidv4();
       const type = 'Control';
-      const errorEmbed = generateErrorEmbed(
-        'Oops something went wrong! D: Try again in a bit!',
-        uuid
-      );
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
       await interaction.editReply({ embeds: errorEmbed });
       await sendErrorLog({ nessie, error, interaction, type, uuid });
     }

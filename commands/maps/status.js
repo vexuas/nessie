@@ -155,10 +155,7 @@ const createStatusChannel = async ({ nessie, interaction }) => {
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Button';
-    const errorEmbed = generateErrorEmbed(
-      'Oops something went wrong! D: Try again in a bit!',
-      uuid
-    );
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.message.edit({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
@@ -170,6 +167,7 @@ const createStatusChannel = async ({ nessie, interaction }) => {
  */
 const cancelStatusStart = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
+
   try {
     const embedSuccess = {
       description: 'Cancelled automated map status setup',
@@ -179,10 +177,7 @@ const cancelStatusStart = async ({ nessie, interaction }) => {
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Cancel Button';
-    const errorEmbed = generateErrorEmbed(
-      'Oops something went wrong! D: Try again in a bit!',
-      uuid
-    );
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.message.edit({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }

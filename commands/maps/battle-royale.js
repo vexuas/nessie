@@ -132,7 +132,6 @@ module.exports = {
     let embed;
     try {
       await interaction.deferReply();
-      throw new Error('Test Error');
       const optionMode = interaction.options.getString('mode');
       switch (optionMode) {
         case 'br_pubs':
