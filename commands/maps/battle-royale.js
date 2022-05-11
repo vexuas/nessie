@@ -157,7 +157,7 @@ module.exports = {
     } catch (error) {
       const uuid = uuidv4();
       const type = 'Battle Royale';
-      const errorEmbed = await generateErrorEmbed(error, uuid);
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
       await interaction.editReply({ embeds: errorEmbed });
       await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
