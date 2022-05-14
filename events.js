@@ -22,6 +22,7 @@ const {
   insertNewGuild,
   removeServerDataFromNessie,
   pool,
+  createStatusTable,
 } = require('./database/handler');
 const { createStatusChannel, cancelStatusStart } = require('./commands/maps/status');
 
@@ -44,6 +45,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * See relevant files under database/* for more information
        */
       createGuildTable(nessie.guilds.cache, nessie);
+      createStatusTable();
       /**
        * Changes Nessie's activity when the current map has switched over to the next
        * Refer to the setCurrentMapStatus function for more information

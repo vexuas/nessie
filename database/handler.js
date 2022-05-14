@@ -113,3 +113,15 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
     });
   });
 };
+exports.createStatusTable = () => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query(
+        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT NOT NULL, pubs_channel_id TEXT NOT NULL, ranked_channel_id TEXT NOT NULL, pubs_message_id TEXT NOT NULL, ranked_message_id TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
+      );
+      client.query('COMMIT', (err) => {
+        done();
+      });
+    });
+  });
+};
