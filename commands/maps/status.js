@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
-const { getBattleRoyalePubs, getBattleRoyaleRanked, getRotationData } = require('../../adapters');
+const { format } = require('date-fns');
+const { getRotationData } = require('../../adapters');
 const {
   generatePubsEmbed,
   generateRankedEmbed,
@@ -8,39 +9,80 @@ const {
   sendErrorLog,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
+const { insertNewStatus, getStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
-const sendHelpInteraction = async (interaction) => {
-  const embedData = {
-    title: 'Status | Help',
-    description:
-      'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
-    color: 3447003,
-  };
-  return await interaction.editReply({ embeds: [embedData] });
+/**
+ * Handler for when a user initiates the /status help command
+ * Calls the getStatus handler to see for existing status in the guild
+ * Passes a success and error callback with the former sending an information embed with context depending on status existence
+ */
+const sendHelpInteraction = async ({ interaction, nessie }) => {
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: 'Status | Help',
+        description: status
+          ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
+          : 'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
+        color: 3447003,
+      };
+      return await interaction.editReply({ embeds: [embedData] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Help)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
-const sendStartInteraction = async (interaction) => {
-  const embedData = {
-    title: 'Status | Start',
-    color: 3447003,
-    description:
-      'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 15 minutes',
-  };
-  const row = new MessageActionRow()
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStart__cancelButton')
-        .setLabel('Cancel')
-        .setStyle('SECONDARY')
-    )
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStart__startButton')
-        .setLabel(`Let's go!`)
-        .setStyle('SUCCESS')
-    );
+/**
+ * Handler for when a user initiates the /status start command
+ * Calls the getStatus handler to see for existing status in the guild
+ * Passes a success and error callback with the former:
+ * - Sending an information embed with context depending on status existence
+ * - Sending Cancel and Start buttons; disabled depened on status existence
+ */
+const sendStartInteraction = async ({ interaction, nessie }) => {
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: 'Status | Start',
+        color: 3447003,
+        description: status
+          ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
+          : 'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 15 minutes',
+      };
+      const row = new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStart__cancelButton')
+            .setLabel('Cancel')
+            .setStyle('SECONDARY')
+            .setDisabled(status ? true : false)
+        )
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStart__startButton')
+            .setLabel(`Let's go!`)
+            .setStyle('SUCCESS')
+            .setDisabled(status ? true : false)
+        );
 
-  return await interaction.editReply({ components: [row], embeds: [embedData] });
+      return await interaction.editReply({ components: [row], embeds: [embedData] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Start)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
 const sendStopInteraction = async (interaction) => {
   const embedData = {
@@ -145,13 +187,42 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
       parent: statusCategory,
     });
-    await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
-    await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
-    const embedSuccess = {
-      description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
-      color: 3066993,
+    const statusPubsMessage = await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
+    const statusRankedMessage = await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
+
+    /**
+     * Creates new status data object to be inserted in our database
+     * We then call the insertNewStatus handler to start insertion
+     * Passes a success and error callback with the former editing the original message with a success embed
+     */
+    const newStatus = {
+      uuid: uuidv4(),
+      guildId: interaction.guildId,
+      categoryChannelId: statusCategory.id,
+      pubsChannelId: statusPubsChannel.id,
+      rankedChannelId: statusRankedChannel.id,
+      pubsMessageId: statusPubsMessage.id,
+      rankedMessageId: statusRankedMessage.id,
+      createdBy: interaction.user.tag,
+      createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
-    await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
+    await insertNewStatus(
+      newStatus,
+      async () => {
+        const embedSuccess = {
+          description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
+          color: 3066993,
+        };
+        await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+      },
+      async (error) => {
+        const uuid = uuidv4();
+        const type = 'Inserting New Status in Database';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    );
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Button';
@@ -216,9 +287,9 @@ module.exports = {
       await interaction.deferReply();
       switch (statusOption) {
         case 'help':
-          return await sendHelpInteraction(interaction);
+          return await sendHelpInteraction({ interaction, nessie });
         case 'start':
-          return await sendStartInteraction(interaction);
+          return await sendStartInteraction({ interaction, nessie });
         case 'stop':
           return await sendStopInteraction(interaction);
       }

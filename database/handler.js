@@ -114,32 +114,81 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
   });
 };
 /**
- * Updates prefix with the new custom prefix provided by the user
- * This will be deprecated in april but might as well migrate it along with the rest of the queries
- * @param message - discord message object
- * @param newPrefix - new custom prefix
- * @param embed - embed message to send back to user after successfully updating
+ * Creates Status table in our database
+ * Straightforward; no additional checks and only creates the table if it does not exist
+ * Gets called in the onReady event of Nessie
  */
-exports.setCustomPrefix = (message, newPrefix, embed) => {
+exports.createStatusTable = () => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
-        'UPDATE Guild SET prefix = ($1) WHERE uuid = ($2)',
-        [`${newPrefix}`, `${message.guildId}`],
-        (err) => {
+        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT NOT NULL, pubs_channel_id TEXT NOT NULL, ranked_channel_id TEXT NOT NULL, pubs_message_id TEXT NOT NULL, ranked_message_id TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
+      );
+      client.query('COMMIT', (err) => {
+        done();
+      });
+    });
+  });
+};
+/**
+ * Inserts new status in our database
+ * Takes in a status object with all the relevant data for scheduler usage
+ * Was feeling intuitive so added callback functions for both success and error
+ * @param status - new status data object
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throw an error
+ */
+exports.insertNewStatus = async (status, onSuccess, onError) => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query(
+        'INSERT INTO Status (uuid, guild_id, category_channel_id, pubs_channel_id, ranked_channel_id, pubs_message_id, ranked_message_id, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        [
+          status.uuid,
+          status.guildId,
+          status.categoryChannelId,
+          status.pubsChannelId,
+          status.rankedChannelId,
+          status.pubsMessageId,
+          status.rankedMessageId,
+          status.createdBy,
+          status.createdAt,
+        ],
+        (err, res) => {
           if (err) {
-            console.log(err);
-            return message.channel.send('Oops something went wrong! Try again!'); //Maybe add link to support server here?
+            return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
           }
-          client.query('COMMIT', () => {
+          client.query('COMMIT', (err) => {
             if (err) {
-              console.log(err);
+              return (
+                onError && onError(err.message ? err.message : { message: 'Unexpected Error' })
+              );
             }
-            message.channel.send({ embeds: embed });
+            onSuccess && onSuccess();
             done();
           });
         }
       );
+    });
+  });
+};
+/**
+ * Gets an existing status in our database
+ * Takes in the guild id of the interaction to be able to query correctly
+ * @param guildId - guild id of the interaction
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throw an error
+ */
+exports.getStatus = async (guildId, onSuccess, onError) => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
+        if (err) {
+          return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+        }
+        onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
+        done();
+      });
     });
   });
 };
