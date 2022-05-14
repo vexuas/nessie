@@ -12,14 +12,27 @@ const { v4: uuidv4 } = require('uuid');
 const { insertNewStatus, getStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
-const sendHelpInteraction = async (interaction) => {
-  const embedData = {
-    title: 'Status | Help',
-    description:
-      'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
-    color: 3447003,
-  };
-  return await interaction.editReply({ embeds: [embedData] });
+const sendHelpInteraction = async ({ interaction, nessie }) => {
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: 'Status | Help',
+        description: status
+          ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
+          : 'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
+        color: 3447003,
+      };
+      return await interaction.editReply({ embeds: [embedData] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Help)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
 const sendStartInteraction = async ({ interaction, nessie }) => {
   await getStatus(
@@ -257,7 +270,7 @@ module.exports = {
       await interaction.deferReply();
       switch (statusOption) {
         case 'help':
-          return await sendHelpInteraction(interaction);
+          return await sendHelpInteraction({ interaction, nessie });
         case 'start':
           return await sendStartInteraction({ interaction, nessie });
         case 'stop':
