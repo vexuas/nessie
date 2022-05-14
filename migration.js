@@ -73,8 +73,20 @@ exports.runMigration = (guilds) => {
       //   client.query('COMMIT');
       // });
       // ----
+      const selectAllStatus = 'SELECT * FROM Status';
+      const deleteAllStatus = 'DELETE FROM Status';
+      client.query(selectAllStatus, (err, res) => {
+        console.log(err);
+        console.log(res.rows);
+        done();
+      });
+      // client.query(deleteAllStatus, (err, res) => {
+      //   console.log(err);
+      //   console.log(res);
+      //   client.query('COMMIT');
+      // });
     });
   });
 };
 
-// this.runMigration();
+this.runMigration();

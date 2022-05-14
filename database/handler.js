@@ -125,3 +125,34 @@ exports.createStatusTable = () => {
     });
   });
 };
+exports.insertNewStatus = async (status, onSuccess, onError) => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query(
+        'INSERT INTO Status (uuid, guild_id, category_channel_id, pubs_channel_id, ranked_channel_id, pubs_message_id, ranked_message_id, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        [
+          status.uuid,
+          status.guildId,
+          status.categoryChannelId,
+          status.pubsChannelId,
+          status.rankedChannelId,
+          status.pubsMessageId,
+          status.rankedMessageId,
+          status.createdBy,
+          status.createdAt,
+        ],
+        (err, res) => {
+          if (err) {
+          }
+          client.query('COMMIT', (err) => {
+            if (err) {
+              onError && onError();
+            }
+            onSuccess && onSuccess();
+            done();
+          });
+        }
+      );
+    });
+  });
+};

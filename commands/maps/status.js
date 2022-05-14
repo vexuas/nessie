@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
+const { format } = require('date-fns');
 const { getBattleRoyalePubs, getBattleRoyaleRanked, getRotationData } = require('../../adapters');
 const {
   generatePubsEmbed,
@@ -8,6 +9,7 @@ const {
   sendErrorLog,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
+const { insertNewStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
 const sendHelpInteraction = async (interaction) => {
@@ -145,13 +147,37 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
       parent: statusCategory,
     });
-    await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
-    await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
-    const embedSuccess = {
-      description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
-      color: 3066993,
+    const statusPubsMessage = await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
+    const statusRankedMessage = await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
+
+    const newStatus = {
+      uuid: uuidv4(),
+      guildId: interaction.guildId,
+      categoryChannelId: statusCategory.id,
+      pubsChannelId: statusPubsChannel.id,
+      rankedChannelId: statusRankedChannel.id,
+      pubsMessageId: statusPubsMessage.id,
+      rankedMessageId: statusRankedMessage.id,
+      createdBy: interaction.user.tag,
+      createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
-    await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
+    await insertNewStatus(
+      newStatus,
+      async () => {
+        const embedSuccess = {
+          description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
+          color: 3066993,
+        };
+        await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
+      },
+      async () => {
+        const uuid = uuidv4();
+        const type = 'Inserting New Status in Database';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    );
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Button';

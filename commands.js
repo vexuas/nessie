@@ -14,6 +14,6 @@ exports.getApplicationCommands = () => {
     br: require('./commands/maps/battle-royale'),
     arenas: require('./commands/maps/arenas'),
     control: require('./commands/maps/control'),
-    // status: require('./commands/maps/status'),
+    status: require('./commands/maps/status'),
   };
 };
