@@ -113,33 +113,3 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
     });
   });
 };
-/**
- * Updates prefix with the new custom prefix provided by the user
- * This will be deprecated in april but might as well migrate it along with the rest of the queries
- * @param message - discord message object
- * @param newPrefix - new custom prefix
- * @param embed - embed message to send back to user after successfully updating
- */
-exports.setCustomPrefix = (message, newPrefix, embed) => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
-      client.query(
-        'UPDATE Guild SET prefix = ($1) WHERE uuid = ($2)',
-        [`${newPrefix}`, `${message.guildId}`],
-        (err) => {
-          if (err) {
-            console.log(err);
-            return message.channel.send('Oops something went wrong! Try again!'); //Maybe add link to support server here?
-          }
-          client.query('COMMIT', () => {
-            if (err) {
-              console.log(err);
-            }
-            message.channel.send({ embeds: embed });
-            done();
-          });
-        }
-      );
-    });
-  });
-};
