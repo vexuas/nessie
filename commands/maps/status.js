@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { format } = require('date-fns');
-const { getBattleRoyalePubs, getBattleRoyaleRanked, getRotationData } = require('../../adapters');
+const { getRotationData } = require('../../adapters');
 const {
   generatePubsEmbed,
   generateRankedEmbed,
@@ -198,7 +198,7 @@ const createStatusChannel = async ({ nessie, interaction }) => {
         };
         await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
       },
-      async () => {
+      async (error) => {
         const uuid = uuidv4();
         const type = 'Inserting New Status in Database';
         const errorEmbed = await generateErrorEmbed(error, uuid, nessie);

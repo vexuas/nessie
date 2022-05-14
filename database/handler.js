@@ -143,6 +143,7 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
         ],
         (err, res) => {
           if (err) {
+            return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
           }
           client.query('COMMIT', (err) => {
             if (err) {
