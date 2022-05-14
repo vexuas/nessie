@@ -232,6 +232,11 @@ const generateAnnouncementMessage = (prefix) => {
  * Gets url link image for each br map
  * Using custom images as the image links sent by API are desaturated for some reason
  * Currently hosted scuffly in discord itself; might want to think of hosting it in cloudfront in the future
+ * TODO: Figure out a system to show custom map images for map commands
+ * Aside from br, the rest of the modes rely on the assets return by the API
+ * These assets don't look good however I've decided to use them for now as it's direct
+ * Manually wiring them up to our images isn't scalable either
+ * I'll just leave this comment so I get reminded about it in the future
  */
 const getMapUrl = (map) => {
   switch (map) {
