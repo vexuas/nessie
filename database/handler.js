@@ -146,13 +146,26 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
           }
           client.query('COMMIT', (err) => {
             if (err) {
-              onError && onError();
+              return onError && onError(err.message ? err.message : 'Unexpected Error');
             }
             onSuccess && onSuccess();
             done();
           });
         }
       );
+    });
+  });
+};
+exports.getStatus = async (guildId, onSuccess, onError) => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
+        if (err) {
+          return onError && onError(err.message ? err.message : 'Unexpected Error');
+        }
+        onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
+        done();
+      });
     });
   });
 };

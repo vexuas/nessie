@@ -9,7 +9,7 @@ const {
   sendErrorLog,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { insertNewStatus } = require('../../database/handler');
+const { insertNewStatus, getStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
 const sendHelpInteraction = async (interaction) => {
@@ -21,28 +21,43 @@ const sendHelpInteraction = async (interaction) => {
   };
   return await interaction.editReply({ embeds: [embedData] });
 };
-const sendStartInteraction = async (interaction) => {
-  const embedData = {
-    title: 'Status | Start',
-    color: 3447003,
-    description:
-      'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 15 minutes',
-  };
-  const row = new MessageActionRow()
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStart__cancelButton')
-        .setLabel('Cancel')
-        .setStyle('SECONDARY')
-    )
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStart__startButton')
-        .setLabel(`Let's go!`)
-        .setStyle('SUCCESS')
-    );
+const sendStartInteraction = async ({ interaction, nessie }) => {
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: 'Status | Start',
+        color: 3447003,
+        description: status
+          ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
+          : 'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 15 minutes',
+      };
+      const row = new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStart__cancelButton')
+            .setLabel('Cancel')
+            .setStyle('SECONDARY')
+            .setDisabled(status ? true : false)
+        )
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStart__startButton')
+            .setLabel(`Let's go!`)
+            .setStyle('SUCCESS')
+            .setDisabled(status ? true : false)
+        );
 
-  return await interaction.editReply({ components: [row], embeds: [embedData] });
+      return await interaction.editReply({ components: [row], embeds: [embedData] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Start)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
 const sendStopInteraction = async (interaction) => {
   const embedData = {
@@ -244,7 +259,7 @@ module.exports = {
         case 'help':
           return await sendHelpInteraction(interaction);
         case 'start':
-          return await sendStartInteraction(interaction);
+          return await sendStartInteraction({ interaction, nessie });
         case 'stop':
           return await sendStopInteraction(interaction);
       }
