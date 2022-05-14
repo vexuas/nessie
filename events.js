@@ -102,7 +102,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Hence, we have a separate handler for these commands in their own files instead of here
        * TODO: Refactor conditional in the future, probably a better way to check since this isn't scalable
        */
-      if (commandName !== 'br' && commandName !== 'arenas') {
+      if (commandName !== 'br' && commandName !== 'arenas' && commandName !== 'control') {
         sendMixpanelEvent(
           interaction.user,
           interaction.channel,
