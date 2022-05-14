@@ -113,6 +113,11 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
     });
   });
 };
+/**
+ * Creates Status table in our database
+ * Straightforward; no additional checks and only creates the table if it does not exist
+ * Gets called in the onReady event of Nessie
+ */
 exports.createStatusTable = () => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
@@ -125,6 +130,14 @@ exports.createStatusTable = () => {
     });
   });
 };
+/**
+ * Inserts new status in our database
+ * Takes in a status object with all the relevant data for scheduler usage
+ * Was feeling intuitive so added callback functions for both success and error
+ * @param status - new status data object
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throw an error
+ */
 exports.insertNewStatus = async (status, onSuccess, onError) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
@@ -159,6 +172,13 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
     });
   });
 };
+/**
+ * Gets an existing status in our database
+ * Takes in the guild id of the interaction to be able to query correctly
+ * @param guildId - guild id of the interaction
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throw an error
+ */
 exports.getStatus = async (guildId, onSuccess, onError) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {

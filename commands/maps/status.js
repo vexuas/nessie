@@ -12,6 +12,11 @@ const { v4: uuidv4 } = require('uuid');
 const { insertNewStatus, getStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
+/**
+ * Handler for when a user initiates the /status help command
+ * Calls the getStatus handler to see for existing status in the guild
+ * Passes a success and error callback with the former sending an information embed with context depending on status existence
+ */
 const sendHelpInteraction = async ({ interaction, nessie }) => {
   await getStatus(
     interaction.guildId,
@@ -34,6 +39,13 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
     }
   );
 };
+/**
+ * Handler for when a user initiates the /status start command
+ * Calls the getStatus handler to see for existing status in the guild
+ * Passes a success and error callback with the former:
+ * - Sending an information embed with context depending on status existence
+ * - Sending Cancel and Start buttons; disabled depened on status existence
+ */
 const sendStartInteraction = async ({ interaction, nessie }) => {
   await getStatus(
     interaction.guildId,
@@ -178,6 +190,11 @@ const createStatusChannel = async ({ nessie, interaction }) => {
     const statusPubsMessage = await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
     const statusRankedMessage = await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
 
+    /**
+     * Creates new status data object to be inserted in our database
+     * We then call the insertNewStatus handler to start insertion
+     * Passes a success and error callback with the former editing the original message with a success embed
+     */
     const newStatus = {
       uuid: uuidv4(),
       guildId: interaction.guildId,
@@ -196,7 +213,7 @@ const createStatusChannel = async ({ nessie, interaction }) => {
           description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
           color: 3066993,
         };
-        await interaction.message.edit({ embeds: [embedSuccess], components: [] }); //Sends success message in channel where command got instantiated
+        await interaction.message.edit({ embeds: [embedSuccess], components: [] });
       },
       async (error) => {
         const uuid = uuidv4();
