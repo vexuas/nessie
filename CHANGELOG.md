@@ -1,3 +1,28 @@
+# v1.6.0 (Sat May 14 2022)
+
+#### 🚀 Enhancement
+
+- Add next split map for br ranked [#63](https://github.com/vexuas/nessie/pull/63) ([@vexuas](https://github.com/vexuas))
+- Retrieve alert messages from channel message [#62](https://github.com/vexuas/nessie/pull/62) ([@vexuas](https://github.com/vexuas))
+- Wire up status start [#61](https://github.com/vexuas/nessie/pull/61) ([@vexuas](https://github.com/vexuas))
+- Create Status Command UI [#60](https://github.com/vexuas/nessie/pull/60) ([@vexuas](https://github.com/vexuas))
+- Add days to br ranked timer [#59](https://github.com/vexuas/nessie/pull/59) ([@vexuas](https://github.com/vexuas))
+- Remove prefix commands [#58](https://github.com/vexuas/nessie/pull/58) ([@vexuas](https://github.com/vexuas))
+
+#### 🐛 Bug Fix
+
+- Remove status command import [#64](https://github.com/vexuas/nessie/pull/64) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 04 15 [#57](https://github.com/vexuas/nessie/pull/57) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.5.0 (Fri Apr 15 2022)
 
 #### 🚀 Enhancement
