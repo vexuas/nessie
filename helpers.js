@@ -329,7 +329,7 @@ const generateRankedEmbed = (data, type = 'Battle Royale') => {
       },
     ],
   };
-  if (type === 'Arenas') {
+  if (data.next && data.next.map) {
     embedData.timestamp = Date.now() + data.current.remainingSecs * 1000;
     embedData.footer = {
       text: `Next Map: ${data.next.map}`,

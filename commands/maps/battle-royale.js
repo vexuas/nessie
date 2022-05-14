@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getBattleRoyalePubs, getBattleRoyaleRanked } = require('../../adapters');
-const { sendErrorLog, generateErrorEmbed } = require('../../helpers');
+const { sendErrorLog, generateErrorEmbed, generateRankedEmbed } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { sendMixpanelEvent } = require('../../analytics');
 
@@ -82,33 +82,6 @@ const generatePubsEmbed = (data) => {
   };
   return [embedData];
 };
-/**
- * Embed design for BR Ranked
- * Fairly simple, don't need any fancy timers and footers
- */
-const generateRankedEmbed = (data) => {
-  const embedData = {
-    title: 'Battle Royale | Ranked',
-    color: 7419530,
-    image: {
-      url: getMapUrl(data.current.map),
-    },
-    fields: [
-      {
-        name: 'Current map',
-        value: '```fix\n\n' + data.current.map + '```',
-        inline: true,
-      },
-      {
-        name: 'Time left',
-        value: '```xl\n\n' + getCountdown(data.current.remainingTimer) + '```',
-        inline: true,
-      },
-    ],
-  };
-  return [embedData];
-};
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('br')
@@ -143,7 +116,7 @@ module.exports = {
           embed = generateRankedEmbed(data);
           break;
       }
-      await interaction.editReply({ embeds: embed });
+      await interaction.editReply({ embeds: [embed] });
       sendMixpanelEvent(
         interaction.user,
         interaction.channel,
