@@ -158,7 +158,7 @@ const generateRankedStatusEmbeds = (data) => {
  * TODO: Start the auto-update scheduler
  * TODO: Create tables in database to store status data
  */
-const createStatusChannel = async ({ nessie, interaction }) => {
+const createStatusChannels = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
   try {
     /**
@@ -253,6 +253,23 @@ const cancelStatusStart = async ({ nessie, interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+const cancelStatusStop = async ({ nessie, interaction }) => {
+  interaction.deferUpdate();
+
+  try {
+    const embedSuccess = {
+      description: 'Cancelled automated map status deletion',
+      color: 16711680,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Cancel Button';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.message.edit({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
 module.exports = {
   /**
    * Creates Status application command with relevant subcommands
@@ -297,6 +314,7 @@ module.exports = {
       console.log(error);
     }
   },
-  createStatusChannel,
+  createStatusChannels,
   cancelStatusStart,
+  cancelStatusStop,
 };

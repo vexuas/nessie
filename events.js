@@ -24,7 +24,11 @@ const {
   pool,
   createStatusTable,
 } = require('./database/handler');
-const { createStatusChannel, cancelStatusStart } = require('./commands/maps/status');
+const {
+  createStatusChannels,
+  cancelStatusStart,
+  cancelStatusStop,
+} = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -125,9 +129,11 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     if (interaction.isButton()) {
       switch (interaction.customId) {
         case 'statusStart__startButton':
-          return await createStatusChannel({ nessie, interaction });
+          return await createStatusChannels({ nessie, interaction });
         case 'statusStart__cancelButton':
           return await cancelStatusStart({ nessie, interaction });
+        case 'statusStop__cancelButton':
+          return await cancelStatusStop({ nessie, interaction });
       }
     }
   });
