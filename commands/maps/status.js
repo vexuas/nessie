@@ -7,6 +7,7 @@ const {
   generateRankedEmbed,
   generateErrorEmbed,
   sendErrorLog,
+  codeBlock,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { insertNewStatus, getStatus } = require('../../database/handler');
@@ -84,28 +85,51 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     }
   );
 };
-const sendStopInteraction = async (interaction) => {
-  const embedData = {
-    title: 'Status | Stop',
-    color: 3447003,
-    description:
-      'By confirming below, Nessie will stop the existing map status and delete these channels:\n• Apex Map Status\n• #apex-pubs\n• #apex-ranked\n\nTo re-enable the automated map status after, simply use `/status start` again',
-  };
-  const row = new MessageActionRow()
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStop__cancelButton')
-        .setLabel('Cancel')
-        .setStyle('SECONDARY')
-    )
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStop__stopButton')
-        .setLabel(`Stop it!`)
-        .setStyle('DANGER')
-    );
+const sendStopInteraction = async ({ interaction, nessie }) => {
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: 'Status | Stop',
+        color: 3447003,
+        description: status
+          ? `By confirming below, Nessie will stop the existing map status and delete these channels:\n• <#${
+              status.category_channel_id
+            }>\n• <#${status.pubs_channel_id}>\n• <#${
+              status.ranked_channel_id
+            }>\nThis status was created on ${status.created_at} by ${
+              status.created_by
+            }\n\nTo re-enable the automated map status after, simply use ${codeBlock(
+              '/status start'
+            )} again`
+          : `There's currently no active automated map status to stop`,
+      };
+      const row = new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStop__cancelButton')
+            .setLabel('Cancel')
+            .setStyle('SECONDARY')
+            .setDisabled(status ? false : true)
+        )
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStop__stopButton')
+            .setLabel(`Stop it!`)
+            .setStyle('DANGER')
+            .setDisabled(status ? false : true)
+        );
 
-  return await interaction.editReply({ components: [row], embeds: [embedData] });
+      return await interaction.editReply({ components: [row], embeds: [embedData] });
+    },
+    async () => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Stop)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
 //----- Status Functions/Interactions -----//
 /**
@@ -308,7 +332,7 @@ module.exports = {
         case 'start':
           return await sendStartInteraction({ interaction, nessie });
         case 'stop':
-          return await sendStopInteraction(interaction);
+          return await sendStopInteraction({ interaction, nessie });
       }
     } catch (error) {
       console.log(error);
