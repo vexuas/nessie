@@ -10,7 +10,7 @@ const {
   codeBlock,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { insertNewStatus, getStatus } = require('../../database/handler');
+const { insertNewStatus, getStatus, deleteStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
 /**
@@ -277,6 +277,49 @@ const cancelStatusStart = async ({ nessie, interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+const deleteStatusChannels = async ({ interaction, nessie }) => {
+  interaction.deferUpdate();
+  await deleteStatus(
+    interaction.guildId,
+    async (status) => {
+      try {
+        if (status) {
+          const embedLoading = {
+            description: `Deleting status channels...`,
+            color: 16776960,
+          };
+          await interaction.message.edit({ embeds: [embedLoading], components: [] });
+          const pubsStatusChannel = await nessie.channels.fetch(status.pubs_channel_id);
+          const rankedStatusChannel = await nessie.channels.fetch(status.ranked_channel_id);
+          const categoryStatusChannel = await nessie.channels.fetch(status.category_channel_id);
+
+          await pubsStatusChannel.delete();
+          await rankedStatusChannel.delete();
+          await categoryStatusChannel.delete();
+
+          const embedSuccess = {
+            description: `Automatic map status successfully deleted!`,
+            color: 3066993,
+          };
+          await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+        }
+      } catch (error) {
+        const uuid = uuidv4();
+        const type = 'Status Stop Button';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Stop Button)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      await interaction.message.edit({ embeds: errorEmbed, components: [] });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
+};
 const cancelStatusStop = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
 
@@ -341,4 +384,5 @@ module.exports = {
   createStatusChannels,
   cancelStatusStart,
   cancelStatusStop,
+  deleteStatusChannels,
 };

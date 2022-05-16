@@ -28,6 +28,7 @@ const {
   createStatusChannels,
   cancelStatusStart,
   cancelStatusStop,
+  deleteStatusChannels,
 } = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -132,6 +133,8 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           return await createStatusChannels({ nessie, interaction });
         case 'statusStart__cancelButton':
           return await cancelStatusStart({ nessie, interaction });
+        case 'statusStop__stopButton':
+          return await deleteStatusChannels({ nessie, interaction });
         case 'statusStop__cancelButton':
           return await cancelStatusStop({ nessie, interaction });
       }

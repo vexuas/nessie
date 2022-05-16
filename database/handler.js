@@ -192,3 +192,29 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
     });
   });
 };
+exports.deleteStatus = async (guildId, onSuccess, onError) => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
+        if (err) {
+          return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+        }
+
+        client.query('DELETE FROM Status WHERE guild_id = ($1)', [guildId], (err) => {
+          if (err) {
+            return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          }
+          client.query('COMMIT', (err) => {
+            if (err) {
+              return (
+                onError && onError(err.message ? err.message : { message: 'Unexpected Error' })
+              );
+            }
+            onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
+            done();
+          });
+        });
+      });
+    });
+  });
+};
