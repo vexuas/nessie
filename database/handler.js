@@ -156,13 +156,13 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
         ],
         (err, res) => {
           if (err) {
-            return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+            onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+            return done();
           }
           client.query('COMMIT', (err) => {
             if (err) {
-              return (
-                onError && onError(err.message ? err.message : { message: 'Unexpected Error' })
-              );
+              onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+              return done();
             }
             onSuccess && onSuccess();
             done();
@@ -184,10 +184,51 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
     client.query('BEGIN', (err) => {
       client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
         if (err) {
-          return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          return done();
         }
         onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
         done();
+      });
+    });
+  });
+};
+/**
+ * Deletes an existing status in our database
+ * To do this, we need to get the status tied to the guild first
+ * This is important as we would need the relevant channel ids to be able to delete those channels in discord
+ * Was initially thinking of adding an onGet callback; we delete the discord channels after we query the data
+ * Had troubles in making it work tho as it was firing it at the same time as the delete queries
+ * Probably doing something wrong but I've opted to just deleting the channels after we delete the status from our database
+ * Prayers to discord's API to not go down when this is happening :prayge:
+ * @param guildId - guild id of the interaction
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throws an error
+ */
+exports.deleteStatus = async (guildId, onSuccess, onError) => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
+        if (err) {
+          //Returning on done to close the connecting to the db; will really need to figure out a better way for error handling here
+          onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          return done();
+        }
+
+        client.query('DELETE FROM Status WHERE guild_id = ($1)', [guildId], (err) => {
+          if (err) {
+            onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+            return done();
+          }
+          client.query('COMMIT', (err) => {
+            if (err) {
+              onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+              return done();
+            }
+            onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
+            done();
+          });
+        });
       });
     });
   });

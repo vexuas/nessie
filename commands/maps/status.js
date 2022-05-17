@@ -7,9 +7,10 @@ const {
   generateRankedEmbed,
   generateErrorEmbed,
   sendErrorLog,
+  codeBlock,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { insertNewStatus, getStatus } = require('../../database/handler');
+const { insertNewStatus, getStatus, deleteStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
 /**
@@ -84,28 +85,56 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     }
   );
 };
-const sendStopInteraction = async (interaction) => {
-  const embedData = {
-    title: 'Status | Stop',
-    color: 3447003,
-    description:
-      'By confirming below, Nessie will stop the existing map status and delete these channels:\n• Apex Map Status\n• #apex-pubs\n• #apex-ranked\n\nTo re-enable the automated map status after, simply use `/status start` again',
-  };
-  const row = new MessageActionRow()
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStop__cancelButton')
-        .setLabel('Cancel')
-        .setStyle('SECONDARY')
-    )
-    .addComponents(
-      new MessageButton()
-        .setCustomId('statusStop__stopButton')
-        .setLabel(`Stop it!`)
-        .setStyle('DANGER')
-    );
+/**
+ * Handler for when a user initiates the /status stop command
+ * Calls the getStatus handler to see for existing status in the guild
+ * Passes a success and error callback with the former sending an information embed with context depending on status existence
+ */
+const sendStopInteraction = async ({ interaction, nessie }) => {
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: 'Status | Stop',
+        color: 3447003,
+        description: status
+          ? `By confirming below, Nessie will stop the existing map status and delete these channels:\n• <#${
+              status.category_channel_id
+            }>\n• <#${status.pubs_channel_id}>\n• <#${
+              status.ranked_channel_id
+            }>\nThis status was created on ${status.created_at} by ${
+              status.created_by
+            }\n\nTo re-enable the automated map status after, simply use ${codeBlock(
+              '/status start'
+            )} again`
+          : `There's currently no active automated map status to stop`,
+      };
+      const row = new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStop__cancelButton')
+            .setLabel('Cancel')
+            .setStyle('SECONDARY')
+            .setDisabled(status ? false : true)
+        )
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusStop__stopButton')
+            .setLabel(`Stop it!`)
+            .setStyle('DANGER')
+            .setDisabled(status ? false : true)
+        );
 
-  return await interaction.editReply({ components: [row], embeds: [embedData] });
+      return await interaction.editReply({ components: [row], embeds: [embedData] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Stop)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
 //----- Status Functions/Interactions -----//
 /**
@@ -153,12 +182,13 @@ const generateRankedStatusEmbeds = (data) => {
  * - Calls the API for the rotation data
  * - Create embeds for each status channel
  * - Creates a category channel and 2 new text channels under it
- * - Sends embeds to respective channels and edits initial message with a success message
+ * - Sends embeds to respective channels
+ * - Inserts a new Status row in our database with all the relevant data
+ * - Edits initial message with a success message
  * -
  * TODO: Start the auto-update scheduler
- * TODO: Create tables in database to store status data
  */
-const createStatusChannel = async ({ nessie, interaction }) => {
+const createStatusChannels = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
   try {
     /**
@@ -247,7 +277,84 @@ const cancelStatusStart = async ({ nessie, interaction }) => {
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
   } catch (error) {
     const uuid = uuidv4();
-    const type = 'Status Cancel Button';
+    const type = 'Status Start Cancel Button';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.message.edit({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+/**
+ * Handler for stopping the process of map status
+ * Gets called when a user clicks the confirm button of the /status stop reply
+ * Main steps upon button click:
+ * - Edits initial message with a loading state
+ * - Calls the deleteStatus handler which returns the status data while also deleting it from the db
+ * - Fetches each of the relevant discord channels with the status data
+ * - Deletes each of of the discord channels
+ * - Edits initial message with a success message
+ * -
+ * TODO: Stop the auto-update-scheduler
+ */
+const deleteStatusChannels = async ({ interaction, nessie }) => {
+  interaction.deferUpdate();
+  await deleteStatus(
+    interaction.guildId,
+    async (status) => {
+      try {
+        if (status) {
+          const embedLoading = {
+            description: `Deleting status channels...`,
+            color: 16776960,
+          };
+          await interaction.message.edit({ embeds: [embedLoading], components: [] });
+          const pubsStatusChannel = await nessie.channels.fetch(status.pubs_channel_id);
+          const rankedStatusChannel = await nessie.channels.fetch(status.ranked_channel_id);
+          const categoryStatusChannel = await nessie.channels.fetch(status.category_channel_id);
+
+          await pubsStatusChannel.delete();
+          await rankedStatusChannel.delete();
+          await categoryStatusChannel.delete();
+
+          const embedSuccess = {
+            description: `Automatic map status successfully deleted!`,
+            color: 3066993,
+          };
+          await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+        }
+      } catch (error) {
+        const uuid = uuidv4();
+        const type = 'Status Stop Button';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting/Deleting Status in Database (Stop Button)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      await interaction.message.edit({ embeds: errorEmbed, components: [] });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
+};
+/**
+ * Handler for cancelling the wizard of /status stop
+ * Gets called when a user clicks the cancel button of the /status stop reply
+ * Pretty straightforward; we just edit the initial message with a cancel message similar to the start handler
+ */
+const cancelStatusStop = async ({ nessie, interaction }) => {
+  interaction.deferUpdate();
+
+  try {
+    const embedSuccess = {
+      description: 'Cancelled automated map status deletion',
+      color: 16711680,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Stop Cancel Button';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.message.edit({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -291,12 +398,14 @@ module.exports = {
         case 'start':
           return await sendStartInteraction({ interaction, nessie });
         case 'stop':
-          return await sendStopInteraction(interaction);
+          return await sendStopInteraction({ interaction, nessie });
       }
     } catch (error) {
       console.log(error);
     }
   },
-  createStatusChannel,
+  createStatusChannels,
   cancelStatusStart,
+  cancelStatusStop,
+  deleteStatusChannels,
 };
