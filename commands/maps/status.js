@@ -127,7 +127,7 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
 
       return await interaction.editReply({ components: [row], embeds: [embedData] });
     },
-    async () => {
+    async (error) => {
       const uuid = uuidv4();
       const type = 'Getting Status in Database (Stop)';
       const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
@@ -277,7 +277,7 @@ const cancelStatusStart = async ({ nessie, interaction }) => {
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
   } catch (error) {
     const uuid = uuidv4();
-    const type = 'Status Cancel Button';
+    const type = 'Status Start Cancel Button';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.message.edit({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -331,7 +331,7 @@ const deleteStatusChannels = async ({ interaction, nessie }) => {
     },
     async (error) => {
       const uuid = uuidv4();
-      const type = 'Getting Status in Database (Stop Button)';
+      const type = 'Getting/Deleting Status in Database (Stop Button)';
       const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
       await interaction.message.edit({ embeds: errorEmbed, components: [] });
       await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -354,7 +354,7 @@ const cancelStatusStop = async ({ nessie, interaction }) => {
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
   } catch (error) {
     const uuid = uuidv4();
-    const type = 'Status Cancel Button';
+    const type = 'Status Stop Cancel Button';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.message.edit({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });

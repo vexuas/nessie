@@ -156,13 +156,13 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
         ],
         (err, res) => {
           if (err) {
-            return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+            onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+            return done();
           }
           client.query('COMMIT', (err) => {
             if (err) {
-              return (
-                onError && onError(err.message ? err.message : { message: 'Unexpected Error' })
-              );
+              onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+              return done();
             }
             onSuccess && onSuccess();
             done();
@@ -184,7 +184,8 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
     client.query('BEGIN', (err) => {
       client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
         if (err) {
-          return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          return done();
         }
         onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
         done();
@@ -209,18 +210,20 @@ exports.deleteStatus = async (guildId, onSuccess, onError) => {
     client.query('BEGIN', (err) => {
       client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
         if (err) {
-          return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          //Returning on done to close the connecting to the db; will really need to figure out a better way for error handling here
+          onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          return done();
         }
 
         client.query('DELETE FROM Status WHERE guild_id = ($1)', [guildId], (err) => {
           if (err) {
-            return onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+            onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+            return done();
           }
           client.query('COMMIT', (err) => {
             if (err) {
-              return (
-                onError && onError(err.message ? err.message : { message: 'Unexpected Error' })
-              );
+              onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+              return done();
             }
             onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
             done();
