@@ -85,6 +85,11 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     }
   );
 };
+/**
+ * Handler for when a user initiates the /status stop command
+ * Calls the getStatus handler to see for existing status in the guild
+ * Passes a success and error callback with the former sending an information embed with context depending on status existence
+ */
 const sendStopInteraction = async ({ interaction, nessie }) => {
   await getStatus(
     interaction.guildId,
@@ -177,10 +182,11 @@ const generateRankedStatusEmbeds = (data) => {
  * - Calls the API for the rotation data
  * - Create embeds for each status channel
  * - Creates a category channel and 2 new text channels under it
- * - Sends embeds to respective channels and edits initial message with a success message
+ * - Sends embeds to respective channels
+ * - Inserts a new Status row in our database with all the relevant data
+ * - Edits initial message with a success message
  * -
  * TODO: Start the auto-update scheduler
- * TODO: Create tables in database to store status data
  */
 const createStatusChannels = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
@@ -277,6 +283,18 @@ const cancelStatusStart = async ({ nessie, interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for stopping the process of map status
+ * Gets called when a user clicks the confirm button of the /status stop reply
+ * Main steps upon button click:
+ * - Edits initial message with a loading state
+ * - Calls the deleteStatus handler which returns the status data while also deleting it from the db
+ * - Fetches each of the relevant discord channels with the status data
+ * - Deletes each of of the discord channels
+ * - Edits initial message with a success message
+ * -
+ * TODO: Stop the auto-update-scheduler
+ */
 const deleteStatusChannels = async ({ interaction, nessie }) => {
   interaction.deferUpdate();
   await deleteStatus(
@@ -320,6 +338,11 @@ const deleteStatusChannels = async ({ interaction, nessie }) => {
     }
   );
 };
+/**
+ * Handler for cancelling the wizard of /status stop
+ * Gets called when a user clicks the cancel button of the /status stop reply
+ * Pretty straightforward; we just edit the initial message with a cancel message similar to the start handler
+ */
 const cancelStatusStop = async ({ nessie, interaction }) => {
   interaction.deferUpdate();
 

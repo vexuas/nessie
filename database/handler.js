@@ -192,6 +192,18 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
     });
   });
 };
+/**
+ * Deletes an existing status in our database
+ * To do this, we need to get the status tied to the guild first
+ * This is important as we would need the relevant channel ids to be able to delete those channels in discord
+ * Was initially thinking of adding an onGet callback; we delete the discord channels after we query the data
+ * Had troubles in making it work tho as it was firing it at the same time as the delete queries
+ * Probably doing something wrong but I've opted to just deleting the channels after we delete the status from our database
+ * Prayers to discord's API to not go down when this is happening :prayge:
+ * @param guildId - guild id of the interaction
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throws an error
+ */
 exports.deleteStatus = async (guildId, onSuccess, onError) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
