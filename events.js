@@ -6,13 +6,14 @@
  * But that would be in another time heh
  */
 const { guildIDs, token } = require('./config/nessie.json');
-const { getBattleRoyalePubs } = require('./adapters');
+const { getBattleRoyalePubs, getRotationData } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
 const {
   sendHealthLog,
   sendGuildUpdateNotification,
   codeBlock,
   checkIfInDevelopment,
+  sendErrorLog,
 } = require('./helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
@@ -23,13 +24,18 @@ const {
   removeServerDataFromNessie,
   pool,
   createStatusTable,
+  getAllStatus,
 } = require('./database/handler');
 const {
   createStatusChannels,
   cancelStatusStart,
   cancelStatusStop,
   deleteStatusChannels,
+  generatePubsStatusEmbeds,
+  generateRankedStatusEmbeds,
 } = require('./commands/maps/status');
+const Scheduler = require('./scheduler');
+const { v4: uuidv4 } = require('uuid');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -59,6 +65,53 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
       sendHealthLog(brPubsData, logChannel, true); //For logging purpose
       setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
+
+      const statusScheduler = new Scheduler('0 */1 * * * *', async () => {
+        getAllStatus(
+          async (allStatus) => {
+            try {
+              const rotationData = await getRotationData();
+              const statusLogChannel = nessie.channels.cache.get('976863441526595644');
+              if (allStatus) {
+                allStatus.forEach(async (status) => {
+                  const pubsChannel = nessie.channels.cache.get(status.pubs_channel_id);
+                  const rankedChannel = nessie.channels.cache.get(status.ranked_channel_id);
+                  const pubsMessage = await pubsChannel.messages.fetch(status.pubs_message_id);
+                  const rankedMessage = await rankedChannel.messages.fetch(
+                    status.ranked_message_id
+                  );
+
+                  const pubsEmbed = generatePubsStatusEmbeds(rotationData);
+                  const rankedEmbed = generateRankedStatusEmbeds(rotationData);
+
+                  await pubsMessage.edit({ embeds: pubsEmbed });
+                  await rankedMessage.edit({ embeds: rankedEmbed });
+                });
+              }
+              const statusLogEmbed = {
+                title: 'Nessie | Auto Map Status Log',
+                description: 'Requested data from API and checked database',
+                timestamp: Date.now(),
+                color: 3066993,
+                fields: [
+                  {
+                    name: 'Auto Map Status Count:',
+                    value: allStatus ? `${allStatus.length}` : '0',
+                    inline: true,
+                  },
+                ],
+              };
+              await statusLogChannel.send({ embeds: [statusLogEmbed] });
+            } catch (error) {
+              console.log(error);
+            }
+          },
+          async (error) => {
+            console.log(error);
+          }
+        );
+      });
+      statusScheduler.start();
     } catch (e) {
       console.log(e); //Add proper error handling
     }

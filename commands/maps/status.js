@@ -408,4 +408,6 @@ module.exports = {
   cancelStatusStart,
   cancelStatusStop,
   deleteStatusChannels,
+  generatePubsStatusEmbeds,
+  generateRankedStatusEmbeds,
 };
