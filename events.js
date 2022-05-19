@@ -14,6 +14,7 @@ const {
   codeBlock,
   checkIfInDevelopment,
   sendErrorLog,
+  generateErrorEmbed,
 } = require('./helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
@@ -86,6 +87,9 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
 
                   await pubsMessage.edit({ embeds: pubsEmbed });
                   await rankedMessage.edit({ embeds: rankedEmbed });
+                  //Figure out rate limiting prevention here
+                  //Docs say normal requests is 50 per second but idk if this falls into a special route case
+                  //Probably just take a risk and try to send 40 requests (10 servers) and then add a timeout of 1 second?
                 });
               }
               const statusLogEmbed = {
@@ -103,11 +107,15 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
               };
               await statusLogChannel.send({ embeds: [statusLogEmbed] });
             } catch (error) {
-              console.log(error);
+              const uuid = uuidv4();
+              const type = 'Status Scheduler (Editing)';
+              await sendErrorLog({ nessie, error, type, uuid, ping: true });
             }
           },
           async (error) => {
-            console.log(error);
+            const uuid = uuidv4();
+            const type = 'Status Scheduler (Database)';
+            await sendErrorLog({ nessie, error, type, uuid, ping: true });
           }
         );
       });
