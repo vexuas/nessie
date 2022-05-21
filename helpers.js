@@ -179,6 +179,7 @@ const generateErrorEmbed = async (error, uuid, nessie) => {
  * @param interaction - discord interaction object
  * @param type - which command the error originated from
  * @param uuid - error uuid
+ * @param ping - whether to ping me if an error occured; default false
  */
 const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid, ping = false }) => {
   const errorChannel = nessie.channels.cache.get('938441853542465548');

@@ -193,6 +193,11 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
     });
   });
 };
+/**
+ * Gets all existing status in our database
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throw an error
+ */
 exports.getAllStatus = async (onSuccess, onError) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
