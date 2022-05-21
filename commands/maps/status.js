@@ -26,7 +26,7 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
         title: 'Status | Help',
         description: status
           ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
-          : 'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
+          : 'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 5 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
         color: 3447003,
       };
       return await interaction.editReply({ embeds: [embedData] });
@@ -56,7 +56,7 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
         color: 3447003,
         description: status
           ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
-          : 'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 15 minutes',
+          : 'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 5 minutes',
       };
       const row = new MessageActionRow()
         .addComponents(
@@ -147,7 +147,7 @@ const generatePubsStatusEmbeds = (data) => {
   const arenasEmbed = generatePubsEmbed(data.arenas, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
@@ -165,7 +165,7 @@ const generateRankedStatusEmbeds = (data) => {
   const arenasEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {

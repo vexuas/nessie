@@ -67,7 +67,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       sendHealthLog(brPubsData, logChannel, true); //For logging purpose
       setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
 
-      const statusScheduler = new Scheduler('0 */5 * * * *', async () => {
+      const statusScheduler = new Scheduler('10 */5 * * * *', async () => {
         getAllStatus(
           async (allStatus) => {
             try {
