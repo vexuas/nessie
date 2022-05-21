@@ -6,16 +6,9 @@
  * But that would be in another time heh
  */
 const { guildIDs, token } = require('./config/nessie.json');
-const { getBattleRoyalePubs, getRotationData } = require('./adapters');
+const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const {
-  sendHealthLog,
-  sendGuildUpdateNotification,
-  codeBlock,
-  checkIfInDevelopment,
-  sendErrorLog,
-  generateErrorEmbed,
-} = require('./helpers');
+const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment } = require('./helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getApplicationCommands } = require('./commands');
@@ -23,21 +16,15 @@ const {
   createGuildTable,
   insertNewGuild,
   removeServerDataFromNessie,
-  pool,
   createStatusTable,
-  getAllStatus,
 } = require('./database/handler');
 const {
   createStatusChannels,
   cancelStatusStart,
   cancelStatusStop,
   deleteStatusChannels,
-  generatePubsStatusEmbeds,
-  generateRankedStatusEmbeds,
   initialiseStatusScheduler,
 } = require('./commands/maps/status');
-const Scheduler = require('./scheduler');
-const { v4: uuidv4 } = require('uuid');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 

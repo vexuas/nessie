@@ -366,6 +366,20 @@ const cancelStatusStop = async ({ nessie, interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler in charge in updating map data in the relevant status channels
+ * Uses the Scheduler class to create a cron job that fires every 10th second of every 5 minutes (0:5:10, 0:10:10, 0:15:10, etc)
+ * When the cron job is executed, we then:
+ * - Call the getAllStatus handler to get every existing status in our database
+ * - Upon finishing the query, we then call the API for the current rotation data
+ * - If there are no existing statuses, we don't do anything
+ * - If there are, we then get all the relevant channels and messages from discord for each status
+ * - We then edit those messages with embeds containing the current rotation
+ * - After updating all the guild statuses, we then send a log to our status-log channel in discord
+ * - Currently there's 4 calls to the discord API per status; fetches messages + editing them
+ *
+ * TODO: Figure out how to prevent getting rate limited
+ */
 const initialiseStatusScheduler = (nessie) => {
   return new Scheduler('10 */5 * * * *', async () => {
     getAllStatus(
