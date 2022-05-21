@@ -194,6 +194,25 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
   });
 };
 /**
+ * Gets all existing status in our database
+ * @param onSuccess - function to call when queries are successfully done
+ * @param onError - function to call when queries throw an error
+ */
+exports.getAllStatus = async (onSuccess, onError) => {
+  this.pool.connect((err, client, done) => {
+    client.query('BEGIN', (err) => {
+      client.query('SELECT * FROM Status', (err, res) => {
+        if (err) {
+          onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
+          return done();
+        }
+        onSuccess && onSuccess(res.rows.length > 0 ? res.rows : null);
+        done();
+      });
+    });
+  });
+};
+/**
  * Deletes an existing status in our database
  * To do this, we need to get the status tied to the guild first
  * This is important as we would need the relevant channel ids to be able to delete those channels in discord

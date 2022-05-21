@@ -10,7 +10,13 @@ const {
   codeBlock,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { insertNewStatus, getStatus, deleteStatus } = require('../../database/handler');
+const {
+  insertNewStatus,
+  getStatus,
+  deleteStatus,
+  getAllStatus,
+} = require('../../database/handler');
+const Scheduler = require('../../scheduler');
 
 //----- Status Application Command Replies -----//
 /**
@@ -26,7 +32,7 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
         title: 'Status | Help',
         description: status
           ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
-          : 'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 15 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
+          : 'This command will send automatic updates of Apex Legends Maps in 2 new channels: *apex-pubs* and *apex-ranked*\n\nUpdates occur **every 5 minutes**\n\nRequires:\n• Manage Channel Permissions\n• Send Message Permissions\n• Only Admins can enable automatic status',
         color: 3447003,
       };
       return await interaction.editReply({ embeds: [embedData] });
@@ -56,7 +62,7 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
         color: 3447003,
         description: status
           ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
-          : 'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 15 minutes',
+          : 'By confirming below, Nessie will create a new category channel and 2 new text channels for the automated map status:\n• `Apex Map Status`\n• `#apex-pubs`\n• `#apex-ranked`\n\nNessie will use these channels to send automatic updates every 5 minutes',
       };
       const row = new MessageActionRow()
         .addComponents(
@@ -147,7 +153,7 @@ const generatePubsStatusEmbeds = (data) => {
   const arenasEmbed = generatePubsEmbed(data.arenas, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
@@ -165,7 +171,7 @@ const generateRankedStatusEmbeds = (data) => {
   const arenasEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
@@ -360,6 +366,72 @@ const cancelStatusStop = async ({ nessie, interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler in charge in updating map data in the relevant status channels
+ * Uses the Scheduler class to create a cron job that fires every 10th second of every 5 minutes (0:5:10, 0:10:10, 0:15:10, etc)
+ * When the cron job is executed, we then:
+ * - Call the getAllStatus handler to get every existing status in our database
+ * - Upon finishing the query, we then call the API for the current rotation data
+ * - If there are no existing statuses, we don't do anything
+ * - If there are, we then get all the relevant channels and messages from discord for each status
+ * - We then edit those messages with embeds containing the current rotation
+ * - After updating all the guild statuses, we then send a log to our status-log channel in discord
+ * - Currently there's 4 calls to the discord API per status; fetches messages + editing them
+ *
+ * TODO: Figure out how to prevent getting rate limited
+ */
+const initialiseStatusScheduler = (nessie) => {
+  return new Scheduler('10 */5 * * * *', async () => {
+    getAllStatus(
+      async (allStatus) => {
+        try {
+          const rotationData = await getRotationData();
+          const statusLogChannel = nessie.channels.cache.get('976863441526595644');
+          if (allStatus) {
+            allStatus.forEach(async (status) => {
+              const pubsChannel = nessie.channels.cache.get(status.pubs_channel_id);
+              const rankedChannel = nessie.channels.cache.get(status.ranked_channel_id);
+              const pubsMessage = await pubsChannel.messages.fetch(status.pubs_message_id);
+              const rankedMessage = await rankedChannel.messages.fetch(status.ranked_message_id);
+
+              const pubsEmbed = generatePubsStatusEmbeds(rotationData);
+              const rankedEmbed = generateRankedStatusEmbeds(rotationData);
+
+              await pubsMessage.edit({ embeds: pubsEmbed });
+              await rankedMessage.edit({ embeds: rankedEmbed });
+              //Figure out rate limiting prevention here
+              //Docs say normal requests is 50 per second but idk if this falls into a special route case
+              //Probably just take a risk and try to send 40 requests (10 servers) and then add a timeout of 1 second?
+            });
+          }
+          const statusLogEmbed = {
+            title: 'Nessie | Auto Map Status Log',
+            description: 'Requested data from API and checked database',
+            timestamp: Date.now(),
+            color: 3066993,
+            fields: [
+              {
+                name: 'Auto Map Status Count:',
+                value: allStatus ? `${allStatus.length}` : '0',
+                inline: true,
+              },
+            ],
+          };
+          await statusLogChannel.send({ embeds: [statusLogEmbed] });
+        } catch (error) {
+          const uuid = uuidv4();
+          const type = 'Status Scheduler (Editing)';
+          await sendErrorLog({ nessie, error, type, uuid, ping: true });
+        }
+      },
+      async (error) => {
+        const uuid = uuidv4();
+        const type = 'Status Scheduler (Database)';
+        await sendErrorLog({ nessie, error, type, uuid, ping: true });
+      }
+    );
+  });
+};
 module.exports = {
   /**
    * Creates Status application command with relevant subcommands
@@ -408,4 +480,7 @@ module.exports = {
   cancelStatusStart,
   cancelStatusStop,
   deleteStatusChannels,
+  generatePubsStatusEmbeds,
+  generateRankedStatusEmbeds,
+  initialiseStatusScheduler,
 };

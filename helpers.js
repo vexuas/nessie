@@ -179,47 +179,53 @@ const generateErrorEmbed = async (error, uuid, nessie) => {
  * @param interaction - discord interaction object
  * @param type - which command the error originated from
  * @param uuid - error uuid
+ * @param ping - whether to ping me if an error occured; default false
  */
-const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid }) => {
+const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid, ping = false }) => {
   const errorChannel = nessie.channels.cache.get('938441853542465548');
   const embed = {
     title: message ? `Error | ${type} Prefix Command` : `Error | ${type} Application Command`,
     color: 16711680,
     description: `uuid: ${uuid}\nError: ${error.message ? error.message : 'Unexpected Error'}`,
-    fields: [
-      {
-        name: 'User',
-        value: message ? message.author.username : interaction.user.username,
-        inline: true,
-      },
-      {
-        name: 'User ID',
-        value: message ? message.author.id : interaction.user.id,
-        inline: true,
-      },
-      {
-        name: 'Channel',
-        value: message ? message.channel.name : interaction.channel.name,
-        inline: true,
-      },
-      {
-        name: 'Channel ID',
-        value: message ? message.channel.id : interaction.channelId,
-        inline: true,
-      },
-      {
-        name: 'Guild',
-        value: message ? message.guild.name : interaction.guild.name,
-        inline: true,
-      },
-      {
-        name: 'Guild ID',
-        value: message ? message.guild.id : interaction.guildId,
-        inline: true,
-      },
-    ],
+    fields:
+      message || interaction
+        ? [
+            {
+              name: 'User',
+              value: message ? message.author.username : interaction.user.username,
+              inline: true,
+            },
+            {
+              name: 'User ID',
+              value: message ? message.author.id : interaction.user.id,
+              inline: true,
+            },
+            {
+              name: 'Channel',
+              value: message ? message.channel.name : interaction.channel.name,
+              inline: true,
+            },
+            {
+              name: 'Channel ID',
+              value: message ? message.channel.id : interaction.channelId,
+              inline: true,
+            },
+            {
+              name: 'Guild',
+              value: message ? message.guild.name : interaction.guild.name,
+              inline: true,
+            },
+            {
+              name: 'Guild ID',
+              value: message ? message.guild.id : interaction.guildId,
+              inline: true,
+            },
+          ]
+        : [],
   };
-  return await errorChannel.send({ embeds: [embed] });
+  return ping
+    ? await errorChannel.send({ embeds: [embed], content: '<@183444648360935424>' })
+    : await errorChannel.send({ embeds: [embed] });
 };
 const generateAnnouncementMessage = (prefix) => {
   return (
