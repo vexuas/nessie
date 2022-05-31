@@ -10,6 +10,7 @@ exports.getApplicationCommands = () => {
     help: require('./commands/hub/help'),
     invite: require('./commands/hub/invite'),
     updates: require('./commands/hub/updates'),
+    // ratelimit: require('./commands/hub/rateLimit'),
     // Maps
     br: require('./commands/maps/battle-royale'),
     arenas: require('./commands/maps/arenas'),
