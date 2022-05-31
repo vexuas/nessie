@@ -8,7 +8,12 @@
 const { guildIDs, token } = require('./config/nessie.json');
 const { getBattleRoyalePubs } = require('./adapters');
 const { sendMixpanelEvent } = require('./analytics');
-const { sendHealthLog, sendGuildUpdateNotification, checkIfInDevelopment } = require('./helpers');
+const {
+  sendHealthLog,
+  sendGuildUpdateNotification,
+  checkIfInDevelopment,
+  sendErrorLog,
+} = require('./helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getApplicationCommands } = require('./commands');
@@ -25,6 +30,7 @@ const {
   deleteStatusChannels,
   initialiseStatusScheduler,
 } = require('./commands/maps/status');
+const { v4: uuidv4 } = require('uuid');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -136,6 +142,17 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           return await cancelStatusStop({ nessie, interaction });
       }
     }
+  });
+  nessie.on('rateLimit', async (data) => {
+    console.log(data);
+    const uuid = uuidv4();
+    const type = 'Rate Limited';
+    const error = {
+      message: data
+        ? `\n• Timeout: ${data.timeout}ms\n• Limit: ${data.limit}\n• Method: ${data.method}\n• Path: ${data.path}\n• Route: ${data.route}\n• Global: ${data.global}`
+        : 'Unexpected rate limit error',
+    };
+    await sendErrorLog({ nessie, error, type, uuid, ping: true });
   });
 };
 
