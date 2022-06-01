@@ -1,20 +1,34 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { sendErrorLog } = require('../../helpers');
+const { sendErrorLog, generatePubsEmbed, generateRankedEmbed } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { format } = require('date-fns');
 const { getRotationData } = require('../../adapters');
-const { generateFullStatusEmbeds } = require('../maps/status');
 
 module.exports = {
   data: new SlashCommandBuilder().setName('ratelimit').setDescription('Testing rate limiting'),
   async execute({ nessie, interaction }) {
     try {
       await interaction.deferReply();
-      const testAnnouncement = nessie.channels.cache.get('981566881993490453');
+      const brAnnouncement = nessie.channels.cache.get('981566881993490453');
+      const arenasAnnouncement = nessie.channels.cache.get('981594277593374821');
       const rotationData = await getRotationData();
-      const statusEmbed = generateFullStatusEmbeds(rotationData);
+      const battleRoyalePubs = generatePubsEmbed(rotationData.battle_royale);
+      const battleRoyaleRanked = generateRankedEmbed(rotationData.ranked);
+      const arenasPubs = generatePubsEmbed(rotationData.arenas, 'Arenas');
+      const arenasRanked = generateRankedEmbed(rotationData.arenasRanked, 'Arenas');
 
-      await testAnnouncement.send({ embeds: statusEmbed });
+      const informationEmbed = {
+        description:
+          '**Updates occur every X minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+        color: 3447003,
+        timestamp: Date.now(),
+        footer: {
+          text: 'Last Update',
+        },
+      };
+      await brAnnouncement.send({
+        embeds: [informationEmbed, battleRoyaleRanked, battleRoyalePubs],
+      });
+      await arenasAnnouncement.send({ embeds: [informationEmbed, arenasRanked, arenasPubs] });
       await interaction.editReply('Testing Announcements');
     } catch (data) {
       console.log(data);

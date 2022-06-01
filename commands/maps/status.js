@@ -180,29 +180,6 @@ const generateRankedStatusEmbeds = (data) => {
   };
   return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
 };
-const generateFullStatusEmbeds = (data) => {
-  const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
-  const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
-  const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
-
-  const informationEmbed = {
-    description:
-      '**Updates occur every X minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
-    color: 3447003,
-    timestamp: Date.now(),
-    footer: {
-      text: 'Last Update',
-    },
-  };
-  return [
-    informationEmbed,
-    arenasRankedEmbed,
-    arenasPubsEmbed,
-    battleRoyaleRankedEmbed,
-    battleRoyalePubsEmbed,
-  ];
-};
 /**
  * Handler for initialising the process of map status
  * Gets called when a user clicks the confirm button of the /status start reply
@@ -505,6 +482,5 @@ module.exports = {
   deleteStatusChannels,
   generatePubsStatusEmbeds,
   generateRankedStatusEmbeds,
-  generateFullStatusEmbeds,
   initialiseStatusScheduler,
 };
