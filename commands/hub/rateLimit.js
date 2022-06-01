@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { format } = require('date-fns');
+const { getRotationData } = require('../../adapters');
+const { generateFullStatusEmbeds } = require('../maps/status');
 
 module.exports = {
   data: new SlashCommandBuilder().setName('ratelimit').setDescription('Testing rate limiting'),
@@ -9,9 +11,10 @@ module.exports = {
     try {
       await interaction.deferReply();
       const testAnnouncement = nessie.channels.cache.get('981566881993490453');
+      const rotationData = await getRotationData();
+      const statusEmbed = generateFullStatusEmbeds(rotationData);
 
-      await testAnnouncement.send('Test');
-
+      await testAnnouncement.send({ embeds: statusEmbed });
       await interaction.editReply('Testing Announcements');
     } catch (data) {
       console.log(data);
