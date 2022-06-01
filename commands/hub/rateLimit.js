@@ -25,10 +25,15 @@ module.exports = {
           text: 'Last Update',
         },
       };
-      await brAnnouncement.send({
+      const brMessage = await brAnnouncement.send({
         embeds: [informationEmbed, battleRoyaleRanked, battleRoyalePubs],
       });
-      await arenasAnnouncement.send({ embeds: [informationEmbed, arenasRanked, arenasPubs] });
+      const arenasMessage = await arenasAnnouncement.send({
+        embeds: [informationEmbed, arenasRanked, arenasPubs],
+      });
+
+      await brMessage.crosspost();
+      await arenasMessage.crosspost();
       await interaction.editReply('Testing Announcements');
     } catch (data) {
       console.log(data);
