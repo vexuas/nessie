@@ -214,6 +214,8 @@ const createStatusChannels = async ({ nessie, interaction }) => {
     }); //Sends initial pubs embed in status channel
     const statusArenasMessage = await statusArenasChannel.send({ embeds: statusArenasEmbed }); //Sends initial ranked embed in status channel
 
+    await statusBattleRoyaleMessage.crosspost();
+    await statusArenasMessage.crosspost();
     /**
      * Creates new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
@@ -367,30 +369,43 @@ const cancelStatusStop = async ({ nessie, interaction }) => {
  * - Currently there's 4 calls to the discord API per status; fetches messages + editing them
  *
  * TODO: Figure out how to prevent getting rate limited
+ *
+ * Update 4 June 2022:
+ * Keeping the above comment for context
+ * After looking into rate limits, it's not possible to do status this way in a large scale
+ * Temporarily pivoting to making it update through announcement channels
+ * Users will have to join Nessie's discord server and follow the channel but this makes it easier for us as we only have to update 1 set of status
+ * Since the functionalitiy is more or less the same, I'm opting to use the same function with some additions
  */
 const initialiseStatusScheduler = (nessie) => {
   return new Scheduler('10 */5 * * * *', async () => {
     getAllStatus(
-      async (allStatus) => {
+      async (allStatus, client) => {
         try {
           const rotationData = await getRotationData();
           const statusLogChannel = nessie.channels.cache.get('976863441526595644');
           if (allStatus) {
-            allStatus.forEach(async (status) => {
-              const pubsChannel = nessie.channels.cache.get(status.br_channel_id);
-              const rankedChannel = nessie.channels.cache.get(status.arenas_channel_id);
-              const pubsMessage = await pubsChannel.messages.fetch(status.br_message_id);
-              const rankedMessage = await rankedChannel.messages.fetch(status.arenas_message_id);
+            const status = allStatus[0];
+            const battleRoyaleChannel = nessie.channels.cache.get(status.br_channel_id);
+            const arenasChannel = nessie.channels.cache.get(status.arenas_channel_id);
+            const battleRoyaleMessage = await battleRoyaleChannel.messages.fetch(
+              status.br_message_id
+            );
+            const arenasMessage = await arenasChannel.messages.fetch(status.arenas_message_id);
 
-              const pubsEmbed = generatePubsStatusEmbeds(rotationData);
-              const rankedEmbed = generateRankedStatusEmbeds(rotationData);
+            const battleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+            const arenasEmbed = generateArenasStatusEmbeds(rotationData);
 
-              await pubsMessage.edit({ embeds: pubsEmbed });
-              await rankedMessage.edit({ embeds: rankedEmbed });
-              //Figure out rate limiting prevention here
-              //Docs say normal requests is 50 per second but idk if this falls into a special route case
-              //Probably just take a risk and try to send 40 requests (10 servers) and then add a timeout of 1 second?
+            await battleRoyaleMessage.delete();
+            await arenasMessage.delete();
+
+            const newBattleRoyaleMessage = await battleRoyaleChannel.send({
+              embeds: battleRoyaleEmbed,
             });
+            const newArenasMessage = await arenasChannel.send({ embeds: arenasEmbed });
+
+            await newBattleRoyaleMessage.crosspost();
+            await newArenasMessage.crosspost();
           }
           const statusLogEmbed = {
             title: 'Nessie | Auto Map Status Log',
@@ -465,4 +480,5 @@ module.exports = {
   cancelStatusStop,
   createStatusChannels,
   deleteStatusChannels,
+  initialiseStatusScheduler,
 };
