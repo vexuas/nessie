@@ -192,6 +192,13 @@ const createStatusChannels = async ({ nessie, interaction }) => {
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
     const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
+    /**
+     * Gets the @everyone role of the guild
+     * This is very important as users who are able to send messages in the announcement channel won't be able to follow it
+     * Quite a weird bug, or maybe intentional by Discord? I think it's a bug tho
+     * To fix this, we have to set the created channels with permission overwrites of not being able to send messages
+     */
+    const everyoneRole = interaction.guild.roles.cache.find((role) => role.name === '@everyone');
 
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
@@ -203,17 +210,31 @@ const createStatusChannels = async ({ nessie, interaction }) => {
       {
         parent: statusCategory,
         type: 'GUILD_NEWS',
+        permissionOverwrites: [
+          {
+            id: everyoneRole.id,
+            deny: ['SEND_MESSAGES'],
+          },
+        ],
       }
     );
     const statusArenasChannel = await interaction.guild.channels.create('apex-arenas', {
       parent: statusCategory,
       type: 'GUILD_NEWS',
+      permissionOverwrites: [
+        {
+          id: everyoneRole.id,
+          deny: ['SEND_MESSAGES'],
+        },
+      ],
     });
     const statusBattleRoyaleMessage = await statusBattleRoyaleChannel.send({
       embeds: statusBattleRoyaleEmbed,
     }); //Sends initial pubs embed in status channel
     const statusArenasMessage = await statusArenasChannel.send({ embeds: statusArenasEmbed }); //Sends initial ranked embed in status channel
 
+    await statusBattleRoyaleMessage.crosspost();
+    await statusArenasMessage.crosspost();
     /**
      * Creates new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
@@ -367,30 +388,67 @@ const cancelStatusStop = async ({ nessie, interaction }) => {
  * - Currently there's 4 calls to the discord API per status; fetches messages + editing them
  *
  * TODO: Figure out how to prevent getting rate limited
+ *
+ * Update 4 June 2022:
+ * Keeping the above comment for context
+ * After looking into rate limits, it's not possible to do status this way in a large scale
+ * Temporarily pivoting to making it update through announcement channels
+ * Users will have to join Nessie's discord server and follow the channel but this makes it easier for us as we only have to update 1 set of status
+ * Since the functionalitiy is more or less the same, I'm opting to use the same function with some additions
+ *
+ * Current flow:
+ * - Call the getAllStatus handler to get every existing status in our database
+ * - Upon finishing the query, we then call the API for the current rotation data
+ * - If there are no existing statuses, we don't do anything
+ * - If there are, we then get all the relevant channels and messages from discord for the first status
+ * - We then delete those messages
+ * - We then send new messages to the relevant channels with an updated embed of rotation data
+ * - After sending the messages, we then update the status in our database with the new message ids
+ * - After the update query, we then publish the messages
+ * - Finally we send a log to our status-log channel in discord
  */
 const initialiseStatusScheduler = (nessie) => {
-  return new Scheduler('10 */5 * * * *', async () => {
+  return new Scheduler('10 */15 * * * *', async () => {
     getAllStatus(
-      async (allStatus) => {
+      async (allStatus, client) => {
         try {
           const rotationData = await getRotationData();
           const statusLogChannel = nessie.channels.cache.get('976863441526595644');
           if (allStatus) {
-            allStatus.forEach(async (status) => {
-              const pubsChannel = nessie.channels.cache.get(status.br_channel_id);
-              const rankedChannel = nessie.channels.cache.get(status.arenas_channel_id);
-              const pubsMessage = await pubsChannel.messages.fetch(status.br_message_id);
-              const rankedMessage = await rankedChannel.messages.fetch(status.arenas_message_id);
+            const status = allStatus[0];
+            const battleRoyaleChannel = nessie.channels.cache.get(status.br_channel_id);
+            const arenasChannel = nessie.channels.cache.get(status.arenas_channel_id);
+            const battleRoyaleMessage = await battleRoyaleChannel.messages.fetch(
+              status.br_message_id
+            );
+            const arenasMessage = await arenasChannel.messages.fetch(status.arenas_message_id);
 
-              const pubsEmbed = generatePubsStatusEmbeds(rotationData);
-              const rankedEmbed = generateRankedStatusEmbeds(rotationData);
+            const battleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+            const arenasEmbed = generateArenasStatusEmbeds(rotationData);
 
-              await pubsMessage.edit({ embeds: pubsEmbed });
-              await rankedMessage.edit({ embeds: rankedEmbed });
-              //Figure out rate limiting prevention here
-              //Docs say normal requests is 50 per second but idk if this falls into a special route case
-              //Probably just take a risk and try to send 40 requests (10 servers) and then add a timeout of 1 second?
+            await battleRoyaleMessage.delete();
+            await arenasMessage.delete();
+
+            const newBattleRoyaleMessage = await battleRoyaleChannel.send({
+              embeds: battleRoyaleEmbed,
             });
+            const newArenasMessage = await arenasChannel.send({ embeds: arenasEmbed });
+
+            /**
+             * Tbh I'm a bit worried about having this query here
+             * It seems to be working during development but I'm not sure if it's actually firing only after the message promises are done
+             * Probably still not confident with database stuff; I'll just keep my fingers crossed heh
+             */
+            client.query(
+              'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
+              [`${newBattleRoyaleMessage.id}`, `${newArenasMessage.id}`, `${status.uuid}`],
+              (err, res) => {
+                client.query('COMMIT', async () => {
+                  await newBattleRoyaleMessage.crosspost();
+                  await newArenasMessage.crosspost();
+                });
+              }
+            );
           }
           const statusLogEmbed = {
             title: 'Nessie | Auto Map Status Log',
@@ -429,6 +487,9 @@ module.exports = {
    * I'm not sure why Discord did it this way but their explanation is the base command now becomes a folder of sorts
    * Was initially planning to have /status, /status start and /status stop with the former showing the command information
    * Not really a problem anyway since now it's /status help
+   *
+   * TODO: Check if it's possible to have default permissions when creating commands
+   * Alternative is to manaully set it inside the guild settings
    */
   isAdmin: true,
   data: new SlashCommandBuilder()
@@ -465,4 +526,5 @@ module.exports = {
   cancelStatusStop,
   createStatusChannels,
   deleteStatusChannels,
+  initialiseStatusScheduler,
 };

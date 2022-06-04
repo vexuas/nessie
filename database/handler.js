@@ -187,7 +187,6 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
           onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
           return done();
         }
-        console.log(res.rows);
         onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
         done();
       });
@@ -207,7 +206,7 @@ exports.getAllStatus = async (onSuccess, onError) => {
           onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
           return done();
         }
-        onSuccess && onSuccess(res.rows.length > 0 ? res.rows : null);
+        onSuccess && onSuccess(res.rows.length > 0 ? res.rows : null, client);
         done();
       });
     });
