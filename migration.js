@@ -20,6 +20,7 @@ exports.runMigration = (guilds) => {
       const updateUsePrefix = 'UPDATE Guild SET use_prefix = ($1) WHERE uuid = ($2)';
       const updateSetPrefix = 'UPDATE Guild SET prefix = ($1) WHERE uuid = ($2)';
       const deleteGuilds = 'DELETE FROM Guild';
+      const dropStatus = 'DROP TABLE Status';
       // ----
       // Create Guild Table
       // client.query(createTable);
@@ -75,9 +76,15 @@ exports.runMigration = (guilds) => {
       // ----
       const selectAllStatus = 'SELECT * FROM Status';
       const deleteAllStatus = 'DELETE FROM Status';
-      client.query(selectAllStatus, (err, res) => {
+      // client.query(selectAllStatus, (err, res) => {
+      //   console.log(err);
+      //   console.log(res.rows);
+      //   done();
+      // });
+      client.query(dropStatus, (err, res) => {
         console.log(err);
-        console.log(res.rows);
+        console.log(res);
+        client.query('COMMIT');
         done();
       });
       // client.query(deleteAllStatus, (err, res) => {

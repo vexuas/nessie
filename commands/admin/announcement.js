@@ -41,7 +41,7 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
         title: 'Announcement | Start',
         color: 3447003,
         description: status
-          ? `There's currently an existing automated map status active in:\n• <#${status.pubs_channel_id}>\n• <#${status.ranked_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
+          ? `There's currently an existing automated map status active in:\n• <#${status.br_channel_id}>\n• <#${status.arenas_channel_id}>\n\nCreated at ${status.created_at} by ${status.created_by}`
           : 'By confirming below, Nessie will create a new category channel and 2 new announcement channels for the automated map status:\n• `Apex Legends Map Status`\n• `#apex-battle-royale`\n• `#apex-arenas`\n\nNessie will use these channels to send automatic updates every 15 minutes',
       };
       const row = new MessageActionRow()
@@ -86,8 +86,8 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
         description: status
           ? `By confirming below, Nessie will stop the existing map status and delete these channels:\n• <#${
               status.category_channel_id
-            }>\n• <#${status.pubs_channel_id}>\n• <#${
-              status.ranked_channel_id
+            }>\n• <#${status.br_channel_id}>\n• <#${
+              status.arenas_channel_id
             }>\nThis status was created on ${status.created_at} by ${
               status.created_by
             }\n\nTo re-enable the automated map status after, simply use ${codeBlock(
@@ -223,10 +223,10 @@ const createStatusChannels = async ({ nessie, interaction }) => {
       uuid: uuidv4(),
       guildId: interaction.guildId,
       categoryChannelId: statusCategory.id,
-      pubsChannelId: statusBattleRoyaleChannel.id,
-      rankedChannelId: statusArenasChannel.id,
-      pubsMessageId: statusBattleRoyaleMessage.id,
-      rankedMessageId: statusArenasMessage.id,
+      battleRoyaleChannelId: statusBattleRoyaleChannel.id,
+      arenasChannelId: statusArenasChannel.id,
+      battleRoyaleMessageId: statusBattleRoyaleMessage.id,
+      arenasMessageId: statusArenasMessage.id,
       createdBy: interaction.user.tag,
       createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
@@ -301,12 +301,12 @@ const deleteStatusChannels = async ({ interaction, nessie }) => {
             color: 16776960,
           };
           await interaction.message.edit({ embeds: [embedLoading], components: [] });
-          const pubsStatusChannel = await nessie.channels.fetch(status.pubs_channel_id);
-          const rankedStatusChannel = await nessie.channels.fetch(status.ranked_channel_id);
+          const battleRoyaleStatusChannel = await nessie.channels.fetch(status.br_channel_id);
+          const arenasStatusChannel = await nessie.channels.fetch(status.arenas_channel_id);
           const categoryStatusChannel = await nessie.channels.fetch(status.category_channel_id);
 
-          await pubsStatusChannel.delete();
-          await rankedStatusChannel.delete();
+          await battleRoyaleStatusChannel.delete();
+          await arenasStatusChannel.delete();
           await categoryStatusChannel.delete();
 
           const embedSuccess = {
@@ -377,10 +377,10 @@ const initialiseStatusScheduler = (nessie) => {
           const statusLogChannel = nessie.channels.cache.get('976863441526595644');
           if (allStatus) {
             allStatus.forEach(async (status) => {
-              const pubsChannel = nessie.channels.cache.get(status.pubs_channel_id);
-              const rankedChannel = nessie.channels.cache.get(status.ranked_channel_id);
-              const pubsMessage = await pubsChannel.messages.fetch(status.pubs_message_id);
-              const rankedMessage = await rankedChannel.messages.fetch(status.ranked_message_id);
+              const pubsChannel = nessie.channels.cache.get(status.br_channel_id);
+              const rankedChannel = nessie.channels.cache.get(status.arenas_channel_id);
+              const pubsMessage = await pubsChannel.messages.fetch(status.br_message_id);
+              const rankedMessage = await rankedChannel.messages.fetch(status.arenas_message_id);
 
               const pubsEmbed = generatePubsStatusEmbeds(rotationData);
               const rankedEmbed = generateRankedStatusEmbeds(rotationData);
