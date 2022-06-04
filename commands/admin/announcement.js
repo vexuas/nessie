@@ -391,7 +391,7 @@ const cancelStatusStop = async ({ nessie, interaction }) => {
  * Since the functionalitiy is more or less the same, I'm opting to use the same function with some additions
  */
 const initialiseStatusScheduler = (nessie) => {
-  return new Scheduler('10 */5 * * * *', async () => {
+  return new Scheduler('10 */15 * * * *', async () => {
     getAllStatus(
       async (allStatus, client) => {
         try {
@@ -417,8 +417,16 @@ const initialiseStatusScheduler = (nessie) => {
             });
             const newArenasMessage = await arenasChannel.send({ embeds: arenasEmbed });
 
-            await newBattleRoyaleMessage.crosspost();
-            await newArenasMessage.crosspost();
+            client.query(
+              'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
+              [`${newBattleRoyaleMessage.id}`, `${newArenasMessage.id}`, `${status.uuid}`],
+              (err, res) => {
+                client.query('COMMIT', async () => {
+                  await newBattleRoyaleMessage.crosspost();
+                  await newArenasMessage.crosspost();
+                });
+              }
+            );
           }
           const statusLogEmbed = {
             title: 'Nessie | Auto Map Status Log',
