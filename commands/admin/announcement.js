@@ -192,6 +192,7 @@ const createStatusChannels = async ({ nessie, interaction }) => {
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
     const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
+    const everyoneRole = interaction.guild.roles.cache.find((role) => role.name === '@everyone');
 
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
@@ -203,11 +204,23 @@ const createStatusChannels = async ({ nessie, interaction }) => {
       {
         parent: statusCategory,
         type: 'GUILD_NEWS',
+        permissionOverwrites: [
+          {
+            id: everyoneRole.id,
+            deny: ['SEND_MESSAGES'],
+          },
+        ],
       }
     );
     const statusArenasChannel = await interaction.guild.channels.create('apex-arenas', {
       parent: statusCategory,
       type: 'GUILD_NEWS',
+      permissionOverwrites: [
+        {
+          id: everyoneRole.id,
+          deny: ['SEND_MESSAGES'],
+        },
+      ],
     });
     const statusBattleRoyaleMessage = await statusBattleRoyaleChannel.send({
       embeds: statusBattleRoyaleEmbed,

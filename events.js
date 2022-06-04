@@ -29,6 +29,7 @@ const {
   cancelStatusStop,
   createStatusChannels,
   deleteStatusChannels,
+  initialiseStatusScheduler,
 } = require('./commands/admin/announcement');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -59,6 +60,8 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
       sendHealthLog(brPubsData, logChannel, true); //For logging purpose
       setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
+      const statusScheduler = initialiseStatusScheduler(nessie); //Initialises auto status scheduler
+      statusScheduler.start(); //Starts the scheduler
     } catch (e) {
       console.log(e); //Add proper error handling
     }
