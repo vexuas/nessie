@@ -122,7 +122,7 @@ exports.createStatusTable = () => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
-        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT NOT NULL, pubs_channel_id TEXT NOT NULL, ranked_channel_id TEXT NOT NULL, pubs_message_id TEXT NOT NULL, ranked_message_id TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
+        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT NOT NULL, br_channel_id TEXT NOT NULL, arenas_channel_id TEXT NOT NULL, br_message_id TEXT NOT NULL, arenas_message_id TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
       );
       client.query('COMMIT', (err) => {
         done();
@@ -142,15 +142,15 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
-        'INSERT INTO Status (uuid, guild_id, category_channel_id, pubs_channel_id, ranked_channel_id, pubs_message_id, ranked_message_id, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, arenas_channel_id, br_message_id, arenas_message_id, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
         [
           status.uuid,
           status.guildId,
           status.categoryChannelId,
-          status.pubsChannelId,
-          status.rankedChannelId,
-          status.pubsMessageId,
-          status.rankedMessageId,
+          status.battleRoyaleChannelId,
+          status.arenasChannelId,
+          status.battleRoyaleMessageId,
+          status.arenasMessageId,
           status.createdBy,
           status.createdAt,
         ],
@@ -187,6 +187,7 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
           onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
           return done();
         }
+        console.log(res.rows);
         onSuccess && onSuccess(res.rows.length > 0 ? res.rows[0] : null);
         done();
       });
