@@ -116,41 +116,42 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
 };
 //----- Status Functions/Interactions -----//
 /**
- * Generates relevant embeds for the status pubs channel
- * Currently only showing battle royale and arenas
- * Might put control in after double checking if it's still up in season 13
+ * Generates relevant embeds for the status battle royale channel
+ * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
+ * Had to split it between br and arenas after seeing that
  */
-const generatePubsStatusEmbeds = (data) => {
-  const battleRoyaleEmbed = generatePubsEmbed(data.battle_royale);
-  const arenasEmbed = generatePubsEmbed(data.arenas, 'Arenas');
+const generateBattleRoyaleStatusEmbeds = (data) => {
+  const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
+  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
   const informationEmbed = {
     description:
-      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
       text: 'Last Update',
     },
   };
-  return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
+  return [informationEmbed, battleRoyalePubsEmbed, battleRoyaleRankedEmbed];
 };
 /**
- * Generates relevant embeds for the status ranked channel
- * Currently only showing battle royale and arenas
+ * Generates relevant embeds for the status arenas channel
+ * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
+ * Had to split it between br and arenas after seeing that
  */
-const generateRankedStatusEmbeds = (data) => {
-  const battleRoyaleEmbed = generateRankedEmbed(data.ranked);
-  const arenasEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
+const generateArenasStatusEmbeds = (data) => {
+  const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
+  const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
       text: 'Last Update',
     },
   };
-  return [informationEmbed, battleRoyaleEmbed, arenasEmbed];
+  return [informationEmbed, arenasPubsEmbed, arenasRankedEmbed];
 };
 /**
  * Handler for initialising the process of map status
@@ -181,22 +182,29 @@ const createStatusChannels = async ({ nessie, interaction }) => {
     await interaction.message.edit({ embeds: [embedLoading], components: [] });
 
     const rotationData = await getRotationData();
-    const statusPubsEmbed = generatePubsStatusEmbeds(rotationData);
-    const statusRankedEmbed = generateRankedStatusEmbeds(rotationData);
+    const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+    const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
 
     // //Creates a category channel for better readability
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
     });
     //Creates the status channnel for pubs and ranked
-    const statusPubsChannel = await interaction.guild.channels.create('apex-pubs', {
+    const statusBattleRoyaleChannel = await interaction.guild.channels.create(
+      'apex-battle-royale',
+      {
+        parent: statusCategory,
+        type: 'GUILD_NEWS',
+      }
+    );
+    const statusArenasChannel = await interaction.guild.channels.create('apex-arenas', {
       parent: statusCategory,
+      type: 'GUILD_NEWS',
     });
-    const statusRankedChannel = await interaction.guild.channels.create('apex-ranked', {
-      parent: statusCategory,
-    });
-    const statusPubsMessage = await statusPubsChannel.send({ embeds: statusPubsEmbed }); //Sends initial pubs embed in status channel
-    const statusRankedMessage = await statusRankedChannel.send({ embeds: statusRankedEmbed }); //Sends initial ranked embed in status channel
+    const statusBattleRoyaleMessage = await statusBattleRoyaleChannel.send({
+      embeds: statusBattleRoyaleEmbed,
+    }); //Sends initial pubs embed in status channel
+    const statusArenasMessage = await statusArenasChannel.send({ embeds: statusArenasEmbed }); //Sends initial ranked embed in status channel
 
     /**
      * Creates new status data object to be inserted in our database
@@ -207,10 +215,10 @@ const createStatusChannels = async ({ nessie, interaction }) => {
       uuid: uuidv4(),
       guildId: interaction.guildId,
       categoryChannelId: statusCategory.id,
-      pubsChannelId: statusPubsChannel.id,
-      rankedChannelId: statusRankedChannel.id,
-      pubsMessageId: statusPubsMessage.id,
-      rankedMessageId: statusRankedMessage.id,
+      pubsChannelId: statusBattleRoyaleChannel.id,
+      rankedChannelId: statusArenasChannel.id,
+      pubsMessageId: statusBattleRoyaleMessage.id,
+      rankedMessageId: statusArenasMessage.id,
       createdBy: interaction.user.tag,
       createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
@@ -218,7 +226,7 @@ const createStatusChannels = async ({ nessie, interaction }) => {
       newStatus,
       async () => {
         const embedSuccess = {
-          description: `Created map status at ${statusPubsChannel} and ${statusRankedChannel}`,
+          description: `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`,
           color: 3066993,
         };
         await interaction.message.edit({ embeds: [embedSuccess], components: [] });
@@ -432,4 +440,6 @@ module.exports = {
   },
   cancelStatusStart,
   cancelStatusStop,
+  createStatusChannels,
+  deleteStatusChannels,
 };

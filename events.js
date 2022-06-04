@@ -25,7 +25,12 @@ const {
 } = require('./database/handler');
 const { initialiseStatusScheduler } = require('./commands/maps/status');
 const { v4: uuidv4 } = require('uuid');
-const { cancelStatusStart, cancelStatusStop } = require('./commands/admin/announcement');
+const {
+  cancelStatusStart,
+  cancelStatusStop,
+  createStatusChannels,
+  deleteStatusChannels,
+} = require('./commands/admin/announcement');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -55,8 +60,8 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
       sendHealthLog(brPubsData, logChannel, true); //For logging purpose
       setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
-      const statusScheduler = initialiseStatusScheduler(nessie); //Initialises auto status scheduler
-      statusScheduler.start(); //Starts the status scheduler
+      // const statusScheduler = initialiseStatusScheduler(nessie); //Initialises auto status scheduler
+      // statusScheduler.start(); //Starts the status scheduler
     } catch (e) {
       console.log(e); //Add proper error handling
     }
@@ -128,11 +133,11 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     if (interaction.isButton()) {
       switch (interaction.customId) {
         case 'statusStart__startButton':
-          return;
+          return createStatusChannels({ interaction, nessie });
         case 'statusStart__cancelButton':
           return cancelStatusStart({ interaction, nessie });
         case 'statusStop__stopButton':
-          return;
+          return deleteStatusChannels({ interaction, nessie });
         case 'statusStop__cancelButton':
           return cancelStatusStop({ interaction, nessie });
       }
