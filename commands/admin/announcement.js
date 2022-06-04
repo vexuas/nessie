@@ -19,7 +19,15 @@ const {
 const Scheduler = require('../../scheduler');
 
 /**
- * Handler for when a user initiates the /status start command
+ * Most of the functions here were from the status command so some of the code might be referencing status
+ * Pivoted temporarily to become announcements as we can't scale due to Discord limitations
+ * Instead of updating every guild with a message, we're just gonna update announcement channels in Nessie's Discord server
+ * Temporary as I want to still get the updates on people's own servers
+ * More reading her:L https://shizuka.notion.site/Adventures-in-Discord-s-Rate-Limits-4ef7fa20481f4e3b8a388d9cdb1021e7
+ **/
+//-------------
+/**
+ * Handler for when a user initiates the /announcement start command
  * Calls the getStatus handler to see for existing status in the guild
  * Passes a success and error callback with the former:
  * - Sending an information embed with context depending on status existence
@@ -64,7 +72,7 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
   );
 };
 /**
- * Handler for when a user initiates the /status stop command
+ * Handler for when a user initiates the /announcement stop command
  * Calls the getStatus handler to see for existing status in the guild
  * Passes a success and error callback with the former sending an information embed with context depending on status existence
  */
@@ -155,7 +163,7 @@ const generateArenasStatusEmbeds = (data) => {
 };
 /**
  * Handler for initialising the process of map status
- * Gets called when a user clicks the confirm button of the /status start reply
+ * Gets called when a user clicks the confirm button of the /announcement start reply
  * Main steps upon button click:
  * - Edits initial message with a loading state
  * - Calls the API for the rotation data
@@ -248,8 +256,8 @@ const createStatusChannels = async ({ nessie, interaction }) => {
   }
 };
 /**
- * Handler for cancelling the setup of /status start
- * Gets called when a user clicks the cancel button of the /status start reply
+ * Handler for cancelling the setup of /announcement start
+ * Gets called when a user clicks the cancel button of the /announcement start reply
  * Pretty straightforward; we just edit the initial message with a cancel message
  */
 const cancelStatusStart = async ({ nessie, interaction }) => {
@@ -271,7 +279,7 @@ const cancelStatusStart = async ({ nessie, interaction }) => {
 };
 /**
  * Handler for stopping the process of map status
- * Gets called when a user clicks the confirm button of the /status stop reply
+ * Gets called when a user clicks the confirm button of the /announcement stop reply
  * Main steps upon button click:
  * - Edits initial message with a loading state
  * - Calls the deleteStatus handler which returns the status data while also deleting it from the db
@@ -325,8 +333,8 @@ const deleteStatusChannels = async ({ interaction, nessie }) => {
   );
 };
 /**
- * Handler for cancelling the wizard of /status stop
- * Gets called when a user clicks the cancel button of the /status stop reply
+ * Handler for cancelling the wizard of /announcement stop
+ * Gets called when a user clicks the cancel button of the /announcement stop reply
  * Pretty straightforward; we just edit the initial message with a cancel message similar to the start handler
  */
 const cancelStatusStop = async ({ nessie, interaction }) => {
