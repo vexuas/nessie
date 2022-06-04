@@ -203,9 +203,10 @@ const setCurrentMapStatus = (data, channel, nessie) => {
 const registerApplicationCommands = async (nessie) => {
   const isInDevelopment = checkIfInDevelopment(nessie);
   const appCommandList = Object.keys(appCommands)
-    .map((key) => appCommands[key].data)
+    .map((key) => !appCommands[key].isAdmin && appCommands[key].data)
     .filter((command) => command)
     .map((command) => command.toJSON());
+  console.log(appCommandList);
   const rest = new REST({ version: '9' }).setToken(token);
 
   if (isInDevelopment) {

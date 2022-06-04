@@ -16,5 +16,7 @@ exports.getApplicationCommands = () => {
     arenas: require('./commands/maps/arenas'),
     control: require('./commands/maps/control'),
     status: require('./commands/maps/status'),
+    //Admin
+    announcement: require('./commands/admin/announcement'),
   };
 };
