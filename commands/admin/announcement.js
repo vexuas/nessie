@@ -140,7 +140,7 @@ const generateBattleRoyaleStatusEmbeds = (data) => {
       text: 'Last Update',
     },
   };
-  return [informationEmbed, battleRoyalePubsEmbed, battleRoyaleRankedEmbed];
+  return [informationEmbed, battleRoyaleRankedEmbed, battleRoyalePubsEmbed];
 };
 /**
  * Generates relevant embeds for the status arenas channel
@@ -159,7 +159,7 @@ const generateArenasStatusEmbeds = (data) => {
       text: 'Last Update',
     },
   };
-  return [informationEmbed, arenasPubsEmbed, arenasRankedEmbed];
+  return [informationEmbed, arenasRankedEmbed, arenasPubsEmbed];
 };
 /**
  * Handler for initialising the process of map status
