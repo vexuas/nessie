@@ -202,18 +202,26 @@ const setCurrentMapStatus = (data, channel, nessie) => {
  */
 const registerApplicationCommands = async (nessie) => {
   const isInDevelopment = checkIfInDevelopment(nessie);
-  const appCommandList = Object.keys(appCommands)
+  const publicCommandList = Object.keys(appCommands)
     .map((key) => !appCommands[key].isAdmin && appCommands[key].data)
     .filter((command) => command)
     .map((command) => command.toJSON());
-  console.log(appCommandList);
+  const adminCommandList = Object.keys(appCommands)
+    .map((key) => appCommands[key].isAdmin && appCommands[key].data)
+    .filter((command) => command)
+    .map((command) => command.toJSON());
+  const fullCommandList = Object.keys(appCommands)
+    .map((key) => appCommands[key].data)
+    .filter((command) => command)
+    .map((command) => command.toJSON());
+
   const rest = new REST({ version: '9' }).setToken(token);
 
   if (isInDevelopment) {
     //Guild register
     try {
       await rest.put(Routes.applicationGuildCommands('929421200797626388', guildIDs), {
-        body: appCommandList,
+        body: fullCommandList,
       });
       console.log('Successfully registered guild application commands');
     } catch (e) {
@@ -224,7 +232,10 @@ const registerApplicationCommands = async (nessie) => {
     //TODO: Maybe create a script one day to delete global commands for test bot
     //TODO: Make fetching of bot id dynamic as it will either use production or testing id
     try {
-      await rest.put(Routes.applicationCommands('889135055430111252'), { body: appCommandList });
+      await rest.put(Routes.applicationCommands('889135055430111252'), { body: publicCommandList });
+      await rest.put(Routes.applicationGuildCommands('889135055430111252', guildIDs), {
+        body: adminCommandList,
+      });
       console.log('Successfully registered global application commands');
     } catch (e) {
       console.log(e);
