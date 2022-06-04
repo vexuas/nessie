@@ -192,6 +192,12 @@ const createStatusChannels = async ({ nessie, interaction }) => {
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
     const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
+    /**
+     * Gets the @everyone role of the guild
+     * This is very important as users who are able to send messages in the announcement channel won't be able to follow it
+     * Quite a weird bug, or maybe intentional by Discord? I think it's a bug tho
+     * To fix this, we have to set the created channels with permission overwrites of not being able to send messages
+     */
     const everyoneRole = interaction.guild.roles.cache.find((role) => role.name === '@everyone');
 
     // //Creates a category channel for better readability
@@ -389,6 +395,17 @@ const cancelStatusStop = async ({ nessie, interaction }) => {
  * Temporarily pivoting to making it update through announcement channels
  * Users will have to join Nessie's discord server and follow the channel but this makes it easier for us as we only have to update 1 set of status
  * Since the functionalitiy is more or less the same, I'm opting to use the same function with some additions
+ *
+ * Current flow:
+ * - Call the getAllStatus handler to get every existing status in our database
+ * - Upon finishing the query, we then call the API for the current rotation data
+ * - If there are no existing statuses, we don't do anything
+ * - If there are, we then get all the relevant channels and messages from discord for the first status
+ * - We then delete those messages
+ * - We then send new messages to the relevant channels with an updated embed of rotation data
+ * - After sending the messages, we then update the status in our database with the new message ids
+ * - After the update query, we then publish the messages
+ * - Finally we send a log to our status-log channel in discord
  */
 const initialiseStatusScheduler = (nessie) => {
   return new Scheduler('10 */15 * * * *', async () => {
@@ -417,6 +434,11 @@ const initialiseStatusScheduler = (nessie) => {
             });
             const newArenasMessage = await arenasChannel.send({ embeds: arenasEmbed });
 
+            /**
+             * Tbh I'm a bit worried about having this query here
+             * It seems to be working during development but I'm not sure if it's actually firing only after the message promises are done
+             * Probably still not confident with database stuff; I'll just keep my fingers crossed heh
+             */
             client.query(
               'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
               [`${newBattleRoyaleMessage.id}`, `${newArenasMessage.id}`, `${status.uuid}`],
@@ -465,6 +487,9 @@ module.exports = {
    * I'm not sure why Discord did it this way but their explanation is the base command now becomes a folder of sorts
    * Was initially planning to have /status, /status start and /status stop with the former showing the command information
    * Not really a problem anyway since now it's /status help
+   *
+   * TODO: Check if it's possible to have default permissions when creating commands
+   * Alternative is to manaully set it inside the guild settings
    */
   isAdmin: true,
   data: new SlashCommandBuilder()
