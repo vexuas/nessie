@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageActionRow, MessageButton } = require('discord.js');
 const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { getStatus } = require('../../database/handler');
 
 //----- Status Application Command Replies -----//
 /**
@@ -10,24 +10,28 @@ const { getStatus } = require('../../database/handler');
  * Passes a success and error callback with the former sending an information embed with context depending on status existence
  */
 const sendHelpInteraction = async ({ interaction, nessie }) => {
-  await getStatus(
-    interaction.guildId,
-    async (status) => {
-      const embedData = {
-        title: 'Status | Help',
-        description: 'To be filled',
-        color: 3447003,
-      };
-      return await interaction.editReply({ embeds: [embedData] });
-    },
-    async (error) => {
-      const uuid = uuidv4();
-      const type = 'Getting Status in Database (Help)';
-      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-      interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie, error, interaction, type, uuid });
-    }
-  );
+  try {
+    const embedData = {
+      title: 'Status | About',
+      description:
+        "Due to technical limitations with Discord, automatic updates through normal messages/interactions isn't possible in a large scale. Fortunately an alternative approach is being worked on but it might take a while before it gets released\n\nAs a temporary solution, I've set up automatic map updates in announcement channels in the support server.\n\nFeel free to join and follow the channels!",
+      color: 3447003,
+    };
+    const row = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setLabel("To Nessie's Canyon")
+        .setStyle('LINK')
+        .setURL('https://discord.com/invite/47Ccgz9jA4')
+    );
+
+    return await interaction.editReply({ components: [row], embeds: [embedData] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status About';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
 };
 module.exports = {
   data: new SlashCommandBuilder().setName('status').setDescription('To be filled'),
