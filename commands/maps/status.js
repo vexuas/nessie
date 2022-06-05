@@ -34,7 +34,9 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
   }
 };
 module.exports = {
-  data: new SlashCommandBuilder().setName('status').setDescription('To be filled'),
+  data: new SlashCommandBuilder()
+    .setName('status')
+    .setDescription('Displays information on how to get automatic map updates'),
 
   async execute({ nessie, interaction, mixpanel }) {
     try {
