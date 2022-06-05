@@ -3,11 +3,11 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 
-//----- Status Application Command Replies -----//
 /**
- * Handler for when a user initiates the /status help command
- * Calls the getStatus handler to see for existing status in the guild
- * Passes a success and error callback with the former sending an information embed with context depending on status existence
+ * Temporary handler for status command
+ * Just displays information on why there's no proper status yet
+ * Also has an invite button to redirect people to the support server
+ * TODO: Probably need to make the support server an actual community server with actual rules and stuff
  */
 const sendHelpInteraction = async ({ interaction, nessie }) => {
   try {
