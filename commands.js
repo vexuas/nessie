@@ -13,7 +13,7 @@ exports.getApplicationCommands = () => {
     // Maps
     br: require('./commands/maps/battle-royale'),
     arenas: require('./commands/maps/arenas'),
-    control: require('./commands/maps/control'),
+    // control: require('./commands/maps/control'), //Commenting this out so it's easy to switch when control eventually comes back again
     status: require('./commands/maps/status'),
     //Admin
     announcement: require('./commands/admin/announcement'),
