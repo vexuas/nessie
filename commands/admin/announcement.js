@@ -412,6 +412,7 @@ const initialiseStatusScheduler = (nessie) => {
     getAllStatus(
       async (allStatus, client) => {
         try {
+          throw new Error('Test Error');
           const rotationData = await getRotationData();
           const statusLogChannel = nessie.channels.cache.get('976863441526595644');
           if (allStatus) {
