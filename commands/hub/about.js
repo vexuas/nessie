@@ -39,7 +39,7 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
       },
       {
         name: 'Support Server',
-        value: '[Link](https://discord.com/invite/47Ccgz9jA4)',
+        value: '[Link](https://discord.gg/FyxVrAbRAd)',
         inline: true,
       },
     ],

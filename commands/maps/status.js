@@ -21,7 +21,7 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
       new MessageButton()
         .setLabel("To Nessie's Canyon")
         .setStyle('LINK')
-        .setURL('https://discord.com/invite/47Ccgz9jA4')
+        .setURL('https://discord.gg/FyxVrAbRAd')
     );
 
     return await interaction.editReply({ components: [row], embeds: [embedData] });
