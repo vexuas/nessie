@@ -133,7 +133,7 @@ const generateBattleRoyaleStatusEmbeds = (data) => {
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
@@ -152,7 +152,7 @@ const generateArenasStatusEmbeds = (data) => {
   const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback and bug reports, feel free to drop them in the [support server](https://discord.com/invite/47Ccgz9jA4)!',
+      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
@@ -466,7 +466,7 @@ const initialiseStatusScheduler = (nessie) => {
           await statusLogChannel.send({ embeds: [statusLogEmbed] });
         } catch (error) {
           const uuid = uuidv4();
-          const type = 'Status Scheduler (Editing)';
+          const type = 'Status Scheduler Config';
           await sendErrorLog({ nessie, error, type, uuid, ping: true });
         }
       },
