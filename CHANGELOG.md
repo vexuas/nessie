@@ -1,3 +1,28 @@
+# v1.7.0 (Tue Jun 21 2022)
+
+#### 🚀 Enhancement
+
+- Update info for announcement [#75](https://github.com/vexuas/nessie/pull/75) ([@vexuas](https://github.com/vexuas))
+- Remove control [#74](https://github.com/vexuas/nessie/pull/74) ([@vexuas](https://github.com/vexuas))
+- Add announcement info in status [#73](https://github.com/vexuas/nessie/pull/73) ([@vexuas](https://github.com/vexuas))
+- Start announcement scheduler [#72](https://github.com/vexuas/nessie/pull/72) ([@vexuas](https://github.com/vexuas))
+- Add announcement status [#71](https://github.com/vexuas/nessie/pull/71) ([@vexuas](https://github.com/vexuas))
+- Spike on announcement channels [#70](https://github.com/vexuas/nessie/pull/70) ([@vexuas](https://github.com/vexuas))
+- Spiking dem rate limits [#69](https://github.com/vexuas/nessie/pull/69) ([@vexuas](https://github.com/vexuas))
+- Create scheduler for status [#68](https://github.com/vexuas/nessie/pull/68) ([@vexuas](https://github.com/vexuas))
+- Wire up delete status [#67](https://github.com/vexuas/nessie/pull/67) ([@vexuas](https://github.com/vexuas))
+- Wire up create status database [#66](https://github.com/vexuas/nessie/pull/66) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 05 14 [#65](https://github.com/vexuas/nessie/pull/65) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.6.0 (Sat May 14 2022)
 
 #### 🚀 Enhancement
