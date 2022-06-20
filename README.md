@@ -2,7 +2,7 @@
   <img src="https://cdn.discordapp.com/attachments/248430185463021569/955497690735738900/Nessie_Logo_v2.png" width=120px/>
 </div>
 
-# nessie | v1.6.0 <br>Apex Legends Discord Bot | Map Status
+# nessie | v1.7.0 <br>Apex Legends Discord Bot | Map Status
 
 Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/
 
@@ -14,11 +14,13 @@ Simple discord bot that provides an easy way to get status updates of map rotati
 Instead of prefixes, Nessie uses Discord's new [Slash Commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ) `/`
 - `br`: map rotation for battle royale
 - `arenas`: map rotation for arenas
-- `control`: map rotation for control
+- `status`: information on how to get automatic map updates
 - `about`: information hub of Nessie
 - `help`: list of commands and how to use them
 - `invite`: generates Nessie's invite link
 - `updates`: shows the latest news and current update of Nessie
+- 
+Currently there's an announcement command that does automatic map status while publishing those updates in an announcement channel. This is done temporarily as it's impossible to directly show this in individual server messages on a large scale due to [rate limits](https://shizuka.notion.site/Adventures-in-Discord-s-Rate-Limits-4ef7fa20481f4e3b8a388d9cdb1021e7). Made this solution so that people can use it for now while I work on an alternative approach with webhooks; something I have limited experience with hence longer development
 
 ## TODO
 - Automatic Map Status Updates
