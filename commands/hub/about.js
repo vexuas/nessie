@@ -6,7 +6,7 @@ const { version } = require('../../package.json');
 const sendAboutEmbed = async ({ nessie, interaction }) => {
   const embed = {
     title: 'About',
-    description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nUpcoming feature: **Automatic Map Status Updates**\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!\n\nFor the latest news, check out \`/updates\`!`,
+    description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nTry out my cool beta feature: **Automatic Map Updates using News Channels**! To check out what it is, use \`/status\`!\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!\n\nFor the latest news, check out \`/updates\`!`,
     color: 3447003,
     thumbnail: {
       url: nessieLogo,
@@ -34,7 +34,7 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
       },
       {
         name: 'Last Update',
-        value: '14-May-2022',
+        value: '21-June-2022',
         inline: true,
       },
       {
