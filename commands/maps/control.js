@@ -38,6 +38,13 @@ module.exports = {
         true
       );
     } catch (error) {
+      /**
+       * Special error handling here instead of using the error helper
+       * This is due to control being a limited time event and it keeps being taken on and off the game mode list
+       * I've been removing the command and then readding it back in a new release so it's been quite a hassle to actually maintain this
+       * Decided to always just keep it in and show an alert error message when it does fail
+       * Fetches the alert in the alert channel in the support server
+       */
       const uuid = uuidv4();
       const alertChannel = nessie.channels.cache.get('973977422699573258');
       const messageObject = await alertChannel.messages.fetch('989197310502260736');
