@@ -34,7 +34,7 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
       },
       {
         name: 'Last Update',
-        value: '21-June-2022',
+        value: '23-June-2022',
         inline: true,
       },
       {
