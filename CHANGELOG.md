@@ -1,3 +1,20 @@
+# v1.8.0 (Thu Jun 23 2022)
+
+#### 🚀 Enhancement
+
+- Add error alert for control [#78](https://github.com/vexuas/nessie/pull/78) ([@vexuas](https://github.com/vexuas))
+- Re-add control [#77](https://github.com/vexuas/nessie/pull/77) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 06 21 [#76](https://github.com/vexuas/nessie/pull/76) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.7.0 (Tue Jun 21 2022)
 
 #### 🚀 Enhancement
