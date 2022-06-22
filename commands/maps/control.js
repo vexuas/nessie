@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getControlPubs } = require('../../adapters');
-const { sendErrorLog, generateErrorEmbed, generatePubsEmbed } = require('../../helpers');
+const { sendErrorLog, generateErrorEmbed, generatePubsEmbed, codeBlock } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { sendMixpanelEvent } = require('../../analytics');
 
@@ -39,9 +39,23 @@ module.exports = {
       );
     } catch (error) {
       const uuid = uuidv4();
+      const alertChannel = nessie.channels.cache.get('973977422699573258');
+      const messageObject = await alertChannel.messages.fetch('989197310502260736');
+      const errorMessage = messageObject.content;
+      const errorAlert = errorMessage.substring(
+        errorMessage.indexOf('[') + 4,
+        errorMessage.lastIndexOf(']') - 3
+      );
+      const errorEmbed = {
+        description: `${errorAlert}\n\nError: ${
+          error.message ? codeBlock(error.message) : codeBlock('Unexpected Error')
+        }\nError ID: ${codeBlock(
+          uuid
+        )}\nAlternatively, you can also report issue through the [support server](https://discord.gg/FyxVrAbRAd)`,
+        color: 16711680,
+      };
       const type = 'Control';
-      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-      await interaction.editReply({ embeds: errorEmbed });
+      await interaction.editReply({ embeds: [errorEmbed] });
       await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
   },
