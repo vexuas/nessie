@@ -5,6 +5,22 @@ const { testWebhook } = require('../../config/nessie.json');
 const { generatePubsEmbed } = require('../../helpers');
 const { nessieLogo } = require('../../constants');
 
+/**
+ * Temporary command to test how to use webhooks
+ * Tbh after testing this and realising how straightforward it is, makes me wonder why I even bothered making announcements kek
+ * Either way, pretty good to know to have this. Got a good feeling this will make auto updates a reality
+ * Things to consider during the user mapping/prototype iteration:
+ * - Webhooks rate limit
+ * - Storing webhook data
+ * - Create + delete, create or edit?
+ * - 1 channel or 2
+ * - Control?
+ * - Creating a webhook during status initialisation
+ *
+ * Useful documentation:
+ * https://discordjs.guide/popular-topics/webhooks.html#sending-messages
+ * https://discord.com/developers/docs/resources/webhook#execute-webhook
+ */
 module.exports = {
   isAdmin: true,
   data: new SlashCommandBuilder()
