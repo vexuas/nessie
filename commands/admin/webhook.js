@@ -46,6 +46,7 @@ module.exports = {
           await interaction.editReply({ content: 'Edit Webhook' });
           break;
         case 'delete':
+          await webhook.deleteMessage('989556889429880932');
           await interaction.editReply({ content: 'Delete Webhook' });
       }
     } catch (error) {}
