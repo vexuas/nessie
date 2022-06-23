@@ -39,6 +39,10 @@ module.exports = {
           await interaction.editReply({ content: 'Sent Webhook' });
           break;
         case 'edit':
+          await webhook.editMessage('', {
+            content: 'Edit Message',
+            embeds: [],
+          });
           await interaction.editReply({ content: 'Edit Webhook' });
           break;
         case 'delete':
