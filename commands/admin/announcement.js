@@ -500,6 +500,9 @@ module.exports = {
     )
     .addSubcommand((subCommand) =>
       subCommand.setName('stop').setDescription('Stops an existing automated status')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('restart').setDescription('Restarts automated status')
     ),
   /**
    * Send correct reply based on the user's subcommand input
@@ -517,6 +520,8 @@ module.exports = {
           return await sendStartInteraction({ interaction, nessie });
         case 'stop':
           return await sendStopInteraction({ interaction, nessie });
+        case 'restart':
+          return await interaction.editReply('Restart status');
       }
     } catch (error) {
       console.log(error);
