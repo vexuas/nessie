@@ -502,7 +502,19 @@ module.exports = {
       subCommand.setName('stop').setDescription('Stops an existing automated status')
     )
     .addSubcommand((subCommand) =>
-      subCommand.setName('restart').setDescription('Restarts automated status')
+      subCommand
+        .setName('restart')
+        .setDescription('Restarts automated status')
+        .addStringOption((option) =>
+          option
+            .setName('type')
+            .setDescription('Restart Type')
+            .setRequired(true)
+            .addChoice('all', 'all')
+            .addChoice('all missing', 'all_missing')
+            .addChoice('br missing', 'br_missing')
+            .addChoice('arenas missing', 'arenas_missing')
+        )
     ),
   /**
    * Send correct reply based on the user's subcommand input
@@ -513,6 +525,7 @@ module.exports = {
    */
   async execute({ nessie, interaction }) {
     const statusOption = interaction.options.getSubcommand();
+    const optionType = interaction.options.getString('type');
     try {
       await interaction.deferReply();
       switch (statusOption) {
