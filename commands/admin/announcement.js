@@ -478,7 +478,30 @@ const initialiseStatusScheduler = (nessie) => {
     );
   });
 };
-
+const sendRestartInteraction = ({ interaction, type }) => {
+  getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: `Announcement | Restart ${type}`,
+        color: 3447003,
+        description: status
+          ? `This will restart: ${codeBlock(type)} on\n• <#${status.br_channel_id}>\n• <#${
+              status.arenas_channel_id
+            }>\n`
+          : `There's currently no active map status to stop`,
+      };
+      return await interaction.editReply({ embeds: [embedData] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Restart)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      await interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
+};
 module.exports = {
   /**
    * Creates Status application command with relevant subcommands
@@ -510,10 +533,10 @@ module.exports = {
             .setName('type')
             .setDescription('Restart Type')
             .setRequired(true)
-            .addChoice('all', 'all')
-            .addChoice('all missing', 'all_missing')
-            .addChoice('br missing', 'br_missing')
-            .addChoice('arenas missing', 'arenas_missing')
+            .addChoice('All', 'all')
+            .addChoice('All Missing', 'all_missing')
+            .addChoice('Br Missing', 'br_missing')
+            .addChoice('Arenas Missing', 'arenas_missing')
         )
     ),
   /**
@@ -534,7 +557,7 @@ module.exports = {
         case 'stop':
           return await sendStopInteraction({ interaction, nessie });
         case 'restart':
-          return await interaction.editReply('Restart status');
+          return sendRestartInteraction({ interaction, type: optionType });
       }
     } catch (error) {
       console.log(error);
