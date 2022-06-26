@@ -517,6 +517,83 @@ const sendRestartInteraction = ({ interaction, type }) => {
     }
   );
 };
+const restartStatus = ({ interaction, nessie, restartId }) => {
+  console.log(restartId);
+  return getAllStatus(
+    async (allStatus, client) => {
+      try {
+        const rotationData = await getRotationData();
+        const statusLogChannel = nessie.channels.cache.get('976863441526595644');
+        if (allStatus) {
+          const status = allStatus[0];
+          const battleRoyaleChannel = nessie.channels.cache.get(status.br_channel_id);
+          const arenasChannel = nessie.channels.cache.get(status.arenas_channel_id);
+          const battleRoyaleMessage = await battleRoyaleChannel.messages.fetch(
+            status.br_message_id
+          );
+          const arenasMessage = await arenasChannel.messages.fetch(status.arenas_message_id);
+
+          const battleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+          const arenasEmbed = generateArenasStatusEmbeds(rotationData);
+
+          await battleRoyaleMessage.delete();
+          await arenasMessage.delete();
+
+          const newBattleRoyaleMessage = await battleRoyaleChannel.send({
+            embeds: battleRoyaleEmbed,
+          });
+          const newArenasMessage = await arenasChannel.send({ embeds: arenasEmbed });
+
+          /**
+           * Tbh I'm a bit worried about having this query here
+           * It seems to be working during development but I'm not sure if it's actually firing only after the message promises are done
+           * Probably still not confident with database stuff; I'll just keep my fingers crossed heh
+           */
+          client.query(
+            'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
+            [`${newBattleRoyaleMessage.id}`, `${newArenasMessage.id}`, `${status.uuid}`],
+            (err, res) => {
+              client.query('COMMIT', async () => {
+                // await newBattleRoyaleMessage.crosspost();
+                // await newArenasMessage.crosspost();
+              });
+            }
+          );
+        }
+        const statusLogEmbed = {
+          title: 'Nessie | Auto Map Status Log',
+          description: 'Requested data from API and checked database',
+          timestamp: Date.now(),
+          color: 3066993,
+          fields: [
+            {
+              name: 'Auto Map Status Count:',
+              value: allStatus ? `${allStatus.length}` : '0',
+              inline: true,
+            },
+          ],
+        };
+        await statusLogChannel.send({ embeds: [statusLogEmbed] });
+        const embedSuccess = {
+          description: `Successfully restarted map status`,
+          color: 3066993,
+        };
+        await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+      } catch (error) {
+        const uuid = uuidv4();
+        const type = 'Status Restart';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, type, uuid, ping: true });
+      }
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Status Restart (Database)';
+      await sendErrorLog({ nessie, error, type, uuid, ping: true });
+    }
+  );
+};
 module.exports = {
   /**
    * Creates Status application command with relevant subcommands
@@ -583,4 +660,5 @@ module.exports = {
   createStatusChannels,
   deleteStatusChannels,
   initialiseStatusScheduler,
+  restartStatus,
 };
