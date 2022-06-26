@@ -131,6 +131,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
      * Will still have to check the customId for each of the buttons here though
      */
     if (interaction.isButton()) {
+      console.log(interaction);
       switch (interaction.customId) {
         case 'statusStart__startButton':
           return createStatusChannels({ interaction, nessie });
@@ -140,6 +141,16 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           return deleteStatusChannels({ interaction, nessie });
         case 'statusStop__cancelButton':
           return cancelStatusStop({ interaction, nessie });
+        case 'statusRestart__cancelButton':
+          return interaction.channel.send(`Clicked restart cancel button`);
+        case 'statusRestart__allButton':
+          return interaction.channel.send(`Clicked restart all button`);
+        case 'statusRestart__allMissingButton':
+          return interaction.channel.send(`Clicked restart allMissing button`);
+        case 'statusRestart__brMissingButton':
+          return interaction.channel.send(`Clicked restart brMissing button`);
+        case 'statusRestart__arenasMissingButton':
+          return interaction.channel.send(`Clicked restart arenasMissing button`);
       }
     }
   });

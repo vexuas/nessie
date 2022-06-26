@@ -501,7 +501,7 @@ const sendRestartInteraction = ({ interaction, type }) => {
         )
         .addComponents(
           new MessageButton()
-            .setCustomId(`statusRestart__${type}`)
+            .setCustomId(`statusRestart__${type}Button`)
             .setLabel('Restart')
             .setStyle('SUCCESS')
             .setDisabled(!status ? true : false)
