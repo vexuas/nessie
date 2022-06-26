@@ -478,6 +478,17 @@ const initialiseStatusScheduler = (nessie) => {
     );
   });
 };
+/**
+ * Below are the handlers for announcement restart
+ * Options: all, all missing, br missing and arenas missing
+ * Came about from an error during the status scheduler where the br message got deleted but failed halfway
+ * This resulted in the br message deleted while the arenas message still there
+ * The real problem is due to us only updating our status database after both are done; with the br message now missing, the next cycle will still try to delete the old missing message
+ * Since it's missing, discord js throws an error that it can't find it (a bit weirdchamp here, why not just return null)
+ * I don't think this can be prevented from happening but we can add a way to easily fix it if it does happen
+ * Had to go into the droplet and fix this in production which wasn't ideal
+ * Doing this too since if it messes up here, it's bound to mess up in the actual status feature so we can probably tweak this implementation then
+ */
 const sendRestartInteraction = ({ interaction, type }) => {
   getStatus(
     interaction.guildId,
