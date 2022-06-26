@@ -1,3 +1,23 @@
+# v1.9.0 (Sun Jun 26 2022)
+
+#### 🚀 Enhancement
+
+- Spike on webhooks [#80](https://github.com/vexuas/nessie/pull/80) ([@vexuas](https://github.com/vexuas))
+
+#### 🐛 Bug Fix
+
+- Add restarts to announcement status [#81](https://github.com/vexuas/nessie/pull/81) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 06 23 [#79](https://github.com/vexuas/nessie/pull/79) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.8.0 (Thu Jun 23 2022)
 
 #### 🚀 Enhancement
