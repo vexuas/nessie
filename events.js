@@ -30,6 +30,8 @@ const {
   createStatusChannels,
   deleteStatusChannels,
   initialiseStatusScheduler,
+  restartStatus,
+  cancelStatusRestart,
 } = require('./commands/admin/announcement');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -140,11 +142,20 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           return deleteStatusChannels({ interaction, nessie });
         case 'statusStop__cancelButton':
           return cancelStatusStop({ interaction, nessie });
+        case 'statusRestart__cancelButton':
+          return cancelStatusRestart({ interaction, nessie });
+        case 'statusRestart__allButton':
+          return restartStatus({ interaction, nessie, restartId: interaction.customId });
+        case 'statusRestart__allMissingButton':
+          return restartStatus({ interaction, nessie, restartId: interaction.customId });
+        case 'statusRestart__brMissingButton':
+          return restartStatus({ interaction, nessie, restartId: interaction.customId });
+        case 'statusRestart__arenasMissingButton':
+          return restartStatus({ interaction, nessie, restartId: interaction.customId });
       }
     }
   });
   nessie.on('rateLimit', async (data) => {
-    console.log(data);
     const uuid = uuidv4();
     const type = 'Rate Limited';
     const error = {

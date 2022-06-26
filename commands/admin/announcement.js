@@ -478,7 +478,150 @@ const initialiseStatusScheduler = (nessie) => {
     );
   });
 };
+/**
+ * Below are the handlers for announcement restart
+ * Options: all, all missing, br missing and arenas missing
+ * Came about from an error during the status scheduler where the br message got deleted but failed halfway
+ * This resulted in the br message deleted while the arenas message still there
+ * The real problem is due to us only updating our status database after both are done; with the br message now missing, the next cycle will still try to delete the old missing message
+ * Since it's missing, discord js throws an error that it can't find it (a bit weirdchamp here, why not just return null)
+ * I don't think this can be prevented from happening but we can add a way to easily fix it if it does happen
+ * Had to go into the droplet and fix this in production which wasn't ideal
+ * Doing this too since if it messes up here, it's bound to mess up in the actual status feature so we can probably tweak this implementation then
+ */
+const sendRestartInteraction = ({ interaction, type }) => {
+  getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embedData = {
+        title: `Announcement | Restart ${type}`,
+        color: 3447003,
+        description: status
+          ? `This will restart: ${codeBlock(type)} on\n• <#${status.br_channel_id}>\n• <#${
+              status.arenas_channel_id
+            }>\n`
+          : `There's currently no active map status to stop`,
+      };
+      const row = new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusRestart__cancelButton')
+            .setLabel('Cancel')
+            .setStyle('SECONDARY')
+            .setDisabled(!status ? true : false)
+        )
+        .addComponents(
+          new MessageButton()
+            .setCustomId(`statusRestart__${type}Button`)
+            .setLabel('Restart')
+            .setStyle('SUCCESS')
+            .setDisabled(!status ? true : false)
+        );
+      return await interaction.editReply({ components: [row], embeds: [embedData] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Restart)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      await interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
+};
+const restartStatus = async ({ interaction, nessie, restartId }) => {
+  await interaction.deferUpdate();
+  const missingBr =
+    restartId === 'statusRestart__allMissingButton' ||
+    restartId === 'statusRestart__brMissingButton';
+  const missingArenas =
+    restartId === 'statusRestart__allMissingButton' ||
+    restartId === 'statusRestart__arenasMissingButton';
+  return getAllStatus(
+    async (allStatus, client) => {
+      try {
+        const rotationData = await getRotationData();
+        const statusLogChannel = nessie.channels.cache.get('976863441526595644');
+        if (allStatus) {
+          const status = allStatus[0];
+          const battleRoyaleChannel = nessie.channels.cache.get(status.br_channel_id);
+          const arenasChannel = nessie.channels.cache.get(status.arenas_channel_id);
+          const battleRoyaleMessage =
+            !missingBr && (await battleRoyaleChannel.messages.fetch(status.br_message_id));
+          const arenasMessage =
+            !missingArenas && (await arenasChannel.messages.fetch(status.arenas_message_id));
 
+          const battleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+          const arenasEmbed = generateArenasStatusEmbeds(rotationData);
+
+          battleRoyaleMessage && (await battleRoyaleMessage.delete());
+          arenasMessage && (await arenasMessage.delete());
+
+          const newBattleRoyaleMessage = await battleRoyaleChannel.send({
+            embeds: battleRoyaleEmbed,
+          });
+          const newArenasMessage = await arenasChannel.send({ embeds: arenasEmbed });
+
+          client.query(
+            'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
+            [`${newBattleRoyaleMessage.id}`, `${newArenasMessage.id}`, `${status.uuid}`],
+            (err, res) => {
+              client.query('COMMIT', async () => {
+                await newBattleRoyaleMessage.crosspost();
+                await newArenasMessage.crosspost();
+              });
+            }
+          );
+        }
+        const statusLogEmbed = {
+          title: 'Nessie | Auto Map Status Log',
+          description: 'Requested data from API and checked database',
+          timestamp: Date.now(),
+          color: 3066993,
+          fields: [
+            {
+              name: 'Auto Map Status Count:',
+              value: allStatus ? `${allStatus.length}` : '0',
+              inline: true,
+            },
+          ],
+        };
+        await statusLogChannel.send({ embeds: [statusLogEmbed] });
+        const embedSuccess = {
+          description: `Successfully restarted map status`,
+          color: 3066993,
+        };
+        await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+      } catch (error) {
+        const uuid = uuidv4();
+        const type = 'Status Restart';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, type, uuid, ping: true });
+      }
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Status Restart (Database)';
+      await sendErrorLog({ nessie, error, type, uuid, ping: true });
+    }
+  );
+};
+const cancelStatusRestart = async ({ nessie, interaction }) => {
+  try {
+    await interaction.deferUpdate();
+    const embedSuccess = {
+      description: 'Cancelled automated map status restart',
+      color: 16711680,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Cancel Button';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.message.edit({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
 module.exports = {
   /**
    * Creates Status application command with relevant subcommands
@@ -500,6 +643,21 @@ module.exports = {
     )
     .addSubcommand((subCommand) =>
       subCommand.setName('stop').setDescription('Stops an existing automated status')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand
+        .setName('restart')
+        .setDescription('Restarts automated status')
+        .addStringOption((option) =>
+          option
+            .setName('type')
+            .setDescription('Restart Type')
+            .setRequired(true)
+            .addChoice('All', 'all')
+            .addChoice('All Missing', 'allMissing')
+            .addChoice('Br Missing', 'brMissing')
+            .addChoice('Arenas Missing', 'arenasMissing')
+        )
     ),
   /**
    * Send correct reply based on the user's subcommand input
@@ -510,6 +668,7 @@ module.exports = {
    */
   async execute({ nessie, interaction }) {
     const statusOption = interaction.options.getSubcommand();
+    const optionType = interaction.options.getString('type');
     try {
       await interaction.deferReply();
       switch (statusOption) {
@@ -517,6 +676,8 @@ module.exports = {
           return await sendStartInteraction({ interaction, nessie });
         case 'stop':
           return await sendStopInteraction({ interaction, nessie });
+        case 'restart':
+          return sendRestartInteraction({ interaction, type: optionType });
       }
     } catch (error) {
       console.log(error);
@@ -527,4 +688,6 @@ module.exports = {
   createStatusChannels,
   deleteStatusChannels,
   initialiseStatusScheduler,
+  restartStatus,
+  cancelStatusRestart,
 };
