@@ -133,7 +133,6 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
      * Will still have to check the customId for each of the buttons here though
      */
     if (interaction.isButton()) {
-      console.log(interaction);
       switch (interaction.customId) {
         case 'statusStart__startButton':
           return createStatusChannels({ interaction, nessie });
@@ -157,7 +156,6 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     }
   });
   nessie.on('rateLimit', async (data) => {
-    console.log(data);
     const uuid = uuidv4();
     const type = 'Rate Limited';
     const error = {
