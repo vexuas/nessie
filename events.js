@@ -31,6 +31,7 @@ const {
   deleteStatusChannels,
   initialiseStatusScheduler,
   restartStatus,
+  cancelStatusRestart,
 } = require('./commands/admin/announcement');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -143,7 +144,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
         case 'statusStop__cancelButton':
           return cancelStatusStop({ interaction, nessie });
         case 'statusRestart__cancelButton':
-          return interaction.channel.send(`Clicked restart cancel button`);
+          return cancelStatusRestart({ interaction, nessie });
         case 'statusRestart__allButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
         case 'statusRestart__allMissingButton':

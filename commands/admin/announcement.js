@@ -595,6 +595,22 @@ const restartStatus = async ({ interaction, nessie, restartId }) => {
     }
   );
 };
+const cancelStatusRestart = async ({ nessie, interaction }) => {
+  try {
+    await interaction.deferUpdate();
+    const embedSuccess = {
+      description: 'Cancelled automated map status restart',
+      color: 16711680,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Cancel Button';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.message.edit({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
 module.exports = {
   /**
    * Creates Status application command with relevant subcommands
@@ -662,4 +678,5 @@ module.exports = {
   deleteStatusChannels,
   initialiseStatusScheduler,
   restartStatus,
+  cancelStatusRestart,
 };
