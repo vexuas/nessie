@@ -517,8 +517,14 @@ const sendRestartInteraction = ({ interaction, type }) => {
     }
   );
 };
-const restartStatus = ({ interaction, nessie, restartId }) => {
-  console.log(restartId);
+const restartStatus = async ({ interaction, nessie, restartId }) => {
+  await interaction.deferUpdate();
+  const missingBr =
+    restartId === 'statusRestart__allMissingButton' ||
+    restartId === 'statusRestart__brMissingButton';
+  const missingArenas =
+    restartId === 'statusRestart__allMissingButton' ||
+    restartId === 'statusRestart__arenasMissingButton';
   return getAllStatus(
     async (allStatus, client) => {
       try {
@@ -528,34 +534,29 @@ const restartStatus = ({ interaction, nessie, restartId }) => {
           const status = allStatus[0];
           const battleRoyaleChannel = nessie.channels.cache.get(status.br_channel_id);
           const arenasChannel = nessie.channels.cache.get(status.arenas_channel_id);
-          const battleRoyaleMessage = await battleRoyaleChannel.messages.fetch(
-            status.br_message_id
-          );
-          const arenasMessage = await arenasChannel.messages.fetch(status.arenas_message_id);
+          const battleRoyaleMessage =
+            !missingBr && (await battleRoyaleChannel.messages.fetch(status.br_message_id));
+          const arenasMessage =
+            !missingArenas && (await arenasChannel.messages.fetch(status.arenas_message_id));
 
           const battleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
           const arenasEmbed = generateArenasStatusEmbeds(rotationData);
 
-          await battleRoyaleMessage.delete();
-          await arenasMessage.delete();
+          battleRoyaleMessage && (await battleRoyaleMessage.delete());
+          arenasMessage && (await arenasMessage.delete());
 
           const newBattleRoyaleMessage = await battleRoyaleChannel.send({
             embeds: battleRoyaleEmbed,
           });
           const newArenasMessage = await arenasChannel.send({ embeds: arenasEmbed });
 
-          /**
-           * Tbh I'm a bit worried about having this query here
-           * It seems to be working during development but I'm not sure if it's actually firing only after the message promises are done
-           * Probably still not confident with database stuff; I'll just keep my fingers crossed heh
-           */
           client.query(
             'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
             [`${newBattleRoyaleMessage.id}`, `${newArenasMessage.id}`, `${status.uuid}`],
             (err, res) => {
               client.query('COMMIT', async () => {
-                // await newBattleRoyaleMessage.crosspost();
-                // await newArenasMessage.crosspost();
+                await newBattleRoyaleMessage.crosspost();
+                await newArenasMessage.crosspost();
               });
             }
           );

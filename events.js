@@ -147,11 +147,11 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
         case 'statusRestart__allButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
         case 'statusRestart__allMissingButton':
-          return interaction.channel.send(`Clicked restart allMissing button`);
+          return restartStatus({ interaction, nessie, restartId: interaction.customId });
         case 'statusRestart__brMissingButton':
-          return interaction.channel.send(`Clicked restart brMissing button`);
+          return restartStatus({ interaction, nessie, restartId: interaction.customId });
         case 'statusRestart__arenasMissingButton':
-          return interaction.channel.send(`Clicked restart arenasMissing button`);
+          return restartStatus({ interaction, nessie, restartId: interaction.customId });
       }
     }
   });
