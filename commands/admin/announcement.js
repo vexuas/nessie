@@ -491,7 +491,22 @@ const sendRestartInteraction = ({ interaction, type }) => {
             }>\n`
           : `There's currently no active map status to stop`,
       };
-      return await interaction.editReply({ embeds: [embedData] });
+      const row = new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+            .setCustomId('statusRestart__cancelButton')
+            .setLabel('Cancel')
+            .setStyle('SECONDARY')
+            .setDisabled(!status ? true : false)
+        )
+        .addComponents(
+          new MessageButton()
+            .setCustomId(`statusRestart__${type}`)
+            .setLabel('Restart')
+            .setStyle('SUCCESS')
+            .setDisabled(!status ? true : false)
+        );
+      return await interaction.editReply({ components: [row], embeds: [embedData] });
     },
     async (error) => {
       const uuid = uuidv4();
@@ -534,9 +549,9 @@ module.exports = {
             .setDescription('Restart Type')
             .setRequired(true)
             .addChoice('All', 'all')
-            .addChoice('All Missing', 'all_missing')
-            .addChoice('Br Missing', 'br_missing')
-            .addChoice('Arenas Missing', 'arenas_missing')
+            .addChoice('All Missing', 'allMissing')
+            .addChoice('Br Missing', 'brMissing')
+            .addChoice('Arenas Missing', 'arenasMissing')
         )
     ),
   /**
