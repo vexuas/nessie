@@ -18,5 +18,6 @@ exports.getApplicationCommands = () => {
     //Admin
     announcement: require('./commands/admin/announcement'),
     webhook: require('./commands/admin/webhook'),
+    selectmenu: require('./commands/admin/selectMenu'),
   };
 };
