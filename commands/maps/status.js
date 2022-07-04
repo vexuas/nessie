@@ -1,30 +1,48 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
 const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 
 /**
- * Temporary handler for status command
- * Just displays information on why there's no proper status yet
- * Also has an invite button to redirect people to the support server
- * TODO: Probably need to make the support server an actual community server with actual rules and stuff
+ * Handler for when a user initiates the /status help command
+ * Displays information of status command, explains what it does and permissions it needs
+ * Feeling a bit wacky so added a dynamic checklist of required permissions
+ * Will either show a tick or mark if the permission is missing
+ * Shows a success/warning at the end if any of the permissions are missing
  */
 const sendHelpInteraction = async ({ interaction, nessie }) => {
+  const isAdminUser = interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
+  const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
+  const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
+  const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
+  const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
+  const hasMissingPermissions =
+    (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
+
   try {
     const embedData = {
-      title: 'Status | About',
+      title: 'Status | Help',
       description:
-        "Due to technical limitations with Discord, automatic updates through normal messages/interactions isn't possible in a large scale. Fortunately an alternative approach is being worked on but it might take a while before it gets released\n\nAs a temporary solution, I've set up automatic map updates in announcement channels in the support server.\n\nFeel free to join and follow the channels!",
+        "• Explain the status command does\n• Explain what it'll create; channels, webhooks\n• Explain necessary user permissions; admin\n• Explain bot permissions; whatever nessie needs to operate",
+      fields: [
+        {
+          name: 'User Permissions',
+          value: `${isAdminUser ? '✅' : '❌'} Administrator`,
+        },
+        {
+          name: 'Bot Permissions',
+          value: `${hasAdmin || hasManageChannels ? '✅' : '❌'} Manage Channels\n${
+            hasAdmin || hasManageWebhooks ? '✅' : '❌'
+          } Manage Webhooks\n${hasAdmin || hasSendMessages ? '✅' : '❌'} Send Messages\n\n${
+            !isAdminUser || hasMissingPermissions
+              ? 'Looks like there are missing permissions. Make sure to add the above permissions to be able to create automatic map updates!'
+              : 'Looks like everything is set, use `/status start` to get started!'
+          }`,
+        },
+      ],
       color: 3447003,
     };
-    const row = new MessageActionRow().addComponents(
-      new MessageButton()
-        .setLabel("To Nessie's Canyon")
-        .setStyle('LINK')
-        .setURL('https://discord.gg/FyxVrAbRAd')
-    );
 
-    return await interaction.editReply({ components: [row], embeds: [embedData] });
+    return await interaction.editReply({ embeds: [embedData] });
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status About';
@@ -36,12 +54,31 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('status')
-    .setDescription('Displays information on how to get automatic map updates'),
+    .setDescription('Get your automatic map updates here!')
+    .addSubcommand((subCommand) =>
+      subCommand
+        .setName('help')
+        .setDescription('Displays information on setting up automatic map updates')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('start').setDescription('Set up automatic map updates')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('stop').setDescription('Stops existing automatic map updates')
+    ),
 
   async execute({ nessie, interaction, mixpanel }) {
+    const statusOption = interaction.options.getSubcommand();
     try {
       await interaction.deferReply();
-      return await sendHelpInteraction({ interaction, nessie });
+      switch (statusOption) {
+        case 'help':
+          return sendHelpInteraction({ interaction, nessie });
+        case 'start':
+          return interaction.editReply('Selected status start');
+        case 'stop':
+          return interaction.editReply('Selected status stop');
+      }
     } catch (error) {
       console.log(error);
     }
