@@ -36,12 +36,31 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('status')
-    .setDescription('Displays information on how to get automatic map updates'),
+    .setDescription('Get your automatic map updates here!')
+    .addSubcommand((subCommand) =>
+      subCommand
+        .setName('help')
+        .setDescription('Displays information on setting up automatic map updates')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('start').setDescription('Set up automatic map updates')
+    )
+    .addSubcommand((subCommand) =>
+      subCommand.setName('stop').setDescription('Stops existing automatic map updates')
+    ),
 
   async execute({ nessie, interaction, mixpanel }) {
+    const statusOption = interaction.options.getSubcommand();
     try {
       await interaction.deferReply();
-      return await sendHelpInteraction({ interaction, nessie });
+      switch (statusOption) {
+        case 'help':
+          return interaction.editReply('Selected status help');
+        case 'start':
+          return interaction.editReply('Selected status start');
+        case 'stop':
+          return interaction.editReply('Selected status stop');
+      }
     } catch (error) {
       console.log(error);
     }
