@@ -4,7 +4,6 @@ const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 
 const sendHelpInteraction = async ({ interaction, nessie }) => {
-  console.log(interaction);
   const isAdminUser = interaction.member.permissions.has('ADMINISTRATOR');
   const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
   const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
@@ -12,10 +11,12 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
   const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
   const hasMissingPermissions =
     (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin;
+
   try {
     const embedData = {
       title: 'Status | Help',
-      description: 'Something here',
+      description:
+        "• Explain the status command does\n• Explain what it'll create; channels, webhooks\n• Explain necessary user permissions; admin\n• Explain bot permissions; whatever nessie needs to operate",
       fields: [
         {
           name: 'User Permissions',
