@@ -8,6 +8,7 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
   const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
   const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
   const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
+  const hasMissingPermissions = !hasManageChannels || !hasManageWebhooks || !hasSendMessages;
   try {
     const embedData = {
       title: 'Status | Help',
@@ -21,7 +22,11 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
           name: 'Bot Permissions',
           value: `${hasManageChannels ? '✅ ' : '❌'} Manage Channels\n${
             hasManageWebhooks ? '✅ ' : '❌'
-          } Manage Webhooks\n${hasSendMessages ? '✅ ' : '❌'} Send Messages`,
+          } Manage Webhooks\n${hasSendMessages ? '✅ ' : '❌'} Send Messages\n\n${
+            hasMissingPermissions
+              ? 'Looks like there are missing permissions. Make sure to add the above permissions to be able to create automatic map updates!'
+              : 'Looks like everything is set, use `/status start` to get started!'
+          }`,
         },
       ],
       color: 3447003,
