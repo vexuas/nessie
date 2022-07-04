@@ -1,16 +1,22 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
 const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 
+/**
+ * Handler for when a user initiates the /status help command
+ * Displays information of status command, explains what it does and permissions it needs
+ * Feeling a bit wacky so added a dynamic checklist of required permissions
+ * Will either show a tick or mark if the permission is missing
+ * Shows a success/warning at the end if any of the permissions are missing
+ */
 const sendHelpInteraction = async ({ interaction, nessie }) => {
-  const isAdminUser = interaction.member.permissions.has('ADMINISTRATOR');
+  const isAdminUser = interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
   const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
   const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
   const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
   const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
   const hasMissingPermissions =
-    (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin;
+    (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
 
   try {
     const embedData = {
