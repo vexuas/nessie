@@ -163,7 +163,7 @@ const generateErrorEmbed = async (error, uuid, nessie) => {
       error.message ? codeBlock(error.message) : codeBlock('Unexpected Error')
     }\nError ID: ${codeBlock(
       uuid
-    )}\nAlternatively, you can also report issue through the [support server](https://discord.gg/FyxVrAbRAd`,
+    )}\nAlternatively, you can also report issue through the [support server](https://discord.gg/FyxVrAbRAd)`,
     color: 16711680,
   };
   return [embed];

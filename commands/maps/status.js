@@ -132,7 +132,7 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
-const sendConfirmStatusInteraction = async ({ interaction, nessie }) => {
+const goToConfirmStatus = async ({ interaction, nessie }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
@@ -141,7 +141,7 @@ const sendConfirmStatusInteraction = async ({ interaction, nessie }) => {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
@@ -154,7 +154,7 @@ const goBackToGameModeSelection = async ({ interaction, nessie }) => {
     const uuid = uuidv4();
     const type = 'Status Start Back';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
@@ -170,7 +170,7 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
     const uuid = uuidv4();
     const type = 'Status Start Cancel';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
@@ -186,7 +186,7 @@ const createStatus = async ({ interaction, nessie }) => {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
@@ -222,7 +222,7 @@ module.exports = {
       console.log(error);
     }
   },
-  sendConfirmStatusInteraction,
+  goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
