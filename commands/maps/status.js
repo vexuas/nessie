@@ -52,6 +52,17 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
+ * This is separated from the interaction handlers as we want to be able to reuse them when the user goes back and forth through the steps
+ * Step 1: Game Mode Selection
+ * - Uses a multiple select dropdown that shows the supported game modes for status
+ * - Users need to choose at least one game mode to continue
+ * Step 2: Confirm Status
+ * - We show the selected game mode(s) and explain the corresponding actions Nessie will do after confirmation
+ * - TODO: Don't forget to add copy for the explanation of webhooks/channels creation + status update cycles
+ * - Has 3 buttons: Back goes to Step 1, Cancel stops the wizard entirely, Confirm creates a status for the guild
+ */
 const generateGameModeSelectionMessage = () => {
   const row = new MessageActionRow().addComponents(
     new MessageSelectMenu()
@@ -120,6 +131,10 @@ const generateConfirmStatusMessage = ({ interaction }) => {
     row,
   };
 };
+/**
+ * Handler for when a user initiates the /status start command
+ * Shows the first step of the status start wizard: Game Mode Selection
+ */
 const sendStartInteraction = async ({ interaction, nessie }) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
@@ -132,6 +147,10 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for when a user selects any of the options in the Game Mode dropdown
+ * Will edit and show the second step of the status start wizard: Confirm Status
+ */
 const goToConfirmStatus = async ({ interaction, nessie }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
@@ -145,6 +164,10 @@ const goToConfirmStatus = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for when a user clicks the Back button in Confirm Status Step
+ * Will edit and show the first step of the status start wizard: Confirm Status
+ */
 const goBackToGameModeSelection = async ({ interaction, nessie }) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
@@ -158,6 +181,12 @@ const goBackToGameModeSelection = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for when a user clicks the Cancel button in Confirm Status Step
+ * Will edit and show a success message that the status configuration has been stopped
+ * Prepended an underscore as there's a function in announcement with the same name
+ * TODO: Clean up the code there eventually
+ */
 const _cancelStatusStart = async ({ interaction, nessie }) => {
   const embed = {
     description: 'Cancelled automatic map status config',
@@ -174,6 +203,10 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for when a user clicks the Confirm button in Confirm Status Step
+ * Placeholder for now but this is where most of the magic will happen
+ */
 const createStatus = async ({ interaction, nessie }) => {
   const embed = {
     description: 'Clicked confirm placeholder',
@@ -191,6 +224,17 @@ const createStatus = async ({ interaction, nessie }) => {
   }
 };
 module.exports = {
+  /**
+   * Creates Status application command with relevant subcommands
+   * Apparently when you create a subcommand under a base command, the base command will no longer be called
+   * I.e /status becomes void and only '/status xyz' can be used as commands
+   * I'm not sure why Discord did it this way but their explanation is the base command now becomes a folder of sorts
+   * Was initially planning to have /status, /status start and /status stop with the former showing the command information
+   * Not really a problem anyway since now it's /status about
+   *
+   * TODO: Check if it's possible to have default permissions when creating commands
+   * Alternative is to manaully set it inside the guild settings
+   */
   data: new SlashCommandBuilder()
     .setName('status')
     .setDescription('Get your automatic map updates here!')
