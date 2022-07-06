@@ -38,6 +38,7 @@ const {
   sendConfirmStatusInteraction,
   goBackToGameModeSelection,
   _cancelStatusStart,
+  createStatus,
 } = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -159,9 +160,11 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
         case 'announcementRestart__arenasMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
         case 'statusStart__backButton':
-          return goBackToGameModeSelection({ interaction });
+          return goBackToGameModeSelection({ interaction, nessie });
         case 'statusStart__cancelButton':
-          return _cancelStatusStart({ interaction });
+          return _cancelStatusStart({ interaction, nessie });
+        case 'statusStart__confirmButton':
+          return createStatus({ interaction, nessie });
       }
     }
     if (interaction.isSelectMenu()) {

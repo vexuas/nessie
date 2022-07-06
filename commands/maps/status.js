@@ -132,7 +132,7 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
-const sendConfirmStatusInteraction = async ({ interaction }) => {
+const sendConfirmStatusInteraction = async ({ interaction, nessie }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
@@ -145,7 +145,7 @@ const sendConfirmStatusInteraction = async ({ interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
-const goBackToGameModeSelection = async ({ interaction }) => {
+const goBackToGameModeSelection = async ({ interaction, nessie }) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
     await interaction.deferUpdate();
@@ -158,7 +158,7 @@ const goBackToGameModeSelection = async ({ interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
-const _cancelStatusStart = async ({ interaction }) => {
+const _cancelStatusStart = async ({ interaction, nessie }) => {
   const embed = {
     description: 'Cancelled automatic map status config',
     color: 16711680,
@@ -169,6 +169,22 @@ const _cancelStatusStart = async ({ interaction }) => {
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Cancel';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+const createStatus = async ({ interaction, nessie }) => {
+  const embed = {
+    description: 'Clicked confirm placeholder',
+    color: 3447003,
+  };
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Confirm';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -209,4 +225,5 @@ module.exports = {
   sendConfirmStatusInteraction,
   goBackToGameModeSelection,
   _cancelStatusStart,
+  createStatus,
 };
