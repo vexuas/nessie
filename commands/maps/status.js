@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
+const { MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -45,13 +46,195 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
     return await interaction.editReply({ embeds: [embedData] });
   } catch (error) {
     const uuid = uuidv4();
-    const type = 'Status About';
+    const type = 'Status Help';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
+ * This is separated from the interaction handlers as we want to be able to reuse them when the user goes back and forth through the steps
+ * Step 1: Game Mode Selection
+ * - Uses a multiple select dropdown that shows the supported game modes for status
+ * - Users need to choose at least one game mode to continue
+ * Step 2: Confirm Status
+ * - We show the selected game mode(s) and explain the corresponding actions Nessie will do after confirmation
+ * - TODO: Don't forget to add copy for the explanation of webhooks/channels creation + status update cycles
+ * - Has 3 buttons: Back goes to Step 1, Cancel stops the wizard entirely, Confirm creates a status for the guild
+ */
+const generateGameModeSelectionMessage = () => {
+  const row = new MessageActionRow().addComponents(
+    new MessageSelectMenu()
+      .setCustomId('statusStart__gameModeDropdown')
+      .setPlaceholder('Requires at least one game mode')
+      .setMinValues(1)
+      .setMaxValues(2)
+      .addOptions([
+        {
+          label: 'Arenas',
+          description: 'Pubs and Ranked Map Rotation for Arenas',
+          value: 'gameModeDropdown__arenasValue',
+        },
+        {
+          label: 'Battle Royale',
+          description: 'Pubs and Ranked Map Rotation for Arenas',
+          value: 'gameModeDropdown__battleRoyaleValue',
+        },
+      ])
+  );
+  const embed = {
+    title: `Step 1 | Game Mode Selection`,
+    description: 'Select which game modes to receive automatic updates',
+    color: 3447003,
+  };
+  return {
+    embed,
+    row,
+  };
+};
+const generateConfirmStatusMessage = ({ interaction }) => {
+  const mapOptions = {
+    gameModeDropdown__battleRoyaleValue: 'Battle Royale',
+    gameModeDropdown__arenasValue: 'Arenas',
+  };
+  let selectedValues = '';
+  interaction.values.forEach((value, index) => {
+    selectedValues += `${index > 0 ? ', ' : ''}${mapOptions[value]}`;
+  });
+  const row = new MessageActionRow()
+    .addComponents(
+      new MessageButton()
+        .setLabel('Back')
+        .setStyle('SECONDARY')
+        .setCustomId('statusStart__backButton')
+    )
+    .addComponents(
+      new MessageButton()
+        .setLabel('Cancel')
+        .setStyle('DANGER')
+        .setCustomId('statusStart__cancelButton')
+    )
+    .addComponents(
+      new MessageButton()
+        .setLabel("Let's go!")
+        .setStyle('SUCCESS')
+        .setCustomId('statusStart__confirmButton')
+    );
+  const embed = {
+    title: 'Step 2 | Status Confirmation',
+    description: `Selected ${selectedValues}\n\n• Show selected game modes\n• Explain what channels + webhooks will be created based on selection\n• By confirming below, Nessie will create yada yada yada`,
+    color: 3447003,
+  };
+  return {
+    embed,
+    row,
+  };
+};
+/**
+ * Handler for when a user initiates the /status start command
+ * Shows the first step of the status start wizard: Game Mode Selection
+ */
+const sendStartInteraction = async ({ interaction, nessie }) => {
+  const { embed, row } = generateGameModeSelectionMessage();
+  try {
+    await interaction.editReply({ embeds: [embed], components: [row] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+/**
+ * Handler for when a user selects any of the options in the Game Mode dropdown
+ * Will edit and show the second step of the status start wizard: Confirm Status
+ */
+const goToConfirmStatus = async ({ interaction, nessie }) => {
+  const { embed, row } = generateConfirmStatusMessage({ interaction });
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [row] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Confirm';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+/**
+ * Handler for when a user clicks the Back button in Confirm Status Step
+ * Will edit and show the first step of the status start wizard: Confirm Status
+ */
+const goBackToGameModeSelection = async ({ interaction, nessie }) => {
+  const { embed, row } = generateGameModeSelectionMessage();
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [row] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Back';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+/**
+ * Handler for when a user clicks the Cancel button in Confirm Status Step
+ * Will edit and show a success message that the status configuration has been stopped
+ * Prepended an underscore as there's a function in announcement with the same name
+ * TODO: Clean up the code there eventually
+ */
+const _cancelStatusStart = async ({ interaction, nessie }) => {
+  const embed = {
+    description: 'Cancelled automatic map status config',
+    color: 16711680,
+  };
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Cancel';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+/**
+ * Handler for when a user clicks the Confirm button in Confirm Status Step
+ * Placeholder for now but this is where most of the magic will happen
+ */
+const createStatus = async ({ interaction, nessie }) => {
+  const embed = {
+    description: 'Clicked confirm placeholder',
+    color: 3447003,
+  };
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Confirm';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
 module.exports = {
+  /**
+   * Creates Status application command with relevant subcommands
+   * Apparently when you create a subcommand under a base command, the base command will no longer be called
+   * I.e /status becomes void and only '/status xyz' can be used as commands
+   * I'm not sure why Discord did it this way but their explanation is the base command now becomes a folder of sorts
+   * Was initially planning to have /status, /status start and /status stop with the former showing the command information
+   * Not really a problem anyway since now it's /status about
+   *
+   * TODO: Check if it's possible to have default permissions when creating commands
+   * Alternative is to manaully set it inside the guild settings
+   */
   data: new SlashCommandBuilder()
     .setName('status')
     .setDescription('Get your automatic map updates here!')
@@ -75,7 +258,7 @@ module.exports = {
         case 'help':
           return sendHelpInteraction({ interaction, nessie });
         case 'start':
-          return interaction.editReply('Selected status start');
+          return sendStartInteraction({ interaction, nessie });
         case 'stop':
           return interaction.editReply('Selected status stop');
       }
@@ -83,4 +266,8 @@ module.exports = {
       console.log(error);
     }
   },
+  goToConfirmStatus,
+  goBackToGameModeSelection,
+  _cancelStatusStart,
+  createStatus,
 };

@@ -47,14 +47,14 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
       const row = new MessageActionRow()
         .addComponents(
           new MessageButton()
-            .setCustomId('statusStart__cancelButton')
+            .setCustomId('announcementStart__cancelButton')
             .setLabel('Cancel')
             .setStyle('SECONDARY')
             .setDisabled(status ? true : false)
         )
         .addComponents(
           new MessageButton()
-            .setCustomId('statusStart__startButton')
+            .setCustomId('announcementStart__startButton')
             .setLabel(`Let's go!`)
             .setStyle('SUCCESS')
             .setDisabled(status ? true : false)
@@ -98,14 +98,14 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
       const row = new MessageActionRow()
         .addComponents(
           new MessageButton()
-            .setCustomId('statusStop__cancelButton')
+            .setCustomId('announcementStop__cancelButton')
             .setLabel('Cancel')
             .setStyle('SECONDARY')
             .setDisabled(status ? false : true)
         )
         .addComponents(
           new MessageButton()
-            .setCustomId('statusStop__stopButton')
+            .setCustomId('announcementStop__stopButton')
             .setLabel(`Stop it!`)
             .setStyle('DANGER')
             .setDisabled(status ? false : true)
@@ -505,14 +505,14 @@ const sendRestartInteraction = ({ interaction, type }) => {
       const row = new MessageActionRow()
         .addComponents(
           new MessageButton()
-            .setCustomId('statusRestart__cancelButton')
+            .setCustomId('announcementRestart__cancelButton')
             .setLabel('Cancel')
             .setStyle('SECONDARY')
             .setDisabled(!status ? true : false)
         )
         .addComponents(
           new MessageButton()
-            .setCustomId(`statusRestart__${type}Button`)
+            .setCustomId(`announcementRestart__${type}Button`)
             .setLabel('Restart')
             .setStyle('SUCCESS')
             .setDisabled(!status ? true : false)
@@ -531,11 +531,11 @@ const sendRestartInteraction = ({ interaction, type }) => {
 const restartStatus = async ({ interaction, nessie, restartId }) => {
   await interaction.deferUpdate();
   const missingBr =
-    restartId === 'statusRestart__allMissingButton' ||
-    restartId === 'statusRestart__brMissingButton';
+    restartId === 'announcementRestart__allMissingButton' ||
+    restartId === 'announcementRestart__brMissingButton';
   const missingArenas =
-    restartId === 'statusRestart__allMissingButton' ||
-    restartId === 'statusRestart__arenasMissingButton';
+    restartId === 'announcementRestart__allMissingButton' ||
+    restartId === 'announcementRestart__arenasMissingButton';
   return getAllStatus(
     async (allStatus, client) => {
       try {

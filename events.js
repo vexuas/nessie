@@ -33,7 +33,12 @@ const {
   restartStatus,
   cancelStatusRestart,
 } = require('./commands/admin/announcement');
-const { selectMenuReply } = require('./commands/admin/selectMenu');
+const {
+  goToConfirmStatus,
+  goBackToGameModeSelection,
+  _cancelStatusStart,
+  createStatus,
+} = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -135,31 +140,36 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
      */
     if (interaction.isButton()) {
       switch (interaction.customId) {
-        case 'statusStart__startButton':
+        case 'announcementStart__startButton':
           return createStatusChannels({ interaction, nessie });
-        case 'statusStart__cancelButton':
+        case 'announcementStart__cancelButton':
           return cancelStatusStart({ interaction, nessie });
-        case 'statusStop__stopButton':
+        case 'announcementStop__stopButton':
           return deleteStatusChannels({ interaction, nessie });
-        case 'statusStop__cancelButton':
+        case 'announcementStop__cancelButton':
           return cancelStatusStop({ interaction, nessie });
-        case 'statusRestart__cancelButton':
+        case 'announcementRestart__cancelButton':
           return cancelStatusRestart({ interaction, nessie });
-        case 'statusRestart__allButton':
+        case 'announcementRestart__allButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'statusRestart__allMissingButton':
+        case 'announcementRestart__allMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'statusRestart__brMissingButton':
+        case 'announcementRestart__brMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'statusRestart__arenasMissingButton':
+        case 'announcementRestart__arenasMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
+        case 'statusStart__backButton':
+          return goBackToGameModeSelection({ interaction, nessie });
+        case 'statusStart__cancelButton':
+          return _cancelStatusStart({ interaction, nessie });
+        case 'statusStart__confirmButton':
+          return createStatus({ interaction, nessie });
       }
     }
     if (interaction.isSelectMenu()) {
-      console.log(interaction);
       switch (interaction.customId) {
-        case 'selectMenu__mapOptions':
-          return selectMenuReply({ interaction });
+        case 'statusStart__gameModeDropdown':
+          return goToConfirmStatus({ interaction, nessie });
       }
     }
   });
