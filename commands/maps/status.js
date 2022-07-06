@@ -145,7 +145,7 @@ const sendConfirmStatusInteraction = async ({ interaction }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
-const sendBackStatusInteraction = async ({ interaction }) => {
+const goBackToGameModeSelection = async ({ interaction }) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
     await interaction.deferUpdate();
@@ -153,6 +153,22 @@ const sendBackStatusInteraction = async ({ interaction }) => {
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Back';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+const _cancelStatusStart = async ({ interaction }) => {
+  const embed = {
+    description: 'Cancelled automatic map status config',
+    color: 16711680,
+  };
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Cancel';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -191,5 +207,6 @@ module.exports = {
     }
   },
   sendConfirmStatusInteraction,
-  sendBackStatusInteraction,
+  goBackToGameModeSelection,
+  _cancelStatusStart,
 };
