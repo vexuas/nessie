@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
+const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -45,7 +46,42 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
     return await interaction.editReply({ embeds: [embedData] });
   } catch (error) {
     const uuid = uuidv4();
-    const type = 'Status About';
+    const type = 'Status Help';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+const sendStartInteraction = async ({ interaction, nessie }) => {
+  const row = new MessageActionRow().addComponents(
+    new MessageSelectMenu()
+      .setCustomId('statusStart__gameModeDropdown')
+      .setPlaceholder('Requires at least one game mode')
+      .setMinValues(1)
+      .setMaxValues(2)
+      .addOptions([
+        {
+          label: 'Arenas',
+          description: 'Pubs and Ranked Map Rotation for Arenas',
+          value: 'gameModeDropdown__arenasValue',
+        },
+        {
+          label: 'Battle Royale',
+          description: 'Pubs and Ranked Map Rotation for Arenas',
+          value: 'gameModeDropdown__battleRoyaleValue',
+        },
+      ])
+  );
+  const embed = {
+    title: `Step 1 | Game Mode Selection`,
+    description: 'Select which game modes to receive automatic updates',
+    color: 3447003,
+  };
+  try {
+    await interaction.editReply({ embeds: [embed], components: [row] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -75,7 +111,7 @@ module.exports = {
         case 'help':
           return sendHelpInteraction({ interaction, nessie });
         case 'start':
-          return interaction.editReply('Selected status start');
+          return sendStartInteraction({ interaction, nessie });
         case 'stop':
           return interaction.editReply('Selected status stop');
       }
