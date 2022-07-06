@@ -52,7 +52,7 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
-const sendStartInteraction = async ({ interaction, nessie }) => {
+const generateGameModeSelectionMessage = () => {
   const row = new MessageActionRow().addComponents(
     new MessageSelectMenu()
       .setCustomId('statusStart__gameModeDropdown')
@@ -77,21 +77,16 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     description: 'Select which game modes to receive automatic updates',
     color: 3447003,
   };
-  try {
-    await interaction.editReply({ embeds: [embed], components: [row] });
-  } catch (error) {
-    const uuid = uuidv4();
-    const type = 'Status Start';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
-  }
+  return {
+    embed,
+    row,
+  };
 };
-const mapOptions = {
-  gameModeDropdown__battleRoyaleValue: 'Battle Royale',
-  gameModeDropdown__arenasValue: 'Arenas',
-};
-const sendConfirmStatusInteraction = async ({ interaction }) => {
+const generateConfirmStatusMessage = ({ interaction }) => {
+  const mapOptions = {
+    gameModeDropdown__battleRoyaleValue: 'Battle Royale',
+    gameModeDropdown__arenasValue: 'Arenas',
+  };
   let selectedValues = '';
   interaction.values.forEach((value, index) => {
     selectedValues += `${index > 0 ? ', ' : ''}${mapOptions[value]}`;
@@ -120,12 +115,44 @@ const sendConfirmStatusInteraction = async ({ interaction }) => {
     description: `Selected ${selectedValues}\n\n• Show selected game modes\n• Explain what channels + webhooks will be created based on selection\n• By confirming below, Nessie will create yada yada yada`,
     color: 3447003,
   };
+  return {
+    embed,
+    row,
+  };
+};
+const sendStartInteraction = async ({ interaction, nessie }) => {
+  const { embed, row } = generateGameModeSelectionMessage();
+  try {
+    await interaction.editReply({ embeds: [embed], components: [row] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+const sendConfirmStatusInteraction = async ({ interaction }) => {
+  const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
+const sendBackStatusInteraction = async ({ interaction }) => {
+  const { embed, row } = generateGameModeSelectionMessage();
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [row] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Back';
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -164,4 +191,5 @@ module.exports = {
     }
   },
   sendConfirmStatusInteraction,
+  sendBackStatusInteraction,
 };

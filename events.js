@@ -34,7 +34,10 @@ const {
   cancelStatusRestart,
 } = require('./commands/admin/announcement');
 const { selectMenuReply } = require('./commands/admin/selectMenu');
-const { sendConfirmStatusInteraction } = require('./commands/maps/status');
+const {
+  sendConfirmStatusInteraction,
+  sendBackStatusInteraction,
+} = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -154,6 +157,8 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
         case 'announcementRestart__arenasMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
+        case 'statusStart__backButton':
+          return sendBackStatusInteraction({ interaction });
       }
     }
     if (interaction.isSelectMenu()) {
