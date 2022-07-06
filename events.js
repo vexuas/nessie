@@ -33,7 +33,6 @@ const {
   restartStatus,
   cancelStatusRestart,
 } = require('./commands/admin/announcement');
-const { selectMenuReply } = require('./commands/admin/selectMenu');
 const {
   sendConfirmStatusInteraction,
   goBackToGameModeSelection,
@@ -168,10 +167,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       }
     }
     if (interaction.isSelectMenu()) {
-      console.log(interaction);
       switch (interaction.customId) {
-        case 'selectMenu__mapOptions':
-          return selectMenuReply({ interaction });
         case 'statusStart__gameModeDropdown':
           return sendConfirmStatusInteraction({ interaction, nessie });
       }
