@@ -34,6 +34,7 @@ const {
   cancelStatusRestart,
 } = require('./commands/admin/announcement');
 const { selectMenuReply } = require('./commands/admin/selectMenu');
+const { sendConfirmStatusInteraction } = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -135,23 +136,23 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
      */
     if (interaction.isButton()) {
       switch (interaction.customId) {
-        case 'statusStart__startButton':
+        case 'announcementStart__startButton':
           return createStatusChannels({ interaction, nessie });
-        case 'statusStart__cancelButton':
+        case 'announcementStart__cancelButton':
           return cancelStatusStart({ interaction, nessie });
-        case 'statusStop__stopButton':
+        case 'announcementStop__stopButton':
           return deleteStatusChannels({ interaction, nessie });
-        case 'statusStop__cancelButton':
+        case 'announcementStop__cancelButton':
           return cancelStatusStop({ interaction, nessie });
-        case 'statusRestart__cancelButton':
+        case 'announcementRestart__cancelButton':
           return cancelStatusRestart({ interaction, nessie });
-        case 'statusRestart__allButton':
+        case 'announcementRestart__allButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'statusRestart__allMissingButton':
+        case 'announcementRestart__allMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'statusRestart__brMissingButton':
+        case 'announcementRestart__brMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'statusRestart__arenasMissingButton':
+        case 'announcementRestart__arenasMissingButton':
           return restartStatus({ interaction, nessie, restartId: interaction.customId });
       }
     }
@@ -160,6 +161,8 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       switch (interaction.customId) {
         case 'selectMenu__mapOptions':
           return selectMenuReply({ interaction });
+        case 'statusStart__gameModeDropdown':
+          return sendConfirmStatusInteraction({ interaction, nessie });
       }
     }
   });

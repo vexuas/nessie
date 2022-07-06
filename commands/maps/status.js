@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -87,6 +87,50 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+const mapOptions = {
+  gameModeDropdown__battleRoyaleValue: 'Battle Royale',
+  gameModeDropdown__arenasValue: 'Arenas',
+};
+const sendConfirmStatusInteraction = async ({ interaction }) => {
+  let selectedValues = '';
+  interaction.values.forEach((value, index) => {
+    selectedValues += `${index > 0 ? ', ' : ''}${mapOptions[value]}`;
+  });
+  const row = new MessageActionRow()
+    .addComponents(
+      new MessageButton()
+        .setLabel('Back')
+        .setStyle('SECONDARY')
+        .setCustomId('statusStart__backButton')
+    )
+    .addComponents(
+      new MessageButton()
+        .setLabel('Cancel')
+        .setStyle('DANGER')
+        .setCustomId('statusStart__cancelButton')
+    )
+    .addComponents(
+      new MessageButton()
+        .setLabel("Let's go!")
+        .setStyle('SUCCESS')
+        .setCustomId('statusStart__confirmButton')
+    );
+  const embed = {
+    title: 'Step 2 | Status Confirmation',
+    description: `Selected ${selectedValues}\n\n• Show selected game modes\n• Explain what channels + webhooks will be created based on selection\n• By confirming below, Nessie will create yada yada yada`,
+    color: 3447003,
+  };
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [row] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Start Confirm';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('status')
@@ -119,4 +163,5 @@ module.exports = {
       console.log(error);
     }
   },
+  sendConfirmStatusInteraction,
 };
