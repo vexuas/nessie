@@ -110,9 +110,6 @@ const generateConfirmStatusMessage = ({ interaction }) => {
   const confirmButtonId = `statusStart__confirmButton${modeLength > 0 ? '?' : ''}${
     isBattleRoyaleSelected ? 'battle_royale' : ''
   }${modeLength > 1 ? '&' : ''}${isArenasSelected ? 'arenas' : ''}`;
-  console.log(isBattleRoyaleSelected);
-  console.log(isArenasSelected);
-  console.log(confirmButtonId);
   const mapOptions = {
     gameModeDropdown__battleRoyaleValue: 'Battle Royale',
     gameModeDropdown__arenasValue: 'Arenas',
@@ -264,6 +261,8 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
  * Placeholder for now but this is where most of the magic will happen
  */
 const createStatus = async ({ interaction, nessie }) => {
+  const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
+  const isArenasSelected = interaction.customId.includes('arenas');
   console.log(interaction);
   const embedLoading = {
     description: `Loading status channels...`,
@@ -276,6 +275,22 @@ const createStatus = async ({ interaction, nessie }) => {
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
     const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
+
+    const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
+      type: 'GUILD_CATEGORY',
+    });
+    const statusBattleRoyaleChannel =
+      isBattleRoyaleSelected &&
+      (await interaction.guild.channels.create('apex-battle-royale', {
+        parent: statusCategory,
+        type: 'GUILD_TEXT',
+      }));
+    const statusArenasChannel =
+      isArenasSelected &&
+      (await interaction.guild.channels.create('apex-arenas', {
+        parent: statusCategory,
+        type: 'GUILD_TEXT',
+      }));
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
