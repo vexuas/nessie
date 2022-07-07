@@ -100,10 +100,24 @@ const generateGameModeSelectionMessage = () => {
   };
 };
 const generateConfirmStatusMessage = ({ interaction }) => {
+  const isBattleRoyaleSelected = interaction.values.find(
+    (value) => value === 'gameModeDropdown__battleRoyaleValue'
+  );
+  const isArenasSelected = interaction.values.find(
+    (value) => value === 'gameModeDropdown__arenasValue'
+  );
+  const modeLength = interaction.values.length;
+  const confirmButtonId = `statusStart__confirmButton${modeLength > 0 ? '?' : ''}${
+    isBattleRoyaleSelected ? 'battle_royale' : ''
+  }${modeLength > 1 ? '&' : ''}${isArenasSelected ? 'arenas' : ''}`;
+  console.log(isBattleRoyaleSelected);
+  console.log(isArenasSelected);
+  console.log(confirmButtonId);
   const mapOptions = {
     gameModeDropdown__battleRoyaleValue: 'Battle Royale',
     gameModeDropdown__arenasValue: 'Arenas',
   };
+
   let selectedValues = '';
   interaction.values.forEach((value, index) => {
     selectedValues += `${index > 0 ? ', ' : ''}${mapOptions[value]}`;
@@ -122,10 +136,7 @@ const generateConfirmStatusMessage = ({ interaction }) => {
         .setCustomId('statusStart__cancelButton')
     )
     .addComponents(
-      new MessageButton()
-        .setLabel("Let's go!")
-        .setStyle('SUCCESS')
-        .setCustomId('statusStart__confirmButton')
+      new MessageButton().setLabel("Let's go!").setStyle('SUCCESS').setCustomId(confirmButtonId)
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
@@ -253,6 +264,7 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
  * Placeholder for now but this is where most of the magic will happen
  */
 const createStatus = async ({ interaction, nessie }) => {
+  console.log(interaction);
   const embedLoading = {
     description: `Loading status channels...`,
     color: 16776960,

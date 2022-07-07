@@ -162,8 +162,10 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           return goBackToGameModeSelection({ interaction, nessie });
         case 'statusStart__cancelButton':
           return _cancelStatusStart({ interaction, nessie });
-        case 'statusStart__confirmButton':
-          return createStatus({ interaction, nessie });
+        default:
+          if (interaction.customId.includes('statusStart__confirmButton')) {
+            return createStatus({ interaction, nessie });
+          }
       }
     }
     if (interaction.isSelectMenu()) {
