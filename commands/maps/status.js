@@ -6,7 +6,7 @@ const {
   generateRankedEmbed,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = require('discord.js');
 const { getRotationData } = require('../../adapters');
 const { nessieLogo } = require('../../constants');
 
@@ -304,6 +304,21 @@ const createStatus = async ({ interaction, nessie }) => {
       (await statusArenasChannel.createWebhook('Nessie Automatic Status', {
         avatar: nessieLogo,
         reason: 'Webhook to receive automatic map updates for Apex Arenas',
+      }));
+
+    statusBattleRoyaleWebhook &&
+      (await new WebhookClient({
+        id: statusBattleRoyaleWebhook.id,
+        token: statusBattleRoyaleWebhook.token,
+      }).send({
+        embeds: statusBattleRoyaleEmbed,
+      }));
+    statusArenasWebhook &&
+      (await new WebhookClient({
+        id: statusArenasWebhook.id,
+        token: statusArenasWebhook.token,
+      }).send({
+        embeds: statusArenasEmbed,
       }));
 
     const embedSuccess = {
