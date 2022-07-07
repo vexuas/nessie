@@ -263,11 +263,11 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
 const createStatus = async ({ interaction, nessie }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
-  console.log(interaction);
   const embedLoading = {
     description: `Loading status channels...`,
     color: 16776960,
   };
+
   try {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embedLoading], components: [] });
@@ -291,6 +291,18 @@ const createStatus = async ({ interaction, nessie }) => {
         parent: statusCategory,
         type: 'GUILD_TEXT',
       }));
+
+    statusBattleRoyaleChannel &&
+      (await statusBattleRoyaleChannel.send({
+        embeds: statusBattleRoyaleEmbed,
+      }));
+    statusArenasChannel && (await statusArenasChannel.send({ embeds: statusArenasEmbed }));
+
+    const embedSuccess = {
+      description: `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`,
+      color: 3066993,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
