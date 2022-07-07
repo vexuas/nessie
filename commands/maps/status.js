@@ -1,7 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
+const {
+  generateErrorEmbed,
+  sendErrorLog,
+  generatePubsEmbed,
+  generateRankedEmbed,
+} = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
+const { getRotationData } = require('../../adapters');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -131,6 +137,45 @@ const generateConfirmStatusMessage = ({ interaction }) => {
     row,
   };
 };
+//----- Status Functions/Interactions -----//
+/**
+ * Generates relevant embeds for the status battle royale channel
+ * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
+ * Had to split it between br and arenas after seeing that
+ */
+const generateBattleRoyaleStatusEmbeds = (data) => {
+  const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
+  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
+  const informationEmbed = {
+    description:
+      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+    color: 3447003,
+    timestamp: Date.now(),
+    footer: {
+      text: 'Last Update',
+    },
+  };
+  return [informationEmbed, battleRoyaleRankedEmbed, battleRoyalePubsEmbed];
+};
+/**
+ * Generates relevant embeds for the status arenas channel
+ * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
+ * Had to split it between br and arenas after seeing that
+ */
+const generateArenasStatusEmbeds = (data) => {
+  const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
+  const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
+  const informationEmbed = {
+    description:
+      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+    color: 3447003,
+    timestamp: Date.now(),
+    footer: {
+      text: 'Last Update',
+    },
+  };
+  return [informationEmbed, arenasRankedEmbed, arenasPubsEmbed];
+};
 /**
  * Handler for when a user initiates the /status start command
  * Shows the first step of the status start wizard: Game Mode Selection
@@ -208,13 +253,17 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
  * Placeholder for now but this is where most of the magic will happen
  */
 const createStatus = async ({ interaction, nessie }) => {
-  const embed = {
-    description: 'Clicked confirm placeholder',
-    color: 3447003,
+  const embedLoading = {
+    description: `Loading status channels...`,
+    color: 16776960,
   };
   try {
     await interaction.deferUpdate();
-    await interaction.message.edit({ embeds: [embed], components: [] });
+    await interaction.message.edit({ embeds: [embedLoading], components: [] });
+
+    const rotationData = await getRotationData();
+    const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+    const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
