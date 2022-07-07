@@ -8,6 +8,7 @@ const {
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
 const { getRotationData } = require('../../adapters');
+const { nessieLogo } = require('../../constants');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -292,11 +293,18 @@ const createStatus = async ({ interaction, nessie }) => {
         type: 'GUILD_TEXT',
       }));
 
-    statusBattleRoyaleChannel &&
-      (await statusBattleRoyaleChannel.send({
-        embeds: statusBattleRoyaleEmbed,
+    const statusBattleRoyaleWebhook =
+      statusBattleRoyaleChannel &&
+      (await statusBattleRoyaleChannel.createWebhook('Nessie Automatic Status', {
+        avatar: nessieLogo,
+        reason: 'Webhook to receive automatic map updates for Apex Battle Royale',
       }));
-    statusArenasChannel && (await statusArenasChannel.send({ embeds: statusArenasEmbed }));
+    const statusArenasWebhook =
+      statusArenasChannel &&
+      (await statusArenasChannel.createWebhook('Nessie Automatic Status', {
+        avatar: nessieLogo,
+        reason: 'Webhook to receive automatic map updates for Apex Arenas',
+      }));
 
     const embedSuccess = {
       description: `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`,
