@@ -8,6 +8,7 @@ const {
   generateErrorEmbed,
   sendErrorLog,
   codeBlock,
+  checkIfInDevelopment,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const {
@@ -412,7 +413,7 @@ const initialiseStatusScheduler = (nessie) => {
     getAllStatus(
       async (allStatus, client) => {
         try {
-          const rotationData = await getRotationData();
+          const rotationData = !checkIfInDevelopment(nessie) && (await getRotationData());
           const statusLogChannel = nessie.channels.cache.get('976863441526595644');
           if (allStatus) {
             const status = allStatus[0];
@@ -463,7 +464,9 @@ const initialiseStatusScheduler = (nessie) => {
               },
             ],
           };
-          await statusLogChannel.send({ embeds: [statusLogEmbed] });
+
+          !checkIfInDevelopment(nessie) &&
+            (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
         } catch (error) {
           const uuid = uuidv4();
           const type = 'Status Scheduler Config';
