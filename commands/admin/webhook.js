@@ -4,7 +4,9 @@ const { getBattleRoyalePubs } = require('../../adapters');
 const { testWebhook } = require('../../config/nessie.json');
 const { generatePubsEmbed } = require('../../helpers');
 const { nessieLogo } = require('../../constants');
+const Scheduler = require('../../scheduler');
 
+let messageObject;
 /**
  * Temporary command to test how to use webhooks
  * Tbh after testing this and realising how straightforward it is, makes me wonder why I even bothered making announcements kek
@@ -30,36 +32,60 @@ module.exports = {
       subCommand.setName('send').setDescription('Send Webhook Message')
     )
     .addSubcommand((subCommand) =>
-      subCommand.setName('edit').setDescription('Edit Webhook Message')
+      subCommand.setName('status').setDescription('Test Webhook Status')
     )
     .addSubcommand((subCommand) =>
       subCommand.setName('delete').setDescription('Delete Webhook Message')
     ),
   async execute({ nessie, interaction }) {
     const statusOption = interaction.options.getSubcommand();
-    const webhook = new WebhookClient({
-      id: testWebhook.id,
-      token: testWebhook.token,
-    });
+    const webhook = await nessie.fetchWebhook(testWebhook.id);
+
     try {
       await interaction.deferReply();
       switch (statusOption) {
         case 'send':
           const data = await getBattleRoyalePubs();
           const embed = generatePubsEmbed(data);
-          await webhook.send({
-            username: 'Nessie Map Status',
+          await new WebhookClient({
+            id: webhook.id,
+            token: webhook.token,
+          }).send({
+            username: 'Nessie Automatic Status',
             avatarURL: nessieLogo,
             embeds: [embed],
           });
           await interaction.editReply({ content: 'Sent Webhook' });
           break;
-        case 'edit':
-          await webhook.editMessage('', {
-            content: 'Edit Message',
-            embeds: [],
+        case 'status':
+          const dataBr = await getBattleRoyalePubs();
+          const embedBr = generatePubsEmbed(dataBr);
+          messageObject = await new WebhookClient({
+            id: webhook.id,
+            token: webhook.token,
+          }).send({
+            username: 'Nessie Automatic Status',
+            avatarURL: nessieLogo,
+            embeds: [embedBr],
           });
-          await interaction.editReply({ content: 'Edit Webhook' });
+          await interaction.editReply({ content: 'Status Webhook' });
+
+          const schedule = new Scheduler('10 */1 * * * *', async () => {
+            const dataBrNew = await getBattleRoyalePubs();
+            const embedNew = generatePubsEmbed(dataBrNew);
+            const webhookNew = await nessie.fetchWebhook(testWebhook.id);
+            const webhookClient = new WebhookClient({
+              id: webhookNew.id,
+              token: webhookNew.token,
+            });
+            await webhookClient.deleteMessage(messageObject.id);
+            messageObject = await webhookClient.send({
+              username: 'Nessie Automatic Status',
+              avatarURL: nessieLogo,
+              embeds: [embedNew],
+            });
+          });
+          schedule.start();
           break;
         case 'delete':
           await webhook.deleteMessage('989556889429880932');
