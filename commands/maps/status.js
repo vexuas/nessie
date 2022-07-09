@@ -101,6 +101,12 @@ const generateGameModeSelectionMessage = () => {
   };
 };
 const generateConfirmStatusMessage = ({ interaction }) => {
+  /**
+   * The game mode selections are passed down from the dropdown interaction in step 1
+   * However, there's no direct way of passing them down along with the confirm button interaction
+   * To solve this, we're going to append the selected game modes on the customId of the button itself
+   * Going to treat them like query params (?x&y)
+   */
   const isBattleRoyaleSelected = interaction.values.find(
     (value) => value === 'gameModeDropdown__battleRoyaleValue'
   );
@@ -108,9 +114,12 @@ const generateConfirmStatusMessage = ({ interaction }) => {
     (value) => value === 'gameModeDropdown__arenasValue'
   );
   const modeLength = interaction.values.length;
+
   const confirmButtonId = `statusStart__confirmButton${modeLength > 0 ? '?' : ''}${
     isBattleRoyaleSelected ? 'battle_royale' : ''
-  }${modeLength > 1 ? '&' : ''}${isArenasSelected ? 'arenas' : ''}`;
+  }${modeLength > 1 ? '&' : ''}${isArenasSelected ? 'arenas' : ''}`; //Full selection: statusStart__confirmButton?battle_royale&arenas;
+
+  //TODO: Cleanup the selected game mode display below
   const mapOptions = {
     gameModeDropdown__battleRoyaleValue: 'Battle Royale',
     gameModeDropdown__arenasValue: 'Arenas',
@@ -259,7 +268,19 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
 };
 /**
  * Handler for when a user clicks the Confirm button in Confirm Status Step
- * Placeholder for now but this is where most of the magic will happen
+ * This is the most important aspect as it will initialise the process of map status
+ * Main steps upon button click:
+ * - Check which game modes have been selected based on button customId
+ * - Edits initial message with a loading state
+ * - Calls the API for the rotation data
+ * - Create embeds for each status channel
+ * - Creates a category channel and relevant text channels under it
+ * - Creates relevant webhooks
+ * - Send embeds to respective channels through webhooks
+ * - Edits initial message with a success message
+ *
+ * TODO: Save status data in our database
+ * TODO: Maybe separate ui and wiring up to respective files/folders for better readability
  */
 const createStatus = async ({ interaction, nessie }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
