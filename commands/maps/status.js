@@ -1,7 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { generateErrorEmbed, sendErrorLog } = require('../../helpers');
+const {
+  generateErrorEmbed,
+  sendErrorLog,
+  generatePubsEmbed,
+  generateRankedEmbed,
+} = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
-const { MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = require('discord.js');
+const { getRotationData } = require('../../adapters');
+const { nessieLogo } = require('../../constants');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -94,10 +101,30 @@ const generateGameModeSelectionMessage = () => {
   };
 };
 const generateConfirmStatusMessage = ({ interaction }) => {
+  /**
+   * The game mode selections are passed down from the dropdown interaction in step 1
+   * However, there's no direct way of passing them down along with the confirm button interaction
+   * To solve this, we're going to append the selected game modes on the customId of the button itself
+   * Going to treat them like query params (?x&y)
+   */
+  const isBattleRoyaleSelected = interaction.values.find(
+    (value) => value === 'gameModeDropdown__battleRoyaleValue'
+  );
+  const isArenasSelected = interaction.values.find(
+    (value) => value === 'gameModeDropdown__arenasValue'
+  );
+  const modeLength = interaction.values.length;
+
+  const confirmButtonId = `statusStart__confirmButton${modeLength > 0 ? '?' : ''}${
+    isBattleRoyaleSelected ? 'battle_royale' : ''
+  }${modeLength > 1 ? '&' : ''}${isArenasSelected ? 'arenas' : ''}`; //Full selection: statusStart__confirmButton?battle_royale&arenas;
+
+  //TODO: Cleanup the selected game mode display below
   const mapOptions = {
     gameModeDropdown__battleRoyaleValue: 'Battle Royale',
     gameModeDropdown__arenasValue: 'Arenas',
   };
+
   let selectedValues = '';
   interaction.values.forEach((value, index) => {
     selectedValues += `${index > 0 ? ', ' : ''}${mapOptions[value]}`;
@@ -116,10 +143,7 @@ const generateConfirmStatusMessage = ({ interaction }) => {
         .setCustomId('statusStart__cancelButton')
     )
     .addComponents(
-      new MessageButton()
-        .setLabel("Let's go!")
-        .setStyle('SUCCESS')
-        .setCustomId('statusStart__confirmButton')
+      new MessageButton().setLabel("Let's go!").setStyle('SUCCESS').setCustomId(confirmButtonId)
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
@@ -130,6 +154,45 @@ const generateConfirmStatusMessage = ({ interaction }) => {
     embed,
     row,
   };
+};
+//----- Status Functions/Interactions -----//
+/**
+ * Generates relevant embeds for the status battle royale channel
+ * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
+ * Had to split it between br and arenas after seeing that
+ */
+const generateBattleRoyaleStatusEmbeds = (data) => {
+  const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
+  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
+  const informationEmbed = {
+    description:
+      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+    color: 3447003,
+    timestamp: Date.now(),
+    footer: {
+      text: 'Last Update',
+    },
+  };
+  return [informationEmbed, battleRoyaleRankedEmbed, battleRoyalePubsEmbed];
+};
+/**
+ * Generates relevant embeds for the status arenas channel
+ * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
+ * Had to split it between br and arenas after seeing that
+ */
+const generateArenasStatusEmbeds = (data) => {
+  const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
+  const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
+  const informationEmbed = {
+    description:
+      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+    color: 3447003,
+    timestamp: Date.now(),
+    footer: {
+      text: 'Last Update',
+    },
+  };
+  return [informationEmbed, arenasRankedEmbed, arenasPubsEmbed];
 };
 /**
  * Handler for when a user initiates the /status start command
@@ -205,16 +268,85 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
 };
 /**
  * Handler for when a user clicks the Confirm button in Confirm Status Step
- * Placeholder for now but this is where most of the magic will happen
+ * This is the most important aspect as it will initialise the process of map status
+ * Main steps upon button click:
+ * - Check which game modes have been selected based on button customId
+ * - Edits initial message with a loading state
+ * - Calls the API for the rotation data
+ * - Create embeds for each status channel
+ * - Creates a category channel and relevant text channels under it
+ * - Creates relevant webhooks
+ * - Send embeds to respective channels through webhooks
+ * - Edits initial message with a success message
+ *
+ * TODO: Save status data in our database
+ * TODO: Maybe separate ui and wiring up to respective files/folders for better readability
  */
 const createStatus = async ({ interaction, nessie }) => {
-  const embed = {
-    description: 'Clicked confirm placeholder',
-    color: 3447003,
+  const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
+  const isArenasSelected = interaction.customId.includes('arenas');
+  const embedLoading = {
+    description: `Loading status channels...`,
+    color: 16776960,
   };
+
   try {
     await interaction.deferUpdate();
-    await interaction.message.edit({ embeds: [embed], components: [] });
+    await interaction.message.edit({ embeds: [embedLoading], components: [] });
+
+    const rotationData = await getRotationData();
+    const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+    const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
+
+    const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
+      type: 'GUILD_CATEGORY',
+    });
+    const statusBattleRoyaleChannel =
+      isBattleRoyaleSelected &&
+      (await interaction.guild.channels.create('apex-battle-royale', {
+        parent: statusCategory,
+        type: 'GUILD_TEXT',
+      }));
+    const statusArenasChannel =
+      isArenasSelected &&
+      (await interaction.guild.channels.create('apex-arenas', {
+        parent: statusCategory,
+        type: 'GUILD_TEXT',
+      }));
+
+    const statusBattleRoyaleWebhook =
+      statusBattleRoyaleChannel &&
+      (await statusBattleRoyaleChannel.createWebhook('Nessie Automatic Status', {
+        avatar: nessieLogo,
+        reason: 'Webhook to receive automatic map updates for Apex Battle Royale',
+      }));
+    const statusArenasWebhook =
+      statusArenasChannel &&
+      (await statusArenasChannel.createWebhook('Nessie Automatic Status', {
+        avatar: nessieLogo,
+        reason: 'Webhook to receive automatic map updates for Apex Arenas',
+      }));
+
+    statusBattleRoyaleWebhook &&
+      (await new WebhookClient({
+        id: statusBattleRoyaleWebhook.id,
+        token: statusBattleRoyaleWebhook.token,
+      }).send({
+        embeds: statusBattleRoyaleEmbed,
+      }));
+    statusArenasWebhook &&
+      (await new WebhookClient({
+        id: statusArenasWebhook.id,
+        token: statusArenasWebhook.token,
+      }).send({
+        embeds: statusArenasEmbed,
+      }));
+
+    const embedSuccess = {
+      description: `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`,
+      color: 3066993,
+    };
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
