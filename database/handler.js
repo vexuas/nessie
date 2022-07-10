@@ -117,12 +117,13 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
  * Creates Status table in our database
  * Straightforward; no additional checks and only creates the table if it does not exist
  * Gets called in the onReady event of Nessie
+ * TODO: Maybe document all the necessary columns we need to create a status in notion
  */
 exports.createStatusTable = () => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
-        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT NOT NULL, br_channel_id TEXT NOT NULL, arenas_channel_id TEXT NOT NULL, br_message_id TEXT NOT NULL, arenas_message_id TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
+        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT, br_channel_id TEXT, arenas_channel_id TEXT, br_message_id TEXT, arenas_message_id TEXT, br_webhook_id TEXT, arenas_webhook_id TEXT, original_channel_id TEXT NOT NULL, game_mode_selected TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
       );
       client.query('COMMIT', (err) => {
         done();
@@ -142,7 +143,7 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
-        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, arenas_channel_id, br_message_id, arenas_message_id, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, arenas_channel_id, br_message_id, arenas_message_id, br_webhook_id, arenas_webhook_id, original_channel_id, game_mode_selected, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
         [
           status.uuid,
           status.guildId,
@@ -151,6 +152,10 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
           status.arenasChannelId,
           status.battleRoyaleMessageId,
           status.arenasMessageId,
+          status.battleRoyaleWebhookId,
+          status.arenasWebhookId,
+          status.originalChannelId,
+          status.gameModeSelected,
           status.createdBy,
           status.createdAt,
         ],

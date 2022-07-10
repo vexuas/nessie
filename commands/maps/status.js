@@ -9,6 +9,8 @@ const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = require('discord.js');
 const { getRotationData } = require('../../adapters');
 const { nessieLogo } = require('../../constants');
+const { format } = require('date-fns');
+const { insertNewStatus, getStatus } = require('../../database/handler');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -70,31 +72,45 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
  * - TODO: Don't forget to add copy for the explanation of webhooks/channels creation + status update cycles
  * - Has 3 buttons: Back goes to Step 1, Cancel stops the wizard entirely, Confirm creates a status for the guild
  */
-const generateGameModeSelectionMessage = () => {
-  const row = new MessageActionRow().addComponents(
-    new MessageSelectMenu()
-      .setCustomId('statusStart__gameModeDropdown')
-      .setPlaceholder('Requires at least one game mode')
-      .setMinValues(1)
-      .setMaxValues(2)
-      .addOptions([
-        {
-          label: 'Arenas',
-          description: 'Pubs and Ranked Map Rotation for Arenas',
-          value: 'gameModeDropdown__arenasValue',
-        },
-        {
-          label: 'Battle Royale',
-          description: 'Pubs and Ranked Map Rotation for Arenas',
-          value: 'gameModeDropdown__battleRoyaleValue',
-        },
-      ])
-  );
-  const embed = {
-    title: `Step 1 | Game Mode Selection`,
-    description: 'Select which game modes to receive automatic updates',
-    color: 3447003,
-  };
+const generateGameModeSelectionMessage = (status) => {
+  let embed, row;
+  if (!status) {
+    row = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
+        .setCustomId('statusStart__gameModeDropdown')
+        .setPlaceholder('Requires at least one game mode')
+        .setMinValues(1)
+        .setMaxValues(2)
+        .addOptions([
+          {
+            label: 'Arenas',
+            description: 'Pubs and Ranked Map Rotation for Arenas',
+            value: 'gameModeDropdown__arenasValue',
+          },
+          {
+            label: 'Battle Royale',
+            description: 'Pubs and Ranked Map Rotation for Arenas',
+            value: 'gameModeDropdown__battleRoyaleValue',
+          },
+        ])
+    );
+    embed = {
+      title: `Step 1 | Game Mode Selection`,
+      description: 'Select which game modes to receive automatic updates',
+      color: 3447003,
+    };
+  } else {
+    embed = {
+      title: 'Status | Start',
+      description: `There's currently an existing automated map status active in:${
+        status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''
+      }${status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''}\n\nCreated at ${
+        status.created_at
+      } by ${status.created_by}`,
+      color: 3447003,
+    };
+  }
+
   return {
     embed,
     row,
@@ -199,16 +215,28 @@ const generateArenasStatusEmbeds = (data) => {
  * Shows the first step of the status start wizard: Game Mode Selection
  */
 const sendStartInteraction = async ({ interaction, nessie }) => {
-  const { embed, row } = generateGameModeSelectionMessage();
-  try {
-    await interaction.editReply({ embeds: [embed], components: [row] });
-  } catch (error) {
-    const uuid = uuidv4();
-    const type = 'Status Start';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
-  }
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const { embed, row } = generateGameModeSelectionMessage(status);
+      try {
+        await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
+      } catch (error) {
+        const uuid = uuidv4();
+        const type = 'Status Start';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.editReply({ embeds: errorEmbed });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Start)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
 /**
  * Handler for when a user selects any of the options in the Game Mode dropdown
@@ -285,14 +313,18 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
 const createStatus = async ({ interaction, nessie }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
-  const embedLoading = {
+  const embedLoadingChannels = {
     description: `Loading status channels...`,
+    color: 16776960,
+  };
+  const embedLoadingWebhooks = {
+    description: `Loading webhooks...`,
     color: 16776960,
   };
 
   try {
     await interaction.deferUpdate();
-    await interaction.message.edit({ embeds: [embedLoading], components: [] });
+    await interaction.message.edit({ embeds: [embedLoadingChannels], components: [] });
 
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
@@ -314,6 +346,9 @@ const createStatus = async ({ interaction, nessie }) => {
         type: 'GUILD_TEXT',
       }));
 
+    //Since webhooks take way longer to create than channels, adding another loading state here
+    await interaction.message.edit({ embeds: [embedLoadingWebhooks], components: [] });
+
     const statusBattleRoyaleWebhook =
       statusBattleRoyaleChannel &&
       (await statusBattleRoyaleChannel.createWebhook('Nessie Automatic Status', {
@@ -327,14 +362,16 @@ const createStatus = async ({ interaction, nessie }) => {
         reason: 'Webhook to receive automatic map updates for Apex Arenas',
       }));
 
-    statusBattleRoyaleWebhook &&
+    const statusBattleRoyaleMessage =
+      statusBattleRoyaleWebhook &&
       (await new WebhookClient({
         id: statusBattleRoyaleWebhook.id,
         token: statusBattleRoyaleWebhook.token,
       }).send({
         embeds: statusBattleRoyaleEmbed,
       }));
-    statusArenasWebhook &&
+    const statusArenasMessage =
+      statusArenasWebhook &&
       (await new WebhookClient({
         id: statusArenasWebhook.id,
         token: statusArenasWebhook.token,
@@ -342,11 +379,60 @@ const createStatus = async ({ interaction, nessie }) => {
         embeds: statusArenasEmbed,
       }));
 
-    const embedSuccess = {
-      description: `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`,
-      color: 3066993,
+    /**
+     * Create new status data object to be inserted in our database
+     * We then call the insertNewStatus handler to start insertion
+     * * Passes a success and error callback with the former editing the original message with a success embed
+     */
+    const newStatus = {
+      uuid: uuidv4(),
+      guildId: interaction.guildId,
+      categoryChannelId: statusCategory.id,
+      battleRoyaleChannelId: statusBattleRoyaleChannel ? statusBattleRoyaleChannel.id : null,
+      arenasChannelId: statusArenasChannel ? statusArenasChannel.id : null,
+      battleRoyaleMessageId: statusBattleRoyaleMessage ? statusBattleRoyaleMessage.id : null,
+      arenasMessageId: statusArenasMessage ? statusArenasMessage.id : null,
+      battleRoyaleWebhookId: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.id : null,
+      arenasWebhookId: statusArenasWebhook ? statusArenasWebhook.id : null,
+      originalChannelId: interaction.channelId,
+      gameModeSelected:
+        isBattleRoyaleSelected && isArenasSelected
+          ? 'All'
+          : isBattleRoyaleSelected
+          ? 'Battle Royale'
+          : 'Arenas',
+      createdBy: interaction.user.tag,
+      createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
-    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+
+    await insertNewStatus(
+      newStatus,
+      async () => {
+        const embedSuccess = {
+          description: '',
+          color: 3066993,
+        };
+        //TODO: Probably figure out a better way of handling string manipulation
+        isBattleRoyaleSelected && isArenasSelected
+          ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
+          : null;
+        isBattleRoyaleSelected && !isArenasSelected
+          ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel}`)
+          : null;
+        !isBattleRoyaleSelected && isArenasSelected
+          ? (embedSuccess.description = `Created map status at ${statusArenasChannel}`)
+          : null;
+
+        await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+      },
+      async (error) => {
+        const uuid = uuidv4();
+        const type = 'Inserting New Status in Database';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    );
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
@@ -395,7 +481,11 @@ module.exports = {
           return interaction.editReply('Selected status stop');
       }
     } catch (error) {
-      console.log(error);
+      const uuid = uuidv4();
+      const type = 'Status Generic';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      await interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
   },
   goToConfirmStatus,
