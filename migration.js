@@ -76,17 +76,18 @@ exports.runMigration = (guilds) => {
       // ----
       const selectAllStatus = 'SELECT * FROM Status';
       const deleteAllStatus = 'DELETE FROM Status';
-      // client.query(selectAllStatus, (err, res) => {
-      //   console.log(err);
-      //   console.log(res.rows);
-      //   done();
-      // });
-      client.query(dropStatus, (err, res) => {
+      client.query(selectAllStatus, (err, res) => {
         console.log(err);
         console.log(res);
-        client.query('COMMIT');
+        console.log(res.rows);
         done();
       });
+      // client.query(dropStatus, (err, res) => {
+      //   console.log(err);
+      //   console.log(res);
+      //   client.query('COMMIT');
+      //   done();
+      // });
       // client.query(deleteAllStatus, (err, res) => {
       //   console.log(err);
       //   console.log(res);
