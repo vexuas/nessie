@@ -11,7 +11,7 @@ const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = re
 const { getRotationData } = require('../../adapters');
 const { nessieLogo } = require('../../constants');
 const { format } = require('date-fns');
-const { insertNewStatus, getStatus } = require('../../database/handler');
+const { insertNewStatus, getStatus, deleteStatus } = require('../../database/handler');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -380,11 +380,11 @@ const createStatus = async ({ interaction, nessie }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
   const embedLoadingChannels = {
-    description: `Loading status channels...`,
+    description: `Loading Status Channels...`,
     color: 16776960,
   };
   const embedLoadingWebhooks = {
-    description: `Loading webhooks...`,
+    description: `Loading Webhooks...`,
     color: 16776960,
   };
 
@@ -507,6 +507,52 @@ const createStatus = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+const deleteGuildStatus = async ({ interaction, nessie }) => {
+  await interaction.deferUpdate();
+  await deleteStatus(
+    interaction.guildId,
+    async (status) => {
+      try {
+        if (status) {
+          const embedLoading = {
+            description: `Deleting Status Channels...`,
+            color: 16776960,
+          };
+          await interaction.message.edit({ embeds: [embedLoading], components: [] });
+          const battleRoyaleStatusChannel =
+            status.br_channel_id && (await nessie.channels.fetch(status.br_channel_id));
+          const arenasStatusChannel =
+            status.arenas_channel_id && (await nessie.channels.fetch(status.arenas_channel_id));
+          const categoryStatusChannel =
+            status.category_channel_id && (await nessie.channels.fetch(status.category_channel_id));
+
+          battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
+          arenasStatusChannel && (await arenasStatusChannel.delete());
+          categoryStatusChannel && (await categoryStatusChannel.delete());
+
+          const embedSuccess = {
+            description: `Automatic map status successfully deleted!`,
+            color: 3066993,
+          };
+          await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+        }
+      } catch (error) {
+        const uuid = uuidv4();
+        const type = 'Status Stop Button';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting/Deleting Status in Database (Stop Button)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      await interaction.message.edit({ embeds: errorEmbed, components: [] });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
+};
 module.exports = {
   /**
    * Creates Status application command with relevant subcommands
@@ -559,4 +605,5 @@ module.exports = {
   _cancelStatusStart,
   _cancelStatusStop,
   createStatus,
+  deleteGuildStatus,
 };

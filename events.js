@@ -39,6 +39,7 @@ const {
   _cancelStatusStart,
   createStatus,
   _cancelStatusStop,
+  deleteGuildStatus,
 } = require('./commands/maps/status');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
@@ -166,7 +167,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
         case 'statusStop__cancelButton':
           return _cancelStatusStop({ interaction, nessie });
         case 'statusStop__stopButton':
-          return;
+          return deleteGuildStatus({ interaction, nessie });
         default:
           if (interaction.customId.includes('statusStart__confirmButton')) {
             return createStatus({ interaction, nessie });
