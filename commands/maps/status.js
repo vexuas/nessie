@@ -10,7 +10,7 @@ const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = re
 const { getRotationData } = require('../../adapters');
 const { nessieLogo } = require('../../constants');
 const { format } = require('date-fns');
-const { insertNewStatus } = require('../../database/handler');
+const { insertNewStatus, getStatus } = require('../../database/handler');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -72,31 +72,45 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
  * - TODO: Don't forget to add copy for the explanation of webhooks/channels creation + status update cycles
  * - Has 3 buttons: Back goes to Step 1, Cancel stops the wizard entirely, Confirm creates a status for the guild
  */
-const generateGameModeSelectionMessage = () => {
-  const row = new MessageActionRow().addComponents(
-    new MessageSelectMenu()
-      .setCustomId('statusStart__gameModeDropdown')
-      .setPlaceholder('Requires at least one game mode')
-      .setMinValues(1)
-      .setMaxValues(2)
-      .addOptions([
-        {
-          label: 'Arenas',
-          description: 'Pubs and Ranked Map Rotation for Arenas',
-          value: 'gameModeDropdown__arenasValue',
-        },
-        {
-          label: 'Battle Royale',
-          description: 'Pubs and Ranked Map Rotation for Arenas',
-          value: 'gameModeDropdown__battleRoyaleValue',
-        },
-      ])
-  );
-  const embed = {
-    title: `Step 1 | Game Mode Selection`,
-    description: 'Select which game modes to receive automatic updates',
-    color: 3447003,
-  };
+const generateGameModeSelectionMessage = (status) => {
+  let embed, row;
+  if (!status) {
+    row = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
+        .setCustomId('statusStart__gameModeDropdown')
+        .setPlaceholder('Requires at least one game mode')
+        .setMinValues(1)
+        .setMaxValues(2)
+        .addOptions([
+          {
+            label: 'Arenas',
+            description: 'Pubs and Ranked Map Rotation for Arenas',
+            value: 'gameModeDropdown__arenasValue',
+          },
+          {
+            label: 'Battle Royale',
+            description: 'Pubs and Ranked Map Rotation for Arenas',
+            value: 'gameModeDropdown__battleRoyaleValue',
+          },
+        ])
+    );
+    embed = {
+      title: `Step 1 | Game Mode Selection`,
+      description: 'Select which game modes to receive automatic updates',
+      color: 3447003,
+    };
+  } else {
+    embed = {
+      title: 'Status | Start',
+      description: `There's currently an existing automated map status active in:${
+        status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''
+      }${status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''}\n\nCreated at ${
+        status.created_at
+      } by ${status.created_by}`,
+      color: 3447003,
+    };
+  }
+
   return {
     embed,
     row,
@@ -201,16 +215,28 @@ const generateArenasStatusEmbeds = (data) => {
  * Shows the first step of the status start wizard: Game Mode Selection
  */
 const sendStartInteraction = async ({ interaction, nessie }) => {
-  const { embed, row } = generateGameModeSelectionMessage();
-  try {
-    await interaction.editReply({ embeds: [embed], components: [row] });
-  } catch (error) {
-    const uuid = uuidv4();
-    const type = 'Status Start';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
-  }
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const { embed, row } = generateGameModeSelectionMessage(status);
+      try {
+        await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
+      } catch (error) {
+        const uuid = uuidv4();
+        const type = 'Status Start';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.editReply({ embeds: errorEmbed });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Start)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
 };
 /**
  * Handler for when a user selects any of the options in the Game Mode dropdown
@@ -448,7 +474,11 @@ module.exports = {
           return interaction.editReply('Selected status stop');
       }
     } catch (error) {
-      console.log(error);
+      const uuid = uuidv4();
+      const type = 'Status Generic';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      await interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
   },
   goToConfirmStatus,
