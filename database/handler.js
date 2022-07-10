@@ -122,7 +122,7 @@ exports.createStatusTable = () => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
-        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT, br_channel_id TEXT NOT NULL, arenas_channel_id TEXT NOT NULL, br_message_id TEXT NOT NULL, arenas_message_id TEXT NOT NULL, br_webhook_id TEXT NOT NULL, arenas_webhook_id TEXT NOT NULL, original_channel_id TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
+        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT, br_channel_id TEXT, arenas_channel_id TEXT, br_message_id TEXT, arenas_message_id TEXT, br_webhook_id TEXT, arenas_webhook_id TEXT, original_channel_id TEXT NOT NULL, game_mode_selected TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
       );
       client.query('COMMIT', (err) => {
         done();
