@@ -10,6 +10,7 @@ const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = re
 const { getRotationData } = require('../../adapters');
 const { nessieLogo } = require('../../constants');
 const { format } = require('date-fns');
+const { insertNewStatus } = require('../../database/handler');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -351,20 +352,6 @@ const createStatus = async ({ interaction, nessie }) => {
         embeds: statusArenasEmbed,
       }));
 
-    const embedSuccess = {
-      description: '',
-      color: 3066993,
-    };
-    isBattleRoyaleSelected && isArenasSelected
-      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
-      : null;
-    isBattleRoyaleSelected && !isArenasSelected
-      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel}`)
-      : null;
-    !isBattleRoyaleSelected && isArenasSelected
-      ? (embedSuccess.description = `Created map status at ${statusArenasChannel}`)
-      : null;
-
     const newStatus = {
       uuid: uuidv4(),
       guildId: interaction.guildId,
@@ -385,8 +372,34 @@ const createStatus = async ({ interaction, nessie }) => {
       createdBy: interaction.user.tag,
       createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
-    console.log(newStatus);
-    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+
+    await insertNewStatus(
+      newStatus,
+      async () => {
+        const embedSuccess = {
+          description: '',
+          color: 3066993,
+        };
+        isBattleRoyaleSelected && isArenasSelected
+          ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
+          : null;
+        isBattleRoyaleSelected && !isArenasSelected
+          ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel}`)
+          : null;
+        !isBattleRoyaleSelected && isArenasSelected
+          ? (embedSuccess.description = `Created map status at ${statusArenasChannel}`)
+          : null;
+
+        await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+      },
+      async (error) => {
+        const uuid = uuidv4();
+        const type = 'Inserting New Status in Database';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        await interaction.message.edit({ embeds: errorEmbed, components: [] });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
+      }
+    );
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Start Confirm';
