@@ -9,6 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = require('discord.js');
 const { getRotationData } = require('../../adapters');
 const { nessieLogo } = require('../../constants');
+const { format } = require('date-fns');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -305,50 +306,50 @@ const createStatus = async ({ interaction, nessie }) => {
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
     });
-    const statusBattleRoyaleChannel = isBattleRoyaleSelected
-      ? await interaction.guild.channels.create('apex-battle-royale', {
-          parent: statusCategory,
-          type: 'GUILD_TEXT',
-        })
-      : null;
-    const statusArenasChannel = isArenasSelected
-      ? await interaction.guild.channels.create('apex-arenas', {
-          parent: statusCategory,
-          type: 'GUILD_TEXT',
-        })
-      : null;
+    const statusBattleRoyaleChannel =
+      isBattleRoyaleSelected &&
+      (await interaction.guild.channels.create('apex-battle-royale', {
+        parent: statusCategory,
+        type: 'GUILD_TEXT',
+      }));
+    const statusArenasChannel =
+      isArenasSelected &&
+      (await interaction.guild.channels.create('apex-arenas', {
+        parent: statusCategory,
+        type: 'GUILD_TEXT',
+      }));
 
     await interaction.message.edit({ embeds: [embedLoadingWebhooks], components: [] });
 
-    const statusBattleRoyaleWebhook = statusBattleRoyaleChannel
-      ? await statusBattleRoyaleChannel.createWebhook('Nessie Automatic Status', {
-          avatar: nessieLogo,
-          reason: 'Webhook to receive automatic map updates for Apex Battle Royale',
-        })
-      : null;
-    const statusArenasWebhook = statusArenasChannel
-      ? await statusArenasChannel.createWebhook('Nessie Automatic Status', {
-          avatar: nessieLogo,
-          reason: 'Webhook to receive automatic map updates for Apex Arenas',
-        })
-      : null;
+    const statusBattleRoyaleWebhook =
+      statusBattleRoyaleChannel &&
+      (await statusBattleRoyaleChannel.createWebhook('Nessie Automatic Status', {
+        avatar: nessieLogo,
+        reason: 'Webhook to receive automatic map updates for Apex Battle Royale',
+      }));
+    const statusArenasWebhook =
+      statusArenasChannel &&
+      (await statusArenasChannel.createWebhook('Nessie Automatic Status', {
+        avatar: nessieLogo,
+        reason: 'Webhook to receive automatic map updates for Apex Arenas',
+      }));
 
-    const statusBattleRoyaleMessage = statusBattleRoyaleWebhook
-      ? await new WebhookClient({
-          id: statusBattleRoyaleWebhook.id,
-          token: statusBattleRoyaleWebhook.token,
-        }).send({
-          embeds: statusBattleRoyaleEmbed,
-        })
-      : null;
-    const statusArenasMessage = statusArenasWebhook
-      ? await new WebhookClient({
-          id: statusArenasWebhook.id,
-          token: statusArenasWebhook.token,
-        }).send({
-          embeds: statusArenasEmbed,
-        })
-      : null;
+    const statusBattleRoyaleMessage =
+      statusBattleRoyaleWebhook &&
+      (await new WebhookClient({
+        id: statusBattleRoyaleWebhook.id,
+        token: statusBattleRoyaleWebhook.token,
+      }).send({
+        embeds: statusBattleRoyaleEmbed,
+      }));
+    const statusArenasMessage =
+      statusArenasWebhook &&
+      (await new WebhookClient({
+        id: statusArenasWebhook.id,
+        token: statusArenasWebhook.token,
+      }).send({
+        embeds: statusArenasEmbed,
+      }));
 
     const embedSuccess = {
       description: '',
@@ -368,13 +369,23 @@ const createStatus = async ({ interaction, nessie }) => {
       uuid: uuidv4(),
       guildId: interaction.guildId,
       categoryChannelId: statusCategory.id,
-      battleRoyaleChannelId: statusBattleRoyaleChannel.id,
-      arenasChannelId: statusArenasChannel.id,
-      battleRoyaleMessageId: statusBattleRoyaleMessage.id,
-      arenasMessageId: statusArenasMessage.id,
+      battleRoyaleChannelId: statusBattleRoyaleChannel ? statusBattleRoyaleChannel.id : null,
+      arenasChannelId: statusArenasChannel ? statusArenasChannel.id : null,
+      battleRoyaleMessageId: statusBattleRoyaleMessage ? statusBattleRoyaleMessage.id : null,
+      arenasMessageId: statusArenasMessage ? statusArenasMessage.id : null,
+      battleRoyaleWebhookId: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.id : null,
+      arenasWebhookId: statusArenasWebhook ? statusArenasWebhook.id : null,
+      originalChannelId: interaction.channelId,
+      gameModeSelected:
+        isBattleRoyaleSelected && isArenasSelected
+          ? 'All'
+          : isBattleRoyaleSelected
+          ? 'Battle Royale'
+          : 'Arenas',
       createdBy: interaction.user.tag,
       createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
+    console.log(newStatus);
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
   } catch (error) {
     const uuid = uuidv4();
