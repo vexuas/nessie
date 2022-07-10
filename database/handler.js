@@ -142,7 +142,7 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
   this.pool.connect((err, client, done) => {
     client.query('BEGIN', (err) => {
       client.query(
-        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, arenas_channel_id, br_message_id, arenas_message_id, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, arenas_channel_id, br_message_id, arenas_message_id, br_webhook_id, arenas_webhook_id, original_channel_id, game_mode_selected, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
         [
           status.uuid,
           status.guildId,
@@ -151,6 +151,10 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
           status.arenasChannelId,
           status.battleRoyaleMessageId,
           status.arenasMessageId,
+          status.battleRoyaleWebhookId,
+          status.arenasWebhookId,
+          status.originalChannelId,
+          status.gameModeSelected,
           status.createdBy,
           status.createdAt,
         ],
