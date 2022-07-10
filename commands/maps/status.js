@@ -239,6 +239,11 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     }
   );
 };
+/**
+ * Handler for when a user initiates the /status stop command
+ * Calls the getStatus handler to see for existing status in the guild
+ * Passes a success and error callback with the former sending an information embed with context depending on status existence
+ */
 const sendStopInteraction = async ({ interaction, nessie }) => {
   await getStatus(
     interaction.guildId,
@@ -344,6 +349,10 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for when a user clicks the cancel button of /status stop
+ * Pretty straightforward; we just edit the initial message with a cancel message similar to the cancel start handler
+ */
 const _cancelStatusStop = async ({ interaction, nessie }) => {
   const embed = {
     description: 'Cancelled automated map status deletion',
@@ -507,6 +516,18 @@ const createStatus = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler for stopping the process of map status
+ * Gets called when a user clicks the confirm button of the /status stop reply
+ * Main steps upon button click:
+ * - Edits initial message with a loading state
+ * - Calls the deleteStatus handler which returns the status data while also deleting it from the db
+ * - Fetches each of the relevant discord channels with the status data
+ * - Deletes each of of the discord channels
+ * - Edits initial message with a success message
+ *
+ * We don't need to delete the webhooks as they'll be automatically deleted along with its channels
+ */
 const deleteGuildStatus = async ({ interaction, nessie }) => {
   await interaction.deferUpdate();
   await deleteStatus(
