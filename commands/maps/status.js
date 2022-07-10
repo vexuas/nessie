@@ -346,6 +346,7 @@ const createStatus = async ({ interaction, nessie }) => {
         type: 'GUILD_TEXT',
       }));
 
+    //Since webhooks take way longer to create than channels, adding another loading state here
     await interaction.message.edit({ embeds: [embedLoadingWebhooks], components: [] });
 
     const statusBattleRoyaleWebhook =
@@ -378,6 +379,11 @@ const createStatus = async ({ interaction, nessie }) => {
         embeds: statusArenasEmbed,
       }));
 
+    /**
+     * Create new status data object to be inserted in our database
+     * We then call the insertNewStatus handler to start insertion
+     * * Passes a success and error callback with the former editing the original message with a success embed
+     */
     const newStatus = {
       uuid: uuidv4(),
       guildId: interaction.guildId,
@@ -406,6 +412,7 @@ const createStatus = async ({ interaction, nessie }) => {
           description: '',
           color: 3066993,
         };
+        //TODO: Probably figure out a better way of handling string manipulation
         isBattleRoyaleSelected && isArenasSelected
           ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
           : null;

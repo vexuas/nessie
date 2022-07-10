@@ -117,6 +117,7 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
  * Creates Status table in our database
  * Straightforward; no additional checks and only creates the table if it does not exist
  * Gets called in the onReady event of Nessie
+ * TODO: Maybe document all the necessary columns we need to create a status in notion
  */
 exports.createStatusTable = () => {
   this.pool.connect((err, client, done) => {
