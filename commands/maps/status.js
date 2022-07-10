@@ -285,14 +285,18 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
 const createStatus = async ({ interaction, nessie }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
-  const embedLoading = {
+  const embedLoadingChannels = {
     description: `Loading status channels...`,
+    color: 16776960,
+  };
+  const embedLoadingWebhooks = {
+    description: `Loading webhooks...`,
     color: 16776960,
   };
 
   try {
     await interaction.deferUpdate();
-    await interaction.message.edit({ embeds: [embedLoading], components: [] });
+    await interaction.message.edit({ embeds: [embedLoadingChannels], components: [] });
 
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
@@ -313,6 +317,8 @@ const createStatus = async ({ interaction, nessie }) => {
         parent: statusCategory,
         type: 'GUILD_TEXT',
       }));
+
+    await interaction.message.edit({ embeds: [embedLoadingWebhooks], components: [] });
 
     const statusBattleRoyaleWebhook =
       statusBattleRoyaleChannel &&
@@ -343,9 +349,19 @@ const createStatus = async ({ interaction, nessie }) => {
       }));
 
     const embedSuccess = {
-      description: `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`,
+      description: '',
       color: 3066993,
     };
+    isBattleRoyaleSelected && isArenasSelected
+      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
+      : null;
+    isBattleRoyaleSelected && !isArenasSelected
+      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel}`)
+      : null;
+    !isBattleRoyaleSelected && isArenasSelected
+      ? (embedSuccess.description = `Created map status at ${statusArenasChannel}`)
+      : null;
+
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
   } catch (error) {
     const uuid = uuidv4();
