@@ -90,7 +90,7 @@ const generateGameModeSelectionMessage = (status) => {
           },
           {
             label: 'Battle Royale',
-            description: 'Pubs and Ranked Map Rotation for Arenas',
+            description: 'Pubs and Ranked Map Rotation for Battle Royale',
             value: 'gameModeDropdown__battleRoyaleValue',
           },
         ])
