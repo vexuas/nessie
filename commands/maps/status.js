@@ -344,6 +344,22 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+const _cancelStatusStop = async ({ interaction, nessie }) => {
+  const embed = {
+    description: 'Cancelled automated map status deletion',
+    color: 16711680,
+  };
+  try {
+    await interaction.deferUpdate();
+    await interaction.message.edit({ embeds: [embed], components: [] });
+  } catch (error) {
+    const uuid = uuidv4();
+    const type = 'Status Stop Cancel';
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    await interaction.editReply({ embeds: errorEmbed, components: [] });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
+  }
+};
 /**
  * Handler for when a user clicks the Confirm button in Confirm Status Step
  * This is the most important aspect as it will initialise the process of map status
@@ -541,5 +557,6 @@ module.exports = {
   goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
+  _cancelStatusStop,
   createStatus,
 };
