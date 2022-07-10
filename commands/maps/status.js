@@ -4,6 +4,7 @@ const {
   sendErrorLog,
   generatePubsEmbed,
   generateRankedEmbed,
+  codeBlock,
 } = require('../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = require('discord.js');
@@ -232,6 +233,55 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     async (error) => {
       const uuid = uuidv4();
       const type = 'Getting Status in Database (Start)';
+      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+      interaction.editReply({ embeds: errorEmbed });
+      await sendErrorLog({ nessie, error, interaction, type, uuid });
+    }
+  );
+};
+const sendStopInteraction = async ({ interaction, nessie }) => {
+  await getStatus(
+    interaction.guildId,
+    async (status) => {
+      const embed = {
+        title: 'Status | Stop',
+        color: 3447003,
+        description: status
+          ? `By confirming below, Nessie will stop all existing map status and **delete**:\n• <#${
+              status.category_channel_id
+            }>${status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''}${
+              status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''
+            }\n• Webhooks under each status channel\nThis status was created on ${
+              status.created_at
+            } by ${
+              status.created_by
+            }\n\nTo re-enable automated map status after, simply use ${codeBlock(
+              '/status start'
+            )} again`
+          : `There's currently no active automated map status to stop.\n\nTry starting one with ${codeBlock(
+              '/status start'
+            )}`,
+      };
+      const row = status
+        ? new MessageActionRow()
+            .addComponents(
+              new MessageButton()
+                .setCustomId('statusStop__cancelButton')
+                .setLabel('Cancel')
+                .setStyle('SECONDARY')
+            )
+            .addComponents(
+              new MessageButton()
+                .setCustomId('statusStop__stopButton')
+                .setLabel(`Stop it!`)
+                .setStyle('DANGER')
+            )
+        : null;
+      return await interaction.editReply({ components: row ? [row] : [], embeds: [embed] });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Getting Status in Database (Stop)';
       const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
       interaction.editReply({ embeds: errorEmbed });
       await sendErrorLog({ nessie, error, interaction, type, uuid });
@@ -478,7 +528,7 @@ module.exports = {
         case 'start':
           return sendStartInteraction({ interaction, nessie });
         case 'stop':
-          return interaction.editReply('Selected status stop');
+          return sendStopInteraction({ interaction, nessie });
       }
     } catch (error) {
       const uuid = uuidv4();
