@@ -9,7 +9,8 @@ const {
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
 const { format } = require('date-fns');
-const { insertNewStatus, getStatus } = require('../../../../database/handler');
+const { insertNewStatus, getStatus, getAllStatus } = require('../../../../database/handler');
+const Scheduler = require('../../../../scheduler');
 /**
  * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
  * This is separated from the interaction handlers as we want to be able to reuse them when the user goes back and forth through the steps
@@ -390,11 +391,102 @@ const createStatus = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+/**
+ * Handler in charge in updating map data in the relevant status channels
+ * Uses the Scheduler class to create a cron job that fires every 10th second of every 15 minutes (0:5:10, 0:10:10, 0:15:10, etc)
+ * When the cron job is executed, we then:
+ * - Call the getAllStatus handler to get every existing status in our database
+ * - Upon finishing the query, we then call the API for the current rotation data
+ * - If there are no existing statuses, we don't do anything
+ * - If there are, we then get all relevant webhooks of the guild for each status
+ * - We then delete the old rotation message and then send a new message with updated data
+ * - Finally we update our database of the current change in status
+ *
+ * RED ALERT
+ * Currently for one guild cycle, this takes at least 6 seconds to finish with both arenas + br status active
+ * This is because of our usage with awaits on getting webhooks, deleting and creating messages
+ * This is not good cuz we'll find ourselves back to where we started pre-webhooks where it'll take forever for all guilds to get their status updated
+ * Fortunately we can do away with fetching webhooks by storing tokens and opting for non-blocking deleting
+ * However the big issue here is the creation of new rotation messages. We have to wait for those to finish so we know the message id to delete next cycle
+ * There's gotta be a solution out there. Right now the best one I can think of is scrapping deleting and just sending the new message
+ * This will definitely be the best case scenario time-wise as we don't care about storing data in expense of UX
+ * Oh well, looks like there's one final boss to slay smh
+ */
+const scheduleStatus = (nessie) => {
+  return new Scheduler(
+    '10 */1 * * * *',
+    async () => {
+      getAllStatus(async (allStatus, client) => {
+        try {
+          if (allStatus) {
+            const rotationData = await getRotationData();
+            allStatus.forEach(async (status) => {
+              const brWebhook =
+                status.br_webhook_id && (await nessie.fetchWebhook(status.br_webhook_id));
+              const arenasWebhook =
+                status.arenas_webhook_id && (await nessie.fetchWebhook(status.arenas_webhook_id));
 
+              const brWebhookClient =
+                brWebhook && new WebhookClient({ id: brWebhook.id, token: brWebhook.token });
+              const arenasWebhookClient =
+                arenasWebhook &&
+                new WebhookClient({ id: arenasWebhook.id, token: arenasWebhook.token });
+
+              let newBrMessage;
+              let newArenasMessage;
+
+              if (brWebhookClient) {
+                const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
+                await brWebhookClient.deleteMessage(status.br_message_id);
+                newBrMessage = await brWebhookClient.send({ embeds: brStatusEmbeds });
+              }
+              if (arenasWebhookClient) {
+                const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
+                await arenasWebhookClient.deleteMessage(status.arenas_message_id);
+                newArenasMessage = await arenasWebhookClient.send({ embeds: arenasStatusEmbeds });
+              }
+
+              /**
+               * Tbh I'm a bit worried about having this query here
+               * It seems to be working during development but I'm not sure if it's actually firing only after the message promises are done
+               * Probably still not confident with database stuff; I'll just keep my fingers crossed heh
+               *
+               * TODO: Figure out how to cut down time with this, maybe collect all new messages first then updating database? Rather than updating per iteration
+               */
+              client.query(
+                'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
+                [
+                  newBrMessage ? newBrMessage.id.toString() : null,
+                  newArenasMessage ? newArenasMessage.id.toString() : null,
+                  status.uuid.toString(),
+                ],
+                (err, res) => {
+                  client.query('COMMIT', async () => {
+                    console.log('Updated Status');
+                  });
+                }
+              );
+            });
+          }
+        } catch (error) {
+          const uuid = uuidv4();
+          const type = 'Status Scheduler Config';
+          await sendErrorLog({ nessie, error, type, uuid, ping: true });
+        }
+      });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Status Scheduler (Database)';
+      await sendErrorLog({ nessie, error, type, uuid, ping: true });
+    }
+  );
+};
 module.exports = {
   goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
   sendStartInteraction,
+  scheduleStatus,
 };
