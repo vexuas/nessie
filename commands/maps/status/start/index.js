@@ -9,7 +9,8 @@ const {
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
 const { format } = require('date-fns');
-const { insertNewStatus, getStatus } = require('../../../../database/handler');
+const { insertNewStatus, getStatus, getAllStatus } = require('../../../../database/handler');
+const Scheduler = require('../../../../scheduler');
 /**
  * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
  * This is separated from the interaction handlers as we want to be able to reuse them when the user goes back and forth through the steps
@@ -390,11 +391,75 @@ const createStatus = async ({ interaction, nessie }) => {
     await sendErrorLog({ nessie, error, interaction, type, uuid });
   }
 };
+const scheduleStatus = (nessie) => {
+  return new Scheduler(
+    '10 */1 * * * *',
+    async () => {
+      getAllStatus(async (allStatus, client) => {
+        try {
+          console.log(allStatus);
+          if (allStatus) {
+            const rotationData = await getRotationData();
+            allStatus.forEach(async (status) => {
+              const brWebhook =
+                status.br_webhook_id && (await nessie.fetchWebhook(status.br_webhook_id));
+              const arenasWebhook =
+                status.arenas_webhook_id && (await nessie.fetchWebhook(status.arenas_webhook_id));
 
+              const brWebhookClient =
+                brWebhook && new WebhookClient({ id: brWebhook.id, token: brWebhook.token });
+              const arenasWebhookClient =
+                arenasWebhook &&
+                new WebhookClient({ id: arenasWebhook.id, token: arenasWebhook.token });
+
+              let newBrMessage;
+              let newArenasMessage;
+
+              if (brWebhookClient) {
+                const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
+                await brWebhookClient.deleteMessage(status.br_message_id);
+                newBrMessage = await brWebhookClient.send({ embeds: brStatusEmbeds });
+              }
+              if (arenasWebhookClient) {
+                const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
+                await arenasWebhookClient.deleteMessage(status.arenas_message_id);
+                newArenasMessage = await arenasWebhookClient.send({ embeds: arenasStatusEmbeds });
+              }
+
+              client.query(
+                'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
+                [
+                  newBrMessage ? newBrMessage.id.toString() : null,
+                  newArenasMessage ? newArenasMessage.id.toString() : null,
+                  status.uuid.toString(),
+                ],
+                (err, res) => {
+                  client.query('COMMIT', async () => {
+                    console.log('Updated Status');
+                  });
+                }
+              );
+            });
+          }
+        } catch (error) {
+          const uuid = uuidv4();
+          const type = 'Status Scheduler Config';
+          await sendErrorLog({ nessie, error, type, uuid, ping: true });
+        }
+      });
+    },
+    async (error) => {
+      const uuid = uuidv4();
+      const type = 'Status Scheduler (Database)';
+      await sendErrorLog({ nessie, error, type, uuid, ping: true });
+    }
+  );
+};
 module.exports = {
   goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
   sendStartInteraction,
+  scheduleStatus,
 };

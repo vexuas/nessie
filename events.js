@@ -38,6 +38,7 @@ const {
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
+  scheduleStatus,
 } = require('./commands/maps/status/start');
 const { _cancelStatusStop, deleteGuildStatus } = require('./commands/maps/status/stop');
 
@@ -69,8 +70,11 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
       sendHealthLog(brPubsData, logChannel, true); //For logging purpose
       setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
-      const statusScheduler = initialiseStatusScheduler(nessie); //Initialises auto status scheduler
-      statusScheduler.start(); //Starts the scheduler
+      // const statusScheduler = initialiseStatusScheduler(nessie); //Initialises auto status scheduler
+      // statusScheduler.start(); //Starts the scheduler
+
+      const statusSchedule = scheduleStatus(nessie);
+      statusSchedule.start();
     } catch (e) {
       console.log(e); //Add proper error handling
     }
