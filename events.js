@@ -33,14 +33,13 @@ const {
   restartStatus,
   cancelStatusRestart,
 } = require('./commands/admin/announcement');
+const { _cancelStatusStop, deleteGuildStatus } = require('./commands/maps/status');
 const {
   goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
-  _cancelStatusStop,
-  deleteGuildStatus,
-} = require('./commands/maps/status');
+} = require('./commands/maps/status/start');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
