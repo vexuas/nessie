@@ -11,7 +11,7 @@ exports.getApplicationCommands = () => {
     invite: require('./commands/hub/invite'),
     updates: require('./commands/hub/updates'),
     // Maps
-    br: require('./commands/maps/battle-royale'),
+    br: require('./commands/maps/battleRoyale'),
     arenas: require('./commands/maps/arenas'),
     control: require('./commands/maps/control'),
     status: require('./commands/maps/status'),

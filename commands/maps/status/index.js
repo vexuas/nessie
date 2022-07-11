@@ -5,13 +5,13 @@ const {
   generatePubsEmbed,
   generateRankedEmbed,
   codeBlock,
-} = require('../../helpers');
+} = require('../../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = require('discord.js');
-const { getRotationData } = require('../../adapters');
-const { nessieLogo } = require('../../constants');
+const { getRotationData } = require('../../../adapters');
+const { nessieLogo } = require('../../../constants');
 const { format } = require('date-fns');
-const { insertNewStatus, getStatus, deleteStatus } = require('../../database/handler');
+const { insertNewStatus, getStatus, deleteStatus } = require('../../../database/handler');
 
 /**
  * Handler for when a user initiates the /status help command
