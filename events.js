@@ -258,10 +258,26 @@ const registerApplicationCommands = async (nessie) => {
   const rest = new REST({ version: '9' }).setToken(token);
 
   if (isInDevelopment) {
+    const testGuilds = [
+      '996084542064558091',
+      '996084495843340348',
+      '996084451400486962',
+      '996083985132298382',
+      '996083929972998296',
+      '996083244346912770',
+      '996083190634659880',
+      '996081513554776154',
+      '996081433829462156',
+    ];
     //Guild register
     try {
       await rest.put(Routes.applicationGuildCommands('929421200797626388', guildIDs), {
         body: fullCommandList,
+      });
+      testGuilds.forEach(async (testGuild) => {
+        await rest.put(Routes.applicationGuildCommands('929421200797626388', testGuild), {
+          body: fullCommandList,
+        });
       });
       console.log('Successfully registered guild application commands');
     } catch (e) {

@@ -415,7 +415,7 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */5 * * * *',
+    '10 */2 * * * *',
     async () => {
       const startTime = format(new Date(), 'h:mm:ss a');
       console.log('Start: ', format(new Date(), 'h:mm:ss a'));
