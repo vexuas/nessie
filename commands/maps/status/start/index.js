@@ -5,6 +5,7 @@ const {
   sendErrorLog,
   generatePubsEmbed,
   generateRankedEmbed,
+  codeBlock,
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
@@ -414,18 +415,21 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */1 * * * *',
+    '10 */5 * * * *',
     async () => {
+      const startTime = format(new Date(), 'h:mm:ss a');
+      console.log('Start: ', format(new Date(), 'h:mm:ss a'));
       getAllStatus(async (allStatus, client) => {
         try {
           if (allStatus) {
+            console.log('After Database: ', format(new Date(), 'h:mm:ss a'));
             const rotationData = await getRotationData();
             allStatus.forEach(async (status) => {
               const brWebhook =
                 status.br_webhook_id && (await nessie.fetchWebhook(status.br_webhook_id));
               const arenasWebhook =
                 status.arenas_webhook_id && (await nessie.fetchWebhook(status.arenas_webhook_id));
-
+              console.log('After Fetching Webhooks: ', format(new Date(), 'h:mm:ss a'));
               const brWebhookClient =
                 brWebhook && new WebhookClient({ id: brWebhook.id, token: brWebhook.token });
               const arenasWebhookClient =
@@ -438,12 +442,16 @@ const scheduleStatus = (nessie) => {
               if (brWebhookClient) {
                 const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
                 await brWebhookClient.deleteMessage(status.br_message_id);
+                console.log('After BR Delete: ', format(new Date(), 'h:mm:ss a'));
                 newBrMessage = await brWebhookClient.send({ embeds: brStatusEmbeds });
+                console.log('After BR Message: ', format(new Date(), 'h:mm:ss a'));
               }
               if (arenasWebhookClient) {
                 const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
                 await arenasWebhookClient.deleteMessage(status.arenas_message_id);
+                console.log('After Arenas Delete: ', format(new Date(), 'h:mm:ss a'));
                 newArenasMessage = await arenasWebhookClient.send({ embeds: arenasStatusEmbeds });
+                console.log('After Arenas Message: ', format(new Date(), 'h:mm:ss a'));
               }
 
               /**
@@ -462,7 +470,20 @@ const scheduleStatus = (nessie) => {
                 ],
                 (err, res) => {
                   client.query('COMMIT', async () => {
-                    console.log('Updated Status');
+                    const testChannel = nessie.channels.cache.get('889212328539725824');
+                    const endTime = format(new Date(), 'h:mm:ss a');
+                    console.log('After Update: ', format(new Date(), 'h:mm:ss a'));
+                    testChannel.send({
+                      embeds: [
+                        {
+                          description: `Start of Cycle: ${codeBlock(
+                            startTime
+                          )}\nEnd of Cycle: ${codeBlock(endTime)}\n\nNo. of guilds: ${
+                            allStatus.length
+                          }`,
+                        },
+                      ],
+                    });
                   });
                 }
               );
