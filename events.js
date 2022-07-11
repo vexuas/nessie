@@ -38,9 +38,8 @@ const {
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
-  _cancelStatusStop,
-  deleteGuildStatus,
-} = require('./commands/maps/status');
+} = require('./commands/maps/status/start');
+const { _cancelStatusStop, deleteGuildStatus } = require('./commands/maps/status/stop');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
