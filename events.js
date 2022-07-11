@@ -33,13 +33,13 @@ const {
   restartStatus,
   cancelStatusRestart,
 } = require('./commands/admin/announcement');
-const { _cancelStatusStop, deleteGuildStatus } = require('./commands/maps/status');
 const {
   goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
 } = require('./commands/maps/status/start');
+const { _cancelStatusStop, deleteGuildStatus } = require('./commands/maps/status/stop');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -250,8 +250,6 @@ const registerApplicationCommands = async (nessie) => {
     .map((key) => appCommands[key].data)
     .filter((command) => command)
     .map((command) => command.toJSON());
-
-  console.log(fullCommandList);
 
   const rest = new REST({ version: '9' }).setToken(token);
 

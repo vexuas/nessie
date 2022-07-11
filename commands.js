@@ -17,6 +17,5 @@ exports.getApplicationCommands = () => {
     status: require('./commands/maps/status'),
     //Admin
     announcement: require('./commands/admin/announcement'),
-    webhook: require('./commands/admin/webhook'),
   };
 };
