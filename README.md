@@ -26,6 +26,10 @@ Currently there's an announcement command that does automatic map status while p
 ## TODO
 - Automatic Map Status Updates
 - Add installation guide to this readme
+- Restructure non-command files
+- Make command files object-oriented
+- Migrate to Typescript
+- Make error handling a reusable component
 
 ## Tech Stack
 
