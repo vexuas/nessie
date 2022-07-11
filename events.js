@@ -252,6 +252,8 @@ const registerApplicationCommands = async (nessie) => {
     .filter((command) => command)
     .map((command) => command.toJSON());
 
+  console.log(fullCommandList);
+
   const rest = new REST({ version: '9' }).setToken(token);
 
   if (isInDevelopment) {

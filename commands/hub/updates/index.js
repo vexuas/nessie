@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { nessieLogo } = require('../../constants');
-const { version } = require('../../package.json');
+const { nessieLogo } = require('../../../constants');
+const { version } = require('../../../package.json');
 
 /**
  * Send the latest news and updates of Nessie
