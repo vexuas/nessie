@@ -378,6 +378,15 @@ const sendMissingBotPermissionsError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
+const sendOnlyAdminError = async ({ interaction, title }) => {
+  const embed = {
+    title,
+    description:
+      'Oops only Admins can create automatic map updates D:\n\nRequired User Permissions:\n• Administrator',
+    color: 16711680,
+  };
+  return await interaction.editReply({ embeds: [embed], components: [] });
+};
 //---------
 module.exports = {
   checkIfInDevelopment,
@@ -395,4 +404,5 @@ module.exports = {
   checkMissingBotPermissions,
   checkIfAdminUser,
   sendMissingBotPermissionsError,
+  sendOnlyAdminError,
 };
