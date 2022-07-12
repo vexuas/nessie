@@ -1,4 +1,13 @@
-const { generateErrorEmbed, sendErrorLog, codeBlock } = require('../../../../helpers');
+const {
+  generateErrorEmbed,
+  sendErrorLog,
+  codeBlock,
+  checkMissingBotPermissions,
+  checkIfAdminUser,
+  sendMissingAllPermissionsError,
+  sendMissingBotPermissionsError,
+  sendOnlyAdminError,
+} = require('../../../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { getStatus, deleteStatus } = require('../../../../database/handler');
@@ -11,6 +20,17 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
   await getStatus(
     interaction.guildId,
     async (status) => {
+      const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
+      const isAdminUser = checkIfAdminUser(interaction);
+      if (status) {
+        if (hasMissingPermissions && !isAdminUser) {
+          return sendMissingAllPermissionsError({ interaction, title: 'Status | Stop' });
+        } else {
+          if (hasMissingPermissions)
+            return sendMissingBotPermissionsError({ interaction, title: 'Status | Stop' });
+          if (!isAdminUser) return sendOnlyAdminError({ interaction, title: 'Status | Stop' });
+        }
+      }
       const embed = {
         title: 'Status | Stop',
         color: 3447003,
