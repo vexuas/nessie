@@ -415,7 +415,7 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */2 * * * *',
+    '10 */1 * * * *',
     async () => {
       const startTime = format(new Date(), 'h:mm:ss a');
       console.log('Start: ', format(new Date(), 'h:mm:ss a'));
@@ -424,7 +424,7 @@ const scheduleStatus = (nessie) => {
           if (allStatus) {
             console.log('After Database: ', format(new Date(), 'h:mm:ss a'));
             const rotationData = await getRotationData();
-            allStatus.forEach(async (status) => {
+            allStatus.forEach(async (status, index) => {
               const brWebhook =
                 status.br_webhook_id && (await nessie.fetchWebhook(status.br_webhook_id));
               const arenasWebhook =
@@ -470,20 +470,23 @@ const scheduleStatus = (nessie) => {
                 ],
                 (err, res) => {
                   client.query('COMMIT', async () => {
-                    const testChannel = nessie.channels.cache.get('889212328539725824');
-                    const endTime = format(new Date(), 'h:mm:ss a');
                     console.log('After Update: ', format(new Date(), 'h:mm:ss a'));
-                    testChannel.send({
-                      embeds: [
-                        {
-                          description: `Start of Cycle: ${codeBlock(
-                            startTime
-                          )}\nEnd of Cycle: ${codeBlock(endTime)}\n\nNo. of guilds: ${
-                            allStatus.length
-                          }`,
-                        },
-                      ],
-                    });
+                    console.log('----------------');
+                    const testChannel = nessie.channels.cache.get('889212328539725824');
+                    if (index === allStatus.length - 1) {
+                      const endTime = format(new Date(), 'h:mm:ss a');
+                      testChannel.send({
+                        embeds: [
+                          {
+                            description: `Start of Cycle: ${codeBlock(
+                              startTime
+                            )}\nEnd of Cycle: ${codeBlock(endTime)}\n\nNo. of guilds: ${
+                              allStatus.length
+                            }`,
+                          },
+                        ],
+                      });
+                    }
                   });
                 }
               );
