@@ -414,7 +414,7 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */1 * * * *',
+    '10 */15 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
         try {

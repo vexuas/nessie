@@ -348,6 +348,27 @@ const generateRankedEmbed = (data, type = 'Battle Royale') => {
   }
   return embedData;
 };
+
+const checkMissingBotPermissions = (interaction) => {
+  const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
+  const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
+  const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
+  const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
+
+  const hasMissingPermissions =
+    (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
+
+  return {
+    hasAdmin,
+    hasManageChannels,
+    hasManageWebhooks,
+    hasSendMessages,
+    hasMissingPermissions,
+  };
+};
+const checkMissingUserPermissions = (interaction) => {
+  return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
+};
 //---------
 module.exports = {
   checkIfInDevelopment,
