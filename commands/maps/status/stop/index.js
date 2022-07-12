@@ -15,6 +15,7 @@ const { getStatus, deleteStatus } = require('../../../../database/handler');
  * Handler for when a user initiates the /status stop command
  * Calls the getStatus handler to see for existing status in the guild
  * Passes a success and error callback with the former sending an information embed with context depending on status existence
+ * Also, we want to show permissions errors but only if a status exists as we want to block them from interacting with components
  */
 const sendStopInteraction = async ({ interaction, nessie }) => {
   await getStatus(

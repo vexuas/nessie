@@ -168,6 +168,8 @@ const generateArenasStatusEmbeds = (data) => {
 /**
  * Handler for when a user initiates the /status start command
  * Shows the first step of the status start wizard: Game Mode Selection
+ * We want to show permissions errors only when status do not exist
+ * We want to show them existing status details but block them if they want to create one
  */
 const sendStartInteraction = async ({ interaction, nessie }) => {
   await getStatus(
