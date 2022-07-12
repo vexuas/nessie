@@ -1,5 +1,10 @@
 const { v4: uuidv4 } = require('uuid');
-const { generateErrorEmbed, sendErrorLog } = require('../../../../helpers');
+const {
+  generateErrorEmbed,
+  sendErrorLog,
+  checkMissingBotPermissions,
+  checkIfAdminUser,
+} = require('../../../../helpers');
 
 /**
  * Handler for when a user initiates the /status help command
@@ -9,13 +14,9 @@ const { generateErrorEmbed, sendErrorLog } = require('../../../../helpers');
  * Shows a success/warning at the end if any of the permissions are missing
  */
 const sendHelpInteraction = async ({ interaction, nessie }) => {
-  const isAdminUser = interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
-  const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
-  const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
-  const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
-  const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
-  const hasMissingPermissions =
-    (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
+  const { hasAdmin, hasManageChannels, hasManageWebhooks, hasSendMessages, hasMissingPermissions } =
+    checkMissingBotPermissions(interaction);
+  const isAdminUser = checkIfAdminUser(interaction);
 
   try {
     const embedData = {

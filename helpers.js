@@ -348,6 +348,57 @@ const generateRankedEmbed = (data, type = 'Battle Royale') => {
   }
   return embedData;
 };
+
+const checkMissingBotPermissions = (interaction) => {
+  const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
+  const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
+  const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
+  const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
+
+  const hasMissingPermissions =
+    (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
+
+  return {
+    hasAdmin,
+    hasManageChannels,
+    hasManageWebhooks,
+    hasSendMessages,
+    hasMissingPermissions,
+  };
+};
+const checkIfAdminUser = (interaction) => {
+  return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
+};
+const sendMissingBotPermissionsError = async ({ interaction, title }) => {
+  const embed = {
+    title,
+    description: `Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• Send Messages\n\nFor more details, use ${codeBlock(
+      '/status help'
+    )}`,
+    color: 16711680,
+  };
+  return await interaction.editReply({ embeds: [embed], components: [] });
+};
+const sendOnlyAdminError = async ({ interaction, title }) => {
+  const embed = {
+    title,
+    description: `Oops only Admins can create automatic map updates D:\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
+      '/status help'
+    )}`,
+    color: 16711680,
+  };
+  return await interaction.editReply({ embeds: [embed], components: [] });
+};
+const sendMissingAllPermissionsError = async ({ interaction, title }) => {
+  const embed = {
+    title,
+    description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• Send Messages\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
+      '/status help'
+    )}`,
+    color: 16711680,
+  };
+  return await interaction.editReply({ embeds: [embed], components: [] });
+};
 //---------
 module.exports = {
   checkIfInDevelopment,
@@ -362,4 +413,9 @@ module.exports = {
   getCountdown,
   generatePubsEmbed,
   generateRankedEmbed,
+  checkMissingBotPermissions,
+  checkIfAdminUser,
+  sendMissingBotPermissionsError,
+  sendOnlyAdminError,
+  sendMissingAllPermissionsError,
 };
