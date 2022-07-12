@@ -387,6 +387,15 @@ const sendOnlyAdminError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
+const sendMissingAllPermissionsError = async ({ interaction, title }) => {
+  const embed = {
+    title,
+    description:
+      "Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• Send Messages\n\nRequired User Permissions:\n• Administrator",
+    color: 16711680,
+  };
+  return await interaction.editReply({ embeds: [embed], components: [] });
+};
 //---------
 module.exports = {
   checkIfInDevelopment,
@@ -405,4 +414,5 @@ module.exports = {
   checkIfAdminUser,
   sendMissingBotPermissionsError,
   sendOnlyAdminError,
+  sendMissingAllPermissionsError,
 };
