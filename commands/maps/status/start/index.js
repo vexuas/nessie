@@ -5,6 +5,11 @@ const {
   sendErrorLog,
   generatePubsEmbed,
   generateRankedEmbed,
+  checkMissingBotPermissions,
+  sendMissingBotPermissionsError,
+  checkIfAdminUser,
+  sendOnlyAdminError,
+  sendMissingAllPermissionsError,
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
@@ -163,13 +168,26 @@ const generateArenasStatusEmbeds = (data) => {
 /**
  * Handler for when a user initiates the /status start command
  * Shows the first step of the status start wizard: Game Mode Selection
+ * We want to show permissions errors only when status do not exist
+ * We want to show them existing status details but block them if they want to create one
  */
 const sendStartInteraction = async ({ interaction, nessie }) => {
   await getStatus(
     interaction.guildId,
     async (status) => {
       const { embed, row } = generateGameModeSelectionMessage(status);
+      const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
+      const isAdminUser = checkIfAdminUser(interaction);
       try {
+        if (!status) {
+          if (hasMissingPermissions && !isAdminUser) {
+            return sendMissingAllPermissionsError({ interaction, title: 'Status | Start' });
+          } else {
+            if (hasMissingPermissions)
+              return sendMissingBotPermissionsError({ interaction, title: 'Status | Start' });
+            if (!isAdminUser) return sendOnlyAdminError({ interaction, title: 'Status | Start' });
+          }
+        }
         await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
       } catch (error) {
         const uuid = uuidv4();
@@ -414,7 +432,7 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */1 * * * *',
+    '10 */15 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
         try {
