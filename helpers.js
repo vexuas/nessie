@@ -366,7 +366,7 @@ const checkMissingBotPermissions = (interaction) => {
     hasMissingPermissions,
   };
 };
-const checkMissingUserPermissions = (interaction) => {
+const checkIfAdminUser = (interaction) => {
   return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
 };
 //---------
@@ -383,4 +383,6 @@ module.exports = {
   getCountdown,
   generatePubsEmbed,
   generateRankedEmbed,
+  checkMissingBotPermissions,
+  checkIfAdminUser,
 };
