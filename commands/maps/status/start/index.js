@@ -5,6 +5,8 @@ const {
   sendErrorLog,
   generatePubsEmbed,
   generateRankedEmbed,
+  checkMissingBotPermissions,
+  sendMissingBotPermissionsError,
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
@@ -169,7 +171,11 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
     interaction.guildId,
     async (status) => {
       const { embed, row } = generateGameModeSelectionMessage(status);
+      const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
       try {
+        if (!status && hasMissingPermissions) {
+          return sendMissingBotPermissionsError({ interaction, title: 'Status | Start' });
+        }
         await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
       } catch (error) {
         const uuid = uuidv4();

@@ -369,6 +369,15 @@ const checkMissingBotPermissions = (interaction) => {
 const checkIfAdminUser = (interaction) => {
   return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
 };
+const sendMissingBotPermissionsError = async ({ interaction, title }) => {
+  const embed = {
+    title,
+    description:
+      'Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• Send Messages',
+    color: 16711680,
+  };
+  return await interaction.editReply({ embeds: [embed], components: [] });
+};
 //---------
 module.exports = {
   checkIfInDevelopment,
@@ -385,4 +394,5 @@ module.exports = {
   generateRankedEmbed,
   checkMissingBotPermissions,
   checkIfAdminUser,
+  sendMissingBotPermissionsError,
 };
