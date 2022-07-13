@@ -348,7 +348,12 @@ const generateRankedEmbed = (data, type = 'Battle Royale') => {
   }
   return embedData;
 };
-
+/**
+ * Helper to check if nessie has missing permissions to properly work
+ * Most of these permissions are for the status command
+ * Since having admin trumps every other permission, we also have to check if nessie has that to overwrite missing permissions
+ * Useful to have as a helper so we can quickly check when we need them in commands
+ */
 const checkMissingBotPermissions = (interaction) => {
   const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
   const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
@@ -366,9 +371,16 @@ const checkMissingBotPermissions = (interaction) => {
     hasMissingPermissions,
   };
 };
+/**
+ * Helper to check if user who initiated a command has the admin permission
+ * Since we want to only give power to admins when it comes to important commands, this comes useful to reuse
+ */
 const checkIfAdminUser = (interaction) => {
   return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
 };
+/**
+ * Helper to send an error message regarding missing bot permissions
+ */
 const sendMissingBotPermissionsError = async ({ interaction, title }) => {
   const embed = {
     title,
@@ -379,6 +391,9 @@ const sendMissingBotPermissionsError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
+/**
+ * Helper to send an error message regarding missing bot permissions
+ */
 const sendOnlyAdminError = async ({ interaction, title }) => {
   const embed = {
     title,
@@ -389,6 +404,9 @@ const sendOnlyAdminError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
+/**
+ * Helper to send an error message regarding missing bot permissions
+ */
 const sendMissingAllPermissionsError = async ({ interaction, title }) => {
   const embed = {
     title,

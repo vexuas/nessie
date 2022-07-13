@@ -279,6 +279,7 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
  * TODO: Save status data in our database
  * TODO: Maybe separate ui and wiring up to respective files/folders for better readability
  */
+let testStatus = [];
 const createStatus = async ({ interaction, nessie }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
@@ -347,7 +348,13 @@ const createStatus = async ({ interaction, nessie }) => {
       }).send({
         embeds: statusArenasEmbed,
       }));
-
+    testStatus.push({
+      brId: statusBattleRoyaleWebhook.id,
+      brToken: statusBattleRoyaleWebhook.token,
+      arenasId: statusArenasWebhook.id,
+      arenasToken: statusArenasWebhook.token,
+    });
+    console.log(testStatus);
     /**
      * Create new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
