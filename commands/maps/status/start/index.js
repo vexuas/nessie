@@ -279,7 +279,6 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
  * TODO: Save status data in our database
  * TODO: Maybe separate ui and wiring up to respective files/folders for better readability
  */
-let testStatus = [];
 const createStatus = async ({ interaction, nessie }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
@@ -348,13 +347,7 @@ const createStatus = async ({ interaction, nessie }) => {
       }).send({
         embeds: statusArenasEmbed,
       }));
-    testStatus.push({
-      brId: statusBattleRoyaleWebhook.id,
-      brToken: statusBattleRoyaleWebhook.token,
-      arenasId: statusArenasWebhook.id,
-      arenasToken: statusArenasWebhook.token,
-    });
-    console.log(testStatus);
+
     /**
      * Create new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
@@ -466,19 +459,39 @@ const scheduleStatus = (nessie) => {
 
               if (brWebhookClient) {
                 const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
-                await brWebhookClient.deleteMessage(status.br_message_id);
-                console.log('After BR Delete: ', format(new Date(), 'h:mm:ss a'));
-                newBrMessage = await brWebhookClient.send({ embeds: brStatusEmbeds });
-                console.log('After BR Message: ', format(new Date(), 'h:mm:ss a'));
+                // await brWebhookClient.deleteMessage(status.br_message_id);
+                // console.log('After BR Delete: ', format(new Date(), 'h:mm:ss a'));
+                // newBrMessage = await brWebhookClient.send({ embeds: brStatusEmbeds });
+                // console.log('After BR Message: ', format(new Date(), 'h:mm:ss a'));
+                await brWebhookClient.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
               }
               if (arenasWebhookClient) {
                 const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
-                await arenasWebhookClient.deleteMessage(status.arenas_message_id);
-                console.log('After Arenas Delete: ', format(new Date(), 'h:mm:ss a'));
-                newArenasMessage = await arenasWebhookClient.send({ embeds: arenasStatusEmbeds });
-                console.log('After Arenas Message: ', format(new Date(), 'h:mm:ss a'));
+                // await arenasWebhookClient.deleteMessage(status.arenas_message_id);
+                // console.log('After Arenas Delete: ', format(new Date(), 'h:mm:ss a'));
+                // newArenasMessage = await arenasWebhookClient.send({ embeds: arenasStatusEmbeds });
+                // console.log('After Arenas Message: ', format(new Date(), 'h:mm:ss a'));
+                await arenasWebhookClient.editMessage(status.arenas_message_id, {
+                  embeds: arenasStatusEmbeds,
+                });
               }
-
+              console.log('After Update: ', format(new Date(), 'h:mm:ss a'));
+              console.log('----------------');
+              const testChannel = nessie.channels.cache.get('889212328539725824');
+              if (index === allStatus.length - 1) {
+                const endTime = format(new Date(), 'h:mm:ss a');
+                testChannel.send({
+                  embeds: [
+                    {
+                      description: `Start of Cycle: ${codeBlock(
+                        startTime
+                      )}\nEnd of Cycle: ${codeBlock(endTime)}\n\nNo. of guilds: ${
+                        allStatus.length
+                      }`,
+                    },
+                  ],
+                });
+              }
               /**
                * Tbh I'm a bit worried about having this query here
                * It seems to be working during development but I'm not sure if it's actually firing only after the message promises are done
@@ -486,35 +499,35 @@ const scheduleStatus = (nessie) => {
                *
                * TODO: Figure out how to cut down time with this, maybe collect all new messages first then updating database? Rather than updating per iteration
                */
-              client.query(
-                'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
-                [
-                  newBrMessage ? newBrMessage.id.toString() : null,
-                  newArenasMessage ? newArenasMessage.id.toString() : null,
-                  status.uuid.toString(),
-                ],
-                (err, res) => {
-                  client.query('COMMIT', async () => {
-                    console.log('After Update: ', format(new Date(), 'h:mm:ss a'));
-                    console.log('----------------');
-                    const testChannel = nessie.channels.cache.get('889212328539725824');
-                    if (index === allStatus.length - 1) {
-                      const endTime = format(new Date(), 'h:mm:ss a');
-                      testChannel.send({
-                        embeds: [
-                          {
-                            description: `Start of Cycle: ${codeBlock(
-                              startTime
-                            )}\nEnd of Cycle: ${codeBlock(endTime)}\n\nNo. of guilds: ${
-                              allStatus.length
-                            }`,
-                          },
-                        ],
-                      });
-                    }
-                  });
-                }
-              );
+              // client.query(
+              //   'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
+              //   [
+              //     newBrMessage ? newBrMessage.id.toString() : null,
+              //     newArenasMessage ? newArenasMessage.id.toString() : null,
+              //     status.uuid.toString(),
+              //   ],
+              //   (err, res) => {
+              //     client.query('COMMIT', async () => {
+              //       console.log('After Update: ', format(new Date(), 'h:mm:ss a'));
+              //       console.log('----------------');
+              //       const testChannel = nessie.channels.cache.get('889212328539725824');
+              //       if (index === allStatus.length - 1) {
+              //         const endTime = format(new Date(), 'h:mm:ss a');
+              //         testChannel.send({
+              //           embeds: [
+              //             {
+              //               description: `Start of Cycle: ${codeBlock(
+              //                 startTime
+              //               )}\nEnd of Cycle: ${codeBlock(endTime)}\n\nNo. of guilds: ${
+              //                 allStatus.length
+              //               }`,
+              //             },
+              //           ],
+              //         });
+              //       }
+              //     });
+              //   }
+              // );
             });
           }
         } catch (error) {
