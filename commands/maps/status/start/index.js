@@ -435,19 +435,14 @@ const createStatus = async ({ interaction, nessie }) => {
  * - Call the getAllStatus handler to get every existing status in our database
  * - Upon finishing the query, we then call the API for the current rotation data
  * - If there are no existing statuses, we don't do anything
- * - If there are, we then get all relevant webhooks of the guild for each status
- * - We then delete the old rotation message and then send a new message with updated data
- * - Finally we update our database of the current change in status
+ * - If there are, we then edit the relevant status messages
  *
- * RED ALERT
- * Currently for one guild cycle, this takes at least 6 seconds to finish with both arenas + br status active
- * This is because of our usage with awaits on getting webhooks, deleting and creating messages
- * This is not good cuz we'll find ourselves back to where we started pre-webhooks where it'll take forever for all guilds to get their status updated
- * Fortunately we can do away with fetching webhooks by storing tokens and opting for non-blocking deleting
- * However the big issue here is the creation of new rotation messages. We have to wait for those to finish so we know the message id to delete next cycle
- * There's gotta be a solution out there. Right now the best one I can think of is scrapping deleting and just sending the new message
- * This will definitely be the best case scenario time-wise as we don't care about storing data in expense of UX
- * Oh well, looks like there's one final boss to slay smh
+ * Opted to use edits now to lessen runtime of each status cyle through guilds
+ * Initially wanted to just edit without waiting for the response for peak speed
+ * But realised we at least want to do error handling if it does fail
+ * This definitely affects runtime quite a bit but does make our cycles more stable
+ * Might have to revisit this in the near future when we're supporting a lot of guilds
+ * More detailed explanation here: https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
