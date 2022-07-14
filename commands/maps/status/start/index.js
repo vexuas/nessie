@@ -137,7 +137,7 @@ const generateBattleRoyaleStatusEmbeds = (data) => {
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
@@ -156,7 +156,7 @@ const generateArenasStatusEmbeds = (data) => {
   const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This is a temporary feature while a more refined solution is being worked on to get automatic map updates directly in your servers. For feedback, bug reports or news update, feel free visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
     timestamp: Date.now(),
     footer: {
