@@ -13,6 +13,7 @@ const {
   sendGuildUpdateNotification,
   checkIfInDevelopment,
   sendErrorLog,
+  codeBlock,
 } = require('./helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
@@ -29,7 +30,6 @@ const {
   cancelStatusStop,
   createStatusChannels,
   deleteStatusChannels,
-  initialiseStatusScheduler,
   restartStatus,
   cancelStatusRestart,
 } = require('./commands/admin/announcement');
@@ -144,6 +144,16 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
      * Will still have to check the customId for each of the buttons here though
      */
     if (interaction.isButton()) {
+      if (interaction.user.id !== interaction.message.interaction.user.id) {
+        const wrongUserEmbed = {
+          description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
+            '/help'
+          )}!`,
+          color: 16711680,
+        };
+        await interaction.deferReply({ ephemeral: true });
+        return interaction.editReply({ embeds: [wrongUserEmbed] });
+      }
       switch (interaction.customId) {
         case 'announcementStart__startButton':
           return createStatusChannels({ interaction, nessie });
@@ -178,6 +188,16 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       }
     }
     if (interaction.isSelectMenu()) {
+      if (interaction.user.id !== interaction.message.interaction.user.id) {
+        const wrongUserEmbed = {
+          description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
+            '/help'
+          )}!`,
+          color: 16711680,
+        };
+        await interaction.deferReply({ ephemeral: true });
+        return interaction.editReply({ embeds: [wrongUserEmbed] });
+      }
       switch (interaction.customId) {
         case 'statusStart__gameModeDropdown':
           return goToConfirmStatus({ interaction, nessie });
