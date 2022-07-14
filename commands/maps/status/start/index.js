@@ -434,34 +434,42 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */1 * * * *',
+    '10 */15 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
         try {
           if (allStatus) {
             const rotationData = await getRotationData();
             allStatus.forEach(async (status) => {
-              const brWebhook =
-                status.br_webhook_id &&
-                status.br_webhook_token &&
-                new WebhookClient({
-                  id: status.br_webhook_id,
-                  token: status.br_webhook_token,
-                });
-              const arenasWebhook =
-                status.arenas_webhook_id &&
-                status.arenas_webhook_token &&
-                new WebhookClient({
-                  id: status.arenas_webhook_id,
-                  token: status.arenas_webhook_token,
-                });
-              if (brWebhook) {
-                const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
-                brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
-              }
-              if (arenasWebhook) {
-                const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
-                arenasWebhook.editMessage(status.arenas_message_id, { embeds: arenasStatusEmbeds });
+              try {
+                const brWebhook =
+                  status.br_webhook_id &&
+                  status.br_webhook_token &&
+                  new WebhookClient({
+                    id: status.br_webhook_id,
+                    token: status.br_webhook_token,
+                  });
+                const arenasWebhook =
+                  status.arenas_webhook_id &&
+                  status.arenas_webhook_token &&
+                  new WebhookClient({
+                    id: status.arenas_webhook_id,
+                    token: status.arenas_webhook_token,
+                  });
+                if (brWebhook) {
+                  const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
+                  await brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
+                }
+                if (arenasWebhook) {
+                  const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
+                  await arenasWebhook.editMessage(status.arenas_message_id, {
+                    embeds: arenasStatusEmbeds,
+                  });
+                }
+              } catch (error) {
+                const uuid = uuidv4();
+                const type = 'Status Scheduler Cycle';
+                await sendErrorLog({ nessie, error, type, uuid, ping: true });
               }
             });
           }
