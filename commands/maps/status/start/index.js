@@ -434,7 +434,7 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 15 * * * *',
+    '10 */1 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
         try {
@@ -442,50 +442,27 @@ const scheduleStatus = (nessie) => {
             const rotationData = await getRotationData();
             allStatus.forEach(async (status) => {
               const brWebhook =
-                status.br_webhook_id && (await nessie.fetchWebhook(status.br_webhook_id));
+                status.br_webhook_id &&
+                status.br_webhook_token &&
+                new WebhookClient({
+                  id: status.br_webhook_id,
+                  token: status.br_webhook_token,
+                });
               const arenasWebhook =
-                status.arenas_webhook_id && (await nessie.fetchWebhook(status.arenas_webhook_id));
-
-              const brWebhookClient =
-                brWebhook && new WebhookClient({ id: brWebhook.id, token: brWebhook.token });
-              const arenasWebhookClient =
-                arenasWebhook &&
-                new WebhookClient({ id: arenasWebhook.id, token: arenasWebhook.token });
-
-              let newBrMessage;
-              let newArenasMessage;
-
-              if (brWebhookClient) {
+                status.arenas_webhook_id &&
+                status.arenas_webhook_token &&
+                new WebhookClient({
+                  id: status.arenas_webhook_id,
+                  token: status.arenas_webhook_token,
+                });
+              if (brWebhook) {
                 const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
-                await brWebhookClient.deleteMessage(status.br_message_id);
-                newBrMessage = await brWebhookClient.send({ embeds: brStatusEmbeds });
+                brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
               }
-              if (arenasWebhookClient) {
+              if (arenasWebhook) {
                 const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
-                await arenasWebhookClient.deleteMessage(status.arenas_message_id);
-                newArenasMessage = await arenasWebhookClient.send({ embeds: arenasStatusEmbeds });
+                arenasWebhook.editMessage(status.arenas_message_id, { embeds: arenasStatusEmbeds });
               }
-
-              /**
-               * Tbh I'm a bit worried about having this query here
-               * It seems to be working during development but I'm not sure if it's actually firing only after the message promises are done
-               * Probably still not confident with database stuff; I'll just keep my fingers crossed heh
-               *
-               * TODO: Figure out how to cut down time with this, maybe collect all new messages first then updating database? Rather than updating per iteration
-               */
-              client.query(
-                'UPDATE Status SET br_message_id = ($1), arenas_message_id = ($2) WHERE uuid = ($3)',
-                [
-                  newBrMessage ? newBrMessage.id.toString() : null,
-                  newArenasMessage ? newArenasMessage.id.toString() : null,
-                  status.uuid.toString(),
-                ],
-                (err, res) => {
-                  client.query('COMMIT', async () => {
-                    console.log('Updated Status');
-                  });
-                }
-              );
             });
           }
         } catch (error) {
