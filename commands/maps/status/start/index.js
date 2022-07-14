@@ -297,6 +297,11 @@ const createStatus = async ({ interaction, nessie }) => {
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
     const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
+    /**
+     * Gets the @everyone role of the guild
+     * Important so w can't prevent non-admin users from sending any messages in status channels
+     */
+    const everyoneRole = interaction.guild.roles.cache.find((role) => role.name === '@everyone');
 
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
@@ -306,12 +311,24 @@ const createStatus = async ({ interaction, nessie }) => {
       (await interaction.guild.channels.create('apex-battle-royale', {
         parent: statusCategory,
         type: 'GUILD_TEXT',
+        permissionOverwrites: [
+          {
+            id: everyoneRole.id,
+            deny: ['SEND_MESSAGES'],
+          },
+        ],
       }));
     const statusArenasChannel =
       isArenasSelected &&
       (await interaction.guild.channels.create('apex-arenas', {
         parent: statusCategory,
         type: 'GUILD_TEXT',
+        permissionOverwrites: [
+          {
+            id: everyoneRole.id,
+            deny: ['SEND_MESSAGES'],
+          },
+        ],
       }));
 
     //Since webhooks take way longer to create than channels, adding another loading state here
