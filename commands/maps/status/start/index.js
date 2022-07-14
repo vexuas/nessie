@@ -214,6 +214,7 @@ const goToConfirmStatus = async ({ interaction, nessie }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
+
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     const uuid = uuidv4();
