@@ -362,6 +362,8 @@ const createStatus = async ({ interaction, nessie }) => {
       arenasMessageId: statusArenasMessage ? statusArenasMessage.id : null,
       battleRoyaleWebhookId: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.id : null,
       arenasWebhookId: statusArenasWebhook ? statusArenasWebhook.id : null,
+      battleRoyaleWebhookToken: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.token : null,
+      arenasWebhookToken: statusArenasWebhook ? statusArenasWebhook.token : null,
       originalChannelId: interaction.channelId,
       gameModeSelected:
         isBattleRoyaleSelected && isArenasSelected
@@ -432,7 +434,7 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */15 * * * *',
+    '10 15 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
         try {
