@@ -11,11 +11,17 @@ const {
   sendOnlyAdminError,
   sendMissingAllPermissionsError,
   codeBlock,
+  sendStatusErrorLog,
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
 const { format } = require('date-fns');
-const { insertNewStatus, getStatus, getAllStatus } = require('../../../../database/handler');
+const {
+  insertNewStatus,
+  getStatus,
+  getAllStatus,
+  deleteStatus,
+} = require('../../../../database/handler');
 const Scheduler = require('../../../../scheduler');
 /**
  * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
@@ -454,9 +460,8 @@ const scheduleStatus = (nessie) => {
         try {
           if (allStatus) {
             const rotationData = await getRotationData();
-            allStatus.forEach(async (status, index) => {
+            allStatus.forEach(async (status) => {
               try {
-                console.log('started ', index);
                 const brWebhook =
                   status.br_webhook_id &&
                   status.br_webhook_token &&
@@ -482,40 +487,36 @@ const scheduleStatus = (nessie) => {
                   });
                 }
               } catch (error) {
-                console.log('Oops Error');
                 const uuid = uuidv4();
-                const errorChannel = nessie.channels.cache.get('938441853542465548');
-                const errorGuild = nessie.guilds.cache.get(status.guild_id);
-                const errorEmbed = {
-                  title: 'Error | Status Scheduler Cycle',
-                  color: 16711680,
-                  description: `uuid: ${uuid}\nError: ${
-                    error.message ? codeBlock(error.message) : 'Unexpected Error'
-                  }`,
-                  fields: [
-                    {
-                      name: 'Status ID',
-                      value: status.uuid,
-                    },
-                    {
-                      name: 'Guild',
-                      value: errorGuild ? errorGuild.name : '-',
-                    },
-                    {
-                      name: 'Created By',
-                      value: status.created_by,
-                    },
-                    {
-                      name: 'Game Modes',
-                      value: status.game_mode_selected,
-                    },
-                    {
-                      name: 'Timestamp',
-                      value: format(new Date(), 'dd MMM yyyy, h:mm:ss a'),
-                    },
-                  ],
-                };
-                await errorChannel.send({ embeds: [errorEmbed], content: '<@183444648360935424>' });
+                await sendStatusErrorLog({ nessie, uuid, error, status });
+                if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
+                  deleteStatus(status.guild_id, async (status) => {
+                    const battleRoyaleStatusChannel =
+                      status.br_channel_id &&
+                      (await nessie.channels.cache.get(status.br_channel_id));
+                    const arenasStatusChannel =
+                      status.arenas_channel_id &&
+                      (await nessie.channels.cache.get(status.arenas_channel_id));
+                    const categoryStatusChannel =
+                      status.category_channel_id &&
+                      (await nessie.channels.cache.get(status.category_channel_id));
+                    battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
+                    arenasStatusChannel && (await arenasStatusChannel.delete());
+                    categoryStatusChannel && (await categoryStatusChannel.delete());
+                    const originalChannel = await nessie.channels.fetch(status.original_channel_id);
+                    await originalChannel.send({
+                      embeds: [
+                        {
+                          title: 'Automatic Map Status Error',
+                          description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${codeBlock(
+                            '/status start'
+                          )}`,
+                          color: 16711680,
+                        },
+                      ],
+                    });
+                  });
+                }
               }
             });
           }
