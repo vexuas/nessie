@@ -419,6 +419,7 @@ const createStatus = async ({ interaction, nessie }) => {
           : null;
 
         await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+        //Sends status creation log after everything is done
         const statusLogChannel = nessie.channels.cache.get('976863441526595644');
         const statusLogEmbed = {
           title: 'New Status Created',
@@ -580,6 +581,11 @@ const handleStatusCycle = async ({
         embeds: arenasStatusEmbeds,
       });
     }
+    /**
+     * Logs health of status after the last guild gets done
+     * This is placed here instead of finally as somehow the latter gets fired even before the loop ends
+     * Added time fields so we can monitor how long a cycle finishes
+     */
     if (index === totalCount - 1) {
       const endTime = Date.now();
       const statusLogChannel = nessie.channels.cache.get('976863441526595644');

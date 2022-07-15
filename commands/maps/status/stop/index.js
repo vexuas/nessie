@@ -133,6 +133,7 @@ const deleteGuildStatus = async ({ interaction, nessie }) => {
             color: 3066993,
           };
           await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+          //Sends status deletion log after everything is done
           const statusLogChannel = nessie.channels.cache.get('976863441526595644');
           const statusLogEmbed = {
             title: 'Status Deleted',
