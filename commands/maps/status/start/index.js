@@ -10,11 +10,18 @@ const {
   checkIfAdminUser,
   sendOnlyAdminError,
   sendMissingAllPermissionsError,
+  codeBlock,
+  sendStatusErrorLog,
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
 const { format } = require('date-fns');
-const { insertNewStatus, getStatus, getAllStatus } = require('../../../../database/handler');
+const {
+  insertNewStatus,
+  getStatus,
+  getAllStatus,
+  deleteStatus,
+} = require('../../../../database/handler');
 const Scheduler = require('../../../../scheduler');
 /**
  * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
@@ -453,42 +460,41 @@ const scheduleStatus = (nessie) => {
         try {
           if (allStatus) {
             const rotationData = await getRotationData();
+            const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
+            const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
             allStatus.forEach(async (status) => {
-              try {
-                const brWebhook =
-                  status.br_webhook_id &&
-                  status.br_webhook_token &&
-                  new WebhookClient({
-                    id: status.br_webhook_id,
-                    token: status.br_webhook_token,
-                  });
-                const arenasWebhook =
-                  status.arenas_webhook_id &&
-                  status.arenas_webhook_token &&
-                  new WebhookClient({
-                    id: status.arenas_webhook_id,
-                    token: status.arenas_webhook_token,
-                  });
-                if (brWebhook) {
-                  const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
-                  await brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
-                }
-                if (arenasWebhook) {
-                  const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
-                  await arenasWebhook.editMessage(status.arenas_message_id, {
-                    embeds: arenasStatusEmbeds,
-                  });
-                }
-              } catch (error) {
-                const uuid = uuidv4();
-                const type = 'Status Scheduler Cycle';
-                await sendErrorLog({ nessie, error, type, uuid, ping: true });
-              }
+              await handleStatusCycle({ nessie, status, brStatusEmbeds, arenasStatusEmbeds });
             });
           }
         } catch (error) {
+          /**
+           * Different error handling from status cycles
+           * Specifically due to this is where we catch API issues
+           * Should really make these errors distinguishable from the others but assumming the errors comes from the API here is alright for now
+           * Since technically the status is working fine, we still want to edit the status messages in every guild
+           * Only difference is instead of the rotation data, we're showing the information embed + an error message
+           */
           const uuid = uuidv4();
           const type = 'Status Scheduler Config';
+          const errorEmbed = [
+            {
+              description:
+                '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+              color: 3447003,
+              timestamp: Date.now(),
+              footer: {
+                text: 'Last Update',
+              },
+            },
+          ].concat(await generateErrorEmbed(error, uuid, nessie));
+          allStatus.forEach(async (status) => {
+            await handleStatusCycle({
+              nessie,
+              status,
+              brStatusEmbeds: errorEmbed,
+              arenasStatusEmbeds: errorEmbed,
+            });
+          });
           await sendErrorLog({ nessie, error, type, uuid, ping: true });
         }
       });
@@ -499,6 +505,80 @@ const scheduleStatus = (nessie) => {
       await sendErrorLog({ nessie, error, type, uuid, ping: true });
     }
   );
+};
+/**
+ * Handler for the status cycle execution
+ * Moved this to its own function as we want to easily reuse it above
+ * Also since the error handling is pretty big here, it makes readability better
+ * Error handling:
+ * Normally we'll just send an error log but there are specific breaking actions a user might take
+ * These would be deleting status messages, channels or and/or webhooks
+ * Without these, Nessie won't be able to properly update the guild with rotation data
+ * Initially just wanted to send an error log to the original channel where status was initialised and ask the user to stop the status
+ * But I felt like that might just open more possibilities of the user to make an error
+ * Finally opted to just delete the status entirely if these errors happen and let the guild know about it
+ */
+const handleStatusCycle = async ({ nessie, status, brStatusEmbeds, arenasStatusEmbeds }) => {
+  try {
+    const brWebhook =
+      status.br_webhook_id &&
+      status.br_webhook_token &&
+      new WebhookClient({
+        id: status.br_webhook_id,
+        token: status.br_webhook_token,
+      });
+    const arenasWebhook =
+      status.arenas_webhook_id &&
+      status.arenas_webhook_token &&
+      new WebhookClient({
+        id: status.arenas_webhook_id,
+        token: status.arenas_webhook_token,
+      });
+    if (brWebhook) {
+      await brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
+    }
+    if (arenasWebhook) {
+      await arenasWebhook.editMessage(status.arenas_message_id, {
+        embeds: arenasStatusEmbeds,
+      });
+    }
+  } catch (error) {
+    const uuid = uuidv4();
+    await sendStatusErrorLog({ nessie, uuid, error, status });
+    if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
+      deleteStatus(status.guild_id, async (status) => {
+        try {
+          //Uses cache on status channels so it doesn't fail when they dont exist
+          //Might have to revamp these when we have to do sharding
+          const battleRoyaleStatusChannel =
+            status.br_channel_id && (await nessie.channels.cache.get(status.br_channel_id));
+          const arenasStatusChannel =
+            status.arenas_channel_id && (await nessie.channels.cache.get(status.arenas_channel_id));
+          const categoryStatusChannel =
+            status.category_channel_id &&
+            (await nessie.channels.cache.get(status.category_channel_id));
+          battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
+          arenasStatusChannel && (await arenasStatusChannel.delete());
+          categoryStatusChannel && (await categoryStatusChannel.delete());
+          const originalChannel = await nessie.channels.fetch(status.original_channel_id);
+          await originalChannel.send({
+            embeds: [
+              {
+                title: 'Automatic Map Status Error',
+                description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${codeBlock(
+                  '/status start'
+                )}`,
+                color: 16711680,
+              },
+            ],
+          });
+        } catch (error) {
+          const uuid = uuidv4();
+          await sendStatusErrorLog({ nessie, uuid, error, status });
+        }
+      });
+    }
+  }
 };
 module.exports = {
   goToConfirmStatus,

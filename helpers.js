@@ -399,6 +399,38 @@ const sendMissingAllPermissionsError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
+const sendStatusErrorLog = async ({ nessie, uuid, error, status }) => {
+  const errorChannel = nessie.channels.cache.get('938441853542465548');
+  const errorGuild = nessie.guilds.cache.get(status.guild_id);
+  const errorEmbed = {
+    title: 'Error | Status Scheduler Cycle',
+    color: 16711680,
+    description: `uuid: ${uuid}\nError: ${codeBlock(error.message)}`,
+    fields: [
+      {
+        name: 'Status ID',
+        value: status.uuid,
+      },
+      {
+        name: 'Guild',
+        value: errorGuild ? errorGuild.name : '-',
+      },
+      {
+        name: 'Created By',
+        value: status.created_by,
+      },
+      {
+        name: 'Game Modes',
+        value: status.game_mode_selected,
+      },
+      {
+        name: 'Timestamp',
+        value: format(new Date(), 'dd MMM yyyy, h:mm:ss a'),
+      },
+    ],
+  };
+  await errorChannel.send({ embeds: [errorEmbed], content: '<@183444648360935424>' });
+};
 //---------
 module.exports = {
   checkIfInDevelopment,
@@ -418,4 +450,5 @@ module.exports = {
   sendMissingBotPermissionsError,
   sendOnlyAdminError,
   sendMissingAllPermissionsError,
+  sendStatusErrorLog,
 };
