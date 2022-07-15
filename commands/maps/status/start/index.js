@@ -460,69 +460,34 @@ const scheduleStatus = (nessie) => {
         try {
           if (allStatus) {
             const rotationData = await getRotationData();
+            const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
+            const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
             allStatus.forEach(async (status) => {
-              try {
-                const brWebhook =
-                  status.br_webhook_id &&
-                  status.br_webhook_token &&
-                  new WebhookClient({
-                    id: status.br_webhook_id,
-                    token: status.br_webhook_token,
-                  });
-                const arenasWebhook =
-                  status.arenas_webhook_id &&
-                  status.arenas_webhook_token &&
-                  new WebhookClient({
-                    id: status.arenas_webhook_id,
-                    token: status.arenas_webhook_token,
-                  });
-                if (brWebhook) {
-                  const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
-                  await brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
-                }
-                if (arenasWebhook) {
-                  const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
-                  await arenasWebhook.editMessage(status.arenas_message_id, {
-                    embeds: arenasStatusEmbeds,
-                  });
-                }
-              } catch (error) {
-                const uuid = uuidv4();
-                await sendStatusErrorLog({ nessie, uuid, error, status });
-                if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
-                  deleteStatus(status.guild_id, async (status) => {
-                    const battleRoyaleStatusChannel =
-                      status.br_channel_id &&
-                      (await nessie.channels.cache.get(status.br_channel_id));
-                    const arenasStatusChannel =
-                      status.arenas_channel_id &&
-                      (await nessie.channels.cache.get(status.arenas_channel_id));
-                    const categoryStatusChannel =
-                      status.category_channel_id &&
-                      (await nessie.channels.cache.get(status.category_channel_id));
-                    battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
-                    arenasStatusChannel && (await arenasStatusChannel.delete());
-                    categoryStatusChannel && (await categoryStatusChannel.delete());
-                    const originalChannel = await nessie.channels.fetch(status.original_channel_id);
-                    await originalChannel.send({
-                      embeds: [
-                        {
-                          title: 'Automatic Map Status Error',
-                          description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${codeBlock(
-                            '/status start'
-                          )}`,
-                          color: 16711680,
-                        },
-                      ],
-                    });
-                  });
-                }
-              }
+              await handleStatusCycle({ nessie, status, brStatusEmbeds, arenasStatusEmbeds });
             });
           }
         } catch (error) {
           const uuid = uuidv4();
           const type = 'Status Scheduler Config';
+          const errorEmbed = [
+            {
+              description:
+                '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+              color: 3447003,
+              timestamp: Date.now(),
+              footer: {
+                text: 'Last Update',
+              },
+            },
+          ].concat(await generateErrorEmbed(error, uuid, nessie));
+          allStatus.forEach(async (status) => {
+            await handleStatusCycle({
+              nessie,
+              status,
+              brStatusEmbeds: errorEmbed,
+              arenasStatusEmbeds: errorEmbed,
+            });
+          });
           await sendErrorLog({ nessie, error, type, uuid, ping: true });
         }
       });
@@ -533,6 +498,61 @@ const scheduleStatus = (nessie) => {
       await sendErrorLog({ nessie, error, type, uuid, ping: true });
     }
   );
+};
+const handleStatusCycle = async ({ nessie, status, brStatusEmbeds, arenasStatusEmbeds }) => {
+  try {
+    const brWebhook =
+      status.br_webhook_id &&
+      status.br_webhook_token &&
+      new WebhookClient({
+        id: status.br_webhook_id,
+        token: status.br_webhook_token,
+      });
+    const arenasWebhook =
+      status.arenas_webhook_id &&
+      status.arenas_webhook_token &&
+      new WebhookClient({
+        id: status.arenas_webhook_id,
+        token: status.arenas_webhook_token,
+      });
+    if (brWebhook) {
+      await brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
+    }
+    if (arenasWebhook) {
+      await arenasWebhook.editMessage(status.arenas_message_id, {
+        embeds: arenasStatusEmbeds,
+      });
+    }
+  } catch (error) {
+    const uuid = uuidv4();
+    await sendStatusErrorLog({ nessie, uuid, error, status });
+    if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
+      deleteStatus(status.guild_id, async (status) => {
+        const battleRoyaleStatusChannel =
+          status.br_channel_id && (await nessie.channels.cache.get(status.br_channel_id));
+        const arenasStatusChannel =
+          status.arenas_channel_id && (await nessie.channels.cache.get(status.arenas_channel_id));
+        const categoryStatusChannel =
+          status.category_channel_id &&
+          (await nessie.channels.cache.get(status.category_channel_id));
+        battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
+        arenasStatusChannel && (await arenasStatusChannel.delete());
+        categoryStatusChannel && (await categoryStatusChannel.delete());
+        const originalChannel = await nessie.channels.fetch(status.original_channel_id);
+        await originalChannel.send({
+          embeds: [
+            {
+              title: 'Automatic Map Status Error',
+              description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${codeBlock(
+                '/status start'
+              )}`,
+              color: 16711680,
+            },
+          ],
+        });
+      });
+    }
+  }
 };
 module.exports = {
   goToConfirmStatus,
