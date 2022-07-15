@@ -15,7 +15,7 @@ const {
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
-const { format } = require('date-fns');
+const { format, differenceInSeconds, differenceInMilliseconds } = require('date-fns');
 const {
   insertNewStatus,
   getStatus,
@@ -454,16 +454,25 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */15 * * * *',
+    '5 */15 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
+        const startTime = Date.now();
         try {
           if (allStatus) {
             const rotationData = await getRotationData();
             const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
             const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
-            allStatus.forEach(async (status) => {
-              await handleStatusCycle({ nessie, status, brStatusEmbeds, arenasStatusEmbeds });
+            allStatus.forEach(async (status, index) => {
+              await handleStatusCycle({
+                nessie,
+                status,
+                index,
+                startTime,
+                totalCount: allStatus.length,
+                brStatusEmbeds,
+                arenasStatusEmbeds,
+              });
             });
           }
         } catch (error) {
@@ -518,7 +527,15 @@ const scheduleStatus = (nessie) => {
  * But I felt like that might just open more possibilities of the user to make an error
  * Finally opted to just delete the status entirely if these errors happen and let the guild know about it
  */
-const handleStatusCycle = async ({ nessie, status, brStatusEmbeds, arenasStatusEmbeds }) => {
+const handleStatusCycle = async ({
+  nessie,
+  status,
+  index,
+  startTime,
+  totalCount,
+  brStatusEmbeds,
+  arenasStatusEmbeds,
+}) => {
   try {
     const brWebhook =
       status.br_webhook_id &&
@@ -541,6 +558,40 @@ const handleStatusCycle = async ({ nessie, status, brStatusEmbeds, arenasStatusE
       await arenasWebhook.editMessage(status.arenas_message_id, {
         embeds: arenasStatusEmbeds,
       });
+    }
+    if (index === totalCount - 1) {
+      const endTime = Date.now();
+      const statusLogChannel = nessie.channels.cache.get('976863441526595644');
+      const statusLogEmbed = {
+        title: 'Nessie | Auto Map Status Log',
+        description: 'Successfully finished status cycle',
+        color: 3066993,
+        fields: [
+          {
+            name: 'Status Count',
+            value: codeBlock(totalCount),
+            inline: true,
+          },
+          {
+            name: 'Start Time',
+            value: codeBlock(format(startTime, 'dd MMM yyyy, h:mm:ss a')),
+          },
+          {
+            name: 'End Time',
+            value: codeBlock(format(endTime, 'dd MMM yyyy, h:mm:ss a')),
+          },
+          {
+            name: 'Time Taken',
+            value: codeBlock(
+              `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
+                endTime,
+                startTime
+              )} milliseconds`
+            ),
+          },
+        ],
+      };
+      await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
   } catch (error) {
     const uuid = uuidv4();
