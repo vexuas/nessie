@@ -1,6 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { codeBlock } = require('../../helpers');
 
+/**
+ * We no longer have use for announcements with the status feature being released soon
+ * I have no idea how many guilds have followed the channels but it's good to at least send one last message before we deprecate the channels completely
+ * Technically I could just write the message myself but Nessie started this, I'd want Nessie to end it. Besides, I can't send embeds heh
+ * This just sends the messages, I'll manually delete the old messages + publish these
+ */
 module.exports = {
   isAdmin: true,
   data: new SlashCommandBuilder()
