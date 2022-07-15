@@ -5,6 +5,7 @@ const {
   generateErrorEmbed,
   generatePubsEmbed,
   generateRankedEmbed,
+  codeBlock,
 } = require('../../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { sendMixpanelEvent } = require('../../../analytics');
@@ -37,10 +38,16 @@ module.exports = {
         case 'arenas_pubs':
           data = await getArenasPubs();
           embed = generatePubsEmbed(data, 'Arenas');
+          embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
+            '/status help'
+          )}`;
           break;
         case 'arenas_ranked':
           data = await getArenasRanked();
           embed = generateRankedEmbed(data, 'Arenas');
+          embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
+            '/status help'
+          )}`;
           break;
       }
       await interaction.editReply({ embeds: [embed] });

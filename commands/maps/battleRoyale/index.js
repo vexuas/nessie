@@ -5,6 +5,7 @@ const {
   generateErrorEmbed,
   generateRankedEmbed,
   generatePubsEmbed,
+  codeBlock,
 } = require('../../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { sendMixpanelEvent } = require('../../../analytics');
@@ -37,10 +38,16 @@ module.exports = {
         case 'br_pubs':
           data = await getBattleRoyalePubs();
           embed = generatePubsEmbed(data);
+          embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
+            '/status help'
+          )}`;
           break;
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
           embed = generateRankedEmbed(data);
+          embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
+            '/status help'
+          )}`;
           break;
       }
       await interaction.editReply({ embeds: [embed] });
