@@ -10,6 +10,7 @@ const {
   checkIfAdminUser,
   sendOnlyAdminError,
   sendMissingAllPermissionsError,
+  codeBlock,
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
@@ -447,14 +448,15 @@ const createStatus = async ({ interaction, nessie }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '10 */15 * * * *',
+    '10 */1 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
         try {
           if (allStatus) {
             const rotationData = await getRotationData();
-            allStatus.forEach(async (status) => {
+            allStatus.forEach(async (status, index) => {
               try {
+                console.log('started ', index);
                 const brWebhook =
                   status.br_webhook_id &&
                   status.br_webhook_token &&
@@ -480,9 +482,40 @@ const scheduleStatus = (nessie) => {
                   });
                 }
               } catch (error) {
+                console.log('Oops Error');
                 const uuid = uuidv4();
-                const type = 'Status Scheduler Cycle';
-                await sendErrorLog({ nessie, error, type, uuid, ping: true });
+                const errorChannel = nessie.channels.cache.get('938441853542465548');
+                const errorGuild = nessie.guilds.cache.get(status.guild_id);
+                const errorEmbed = {
+                  title: 'Error | Status Scheduler Cycle',
+                  color: 16711680,
+                  description: `uuid: ${uuid}\nError: ${
+                    error.message ? codeBlock(error.message) : 'Unexpected Error'
+                  }`,
+                  fields: [
+                    {
+                      name: 'Status ID',
+                      value: status.uuid,
+                    },
+                    {
+                      name: 'Guild',
+                      value: errorGuild ? errorGuild.name : '-',
+                    },
+                    {
+                      name: 'Created By',
+                      value: status.created_by,
+                    },
+                    {
+                      name: 'Game Modes',
+                      value: status.game_mode_selected,
+                    },
+                    {
+                      name: 'Timestamp',
+                      value: format(new Date(), 'dd MMM yyyy, h:mm:ss a'),
+                    },
+                  ],
+                };
+                await errorChannel.send({ embeds: [errorEmbed], content: '<@183444648360935424>' });
               }
             });
           }
