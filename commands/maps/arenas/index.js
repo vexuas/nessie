@@ -30,6 +30,13 @@ module.exports = {
    * which is editing the reply with the relevant information after the promise resolves
    **/
   async execute({ nessie, interaction, mixpanel }) {
+    /**
+     * Temporary database query to check if there's an existing status in the guild
+     * This is so we can conditionally show the status prompt to lessen visual clutter
+     * One could argue this isn't necessary; especially when we're only going to have the prompt till end of August
+     * I don't really have any counter arguments lmao but I'm keeping it in
+     * TODO: Remove this after Aug 31 2022
+     */
     await getStatus(
       interaction.guildId,
       async (status) => {
