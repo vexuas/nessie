@@ -419,6 +419,27 @@ const createStatus = async ({ interaction, nessie }) => {
           : null;
 
         await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+        const statusLogChannel = nessie.channels.cache.get('976863441526595644');
+        const statusLogEmbed = {
+          title: 'New Status Created',
+          color: 3066993,
+          fields: [
+            {
+              name: 'Guild',
+              value: interaction.guild.name,
+            },
+            {
+              name: 'Game Modes',
+              value:
+                isBattleRoyaleSelected && isArenasSelected
+                  ? 'All'
+                  : isBattleRoyaleSelected
+                  ? 'Battle Royale'
+                  : 'Arenas',
+            },
+          ],
+        };
+        await statusLogChannel.send({ embeds: [statusLogEmbed] });
       },
       async (error) => {
         const uuid = uuidv4();
