@@ -9,6 +9,7 @@ const {
 } = require('../../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { sendMixpanelEvent } = require('../../../analytics');
+const { getStatus } = require('../../../database/handler');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -29,43 +30,59 @@ module.exports = {
    * which is editing the reply with the relevant information after the promise resolves
    **/
   async execute({ nessie, interaction, mixpanel }) {
-    let data;
-    let embed;
-    try {
-      await interaction.deferReply();
-      const optionMode = interaction.options.getString('mode');
-      switch (optionMode) {
-        case 'br_pubs':
-          data = await getBattleRoyalePubs();
-          embed = generatePubsEmbed(data);
-          embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
-            '/status help'
-          )}`;
-          break;
-        case 'br_ranked':
-          data = await getBattleRoyaleRanked();
-          embed = generateRankedEmbed(data);
-          embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
-            '/status help'
-          )}`;
-          break;
+    await getStatus(
+      interaction.guildId,
+      async (status) => {
+        let data;
+        let embed;
+        try {
+          await interaction.deferReply();
+          const optionMode = interaction.options.getString('mode');
+          switch (optionMode) {
+            case 'br_pubs':
+              data = await getBattleRoyalePubs();
+              embed = generatePubsEmbed(data);
+              if (!status) {
+                embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
+                  '/status help'
+                )}`;
+              }
+              break;
+            case 'br_ranked':
+              data = await getBattleRoyaleRanked();
+              embed = generateRankedEmbed(data);
+              if (!status) {
+                embed.description = `Try out my new feature to get automatic map updates! More details on ${codeBlock(
+                  '/status help'
+                )}`;
+              }
+              break;
+          }
+          await interaction.editReply({ embeds: [embed] });
+          sendMixpanelEvent(
+            interaction.user,
+            interaction.channel,
+            interaction.guild,
+            'br',
+            mixpanel,
+            optionMode,
+            true
+          );
+        } catch (error) {
+          const uuid = uuidv4();
+          const type = 'Battle Royale';
+          const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+          await interaction.editReply({ embeds: errorEmbed });
+          await sendErrorLog({ nessie, error, interaction, type, uuid });
+        }
+      },
+      async (error) => {
+        const uuid = uuidv4();
+        const type = 'Getting Status in Database (Battle Royale)';
+        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+        interaction.editReply({ embeds: errorEmbed });
+        await sendErrorLog({ nessie, error, interaction, type, uuid });
       }
-      await interaction.editReply({ embeds: [embed] });
-      sendMixpanelEvent(
-        interaction.user,
-        interaction.channel,
-        interaction.guild,
-        'br',
-        mixpanel,
-        optionMode,
-        true
-      );
-    } catch (error) {
-      const uuid = uuidv4();
-      const type = 'Battle Royale';
-      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-      await interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie, error, interaction, type, uuid });
-    }
+    );
   },
 };
