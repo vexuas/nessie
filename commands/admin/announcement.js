@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { codeBlock } = require('../../helpers');
 
 module.exports = {
   isAdmin: true,
@@ -11,7 +12,19 @@ module.exports = {
   async execute({ nessie, interaction }) {
     try {
       await interaction.deferReply();
-      return sendStopInteraction({ interaction, nessie });
+      const brChannel = nessie.channels.cache.get('988491755164942406');
+      const arenasChannel = nessie.channels.cache.get('988491756465184918');
+
+      const deprecationEmbed = {
+        title: 'Automatic Map Updates',
+        description: `This announcement channel is now no longer supported! To get automatic map updates, you can check out ${codeBlock(
+          '/status help'
+        )}!`,
+        color: 3447003,
+      };
+      await brChannel.send({ embeds: [deprecationEmbed] });
+      await arenasChannel.send({ embeds: [deprecationEmbed] });
+      await interaction.editReply('Sent messages');
     } catch (error) {
       console.log(error);
     }
