@@ -26,14 +26,6 @@ const {
 } = require('./database/handler');
 const { v4: uuidv4 } = require('uuid');
 const {
-  cancelStatusStart,
-  cancelStatusStop,
-  createStatusChannels,
-  deleteStatusChannels,
-  restartStatus,
-  cancelStatusRestart,
-} = require('./commands/admin/announcement');
-const {
   goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
@@ -160,24 +152,6 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
         return interaction.editReply({ embeds: [wrongUserEmbed] });
       }
       switch (interaction.customId) {
-        case 'announcementStart__startButton':
-          return createStatusChannels({ interaction, nessie });
-        case 'announcementStart__cancelButton':
-          return cancelStatusStart({ interaction, nessie });
-        case 'announcementStop__stopButton':
-          return deleteStatusChannels({ interaction, nessie });
-        case 'announcementStop__cancelButton':
-          return cancelStatusStop({ interaction, nessie });
-        case 'announcementRestart__cancelButton':
-          return cancelStatusRestart({ interaction, nessie });
-        case 'announcementRestart__allButton':
-          return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'announcementRestart__allMissingButton':
-          return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'announcementRestart__brMissingButton':
-          return restartStatus({ interaction, nessie, restartId: interaction.customId });
-        case 'announcementRestart__arenasMissingButton':
-          return restartStatus({ interaction, nessie, restartId: interaction.customId });
         case 'statusStart__backButton':
           return goBackToGameModeSelection({ interaction, nessie });
         case 'statusStart__cancelButton':
