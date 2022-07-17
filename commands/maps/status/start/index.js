@@ -218,11 +218,10 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
  * Handler for when a user selects any of the options in the Game Mode dropdown
  * Will edit and show the second step of the status start wizard: Confirm Status
  */
-const goToConfirmStatus = async ({ interaction, nessie }) => {
+const goToConfirmStatus = async ({ interaction, nessie, mixpanel }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
-
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     const uuid = uuidv4();
@@ -230,6 +229,14 @@ const goToConfirmStatus = async ({ interaction, nessie }) => {
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
+  } finally {
+    sendMixpanelEvent({
+      user: interaction.user,
+      channel: interaction.channel,
+      guild: interaction.guild,
+      client: mixpanel,
+      customEventName: 'Click status start gamemode select menu',
+    });
   }
 };
 /**

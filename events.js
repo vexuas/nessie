@@ -197,7 +197,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       }
       switch (interaction.customId) {
         case 'statusStart__gameModeDropdown':
-          return goToConfirmStatus({ interaction, nessie });
+          return goToConfirmStatus({ interaction, nessie, mixpanel });
       }
     }
   });
