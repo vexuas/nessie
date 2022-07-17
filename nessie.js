@@ -26,7 +26,9 @@ let mixpanel;
  */
 const initialize = async () => {
   await nessie.login(token);
-  mixpanel = Mixpanel.init(checkIfInDevelopment(nessie) ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
+  mixpanel = Mixpanel.init(checkIfInDevelopment(nessie) ? lochnessMixpanel : nessieMixpanel, {
+    debug: true,
+  }); //Checks if client is initialising as the development bot
   !checkIfInDevelopment(nessie) && AutoPoster(topggToken, nessie); //Check if this is a one time thing per reboot or it actually auto posts when stats change
   registerEventHandlers({ nessie, mixpanel });
 };

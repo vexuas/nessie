@@ -108,7 +108,12 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
 
     if (interaction.isCommand()) {
-      const { commandName } = interaction;
+      console.log(interaction.options);
+      console.log(interaction.options.data);
+      const { commandName, options } = interaction;
+      const usedOption = options.data[0];
+      const isArgument = usedOption && usedOption.type === 'STRING';
+      const isSubcommand = usedOption && usedOption.type === 'SUB_COMMAND';
       await appCommands[commandName].execute({ interaction, nessie, mixpanel });
       /**
        * Send event information to mixpanel for application commands
@@ -117,17 +122,16 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Hence, we have a separate handler for these commands in their own files instead of here
        * TODO: Refactor conditional in the future, probably a better way to check since this isn't scalable
        */
-      if (commandName !== 'br' && commandName !== 'arenas' && commandName !== 'control') {
-        sendMixpanelEvent(
-          interaction.user,
-          interaction.channel,
-          interaction.guild,
-          commandName,
-          mixpanel,
-          null,
-          true
-        );
-      }
+      sendMixpanelEvent({
+        user: interaction.user,
+        channel: interaction.channel,
+        guild: interaction.guild,
+        command: commandName,
+        subcommand: isSubcommand ? usedOption.name : null,
+        arguments: isArgument ? usedOption.value : null,
+        client: mixpanel,
+        isApplicationCommand: true,
+      });
     }
     /**
      * Since components are also interactions, any user inputs from it go through this listener too

@@ -66,15 +66,6 @@ module.exports = {
               break;
           }
           await interaction.editReply({ embeds: [embed] });
-          sendMixpanelEvent(
-            interaction.user,
-            interaction.channel,
-            interaction.guild,
-            'br',
-            mixpanel,
-            optionMode,
-            true
-          );
         } catch (error) {
           const uuid = uuidv4();
           const type = 'Battle Royale';

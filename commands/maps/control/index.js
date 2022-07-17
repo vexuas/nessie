@@ -28,15 +28,6 @@ module.exports = {
           break;
       }
       await interaction.editReply({ embeds: [embed] });
-      sendMixpanelEvent(
-        interaction.user,
-        interaction.channel,
-        interaction.guild,
-        'control',
-        mixpanel,
-        optionMode,
-        true
-      );
     } catch (error) {
       /**
        * Special error handling here instead of using the error helper
