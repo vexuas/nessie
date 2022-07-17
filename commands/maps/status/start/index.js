@@ -23,6 +23,7 @@ const {
   deleteStatus,
 } = require('../../../../database/handler');
 const Scheduler = require('../../../../scheduler');
+const { sendMixpanelEvent } = require('../../../../analytics');
 /**
  * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
  * This is separated from the interaction handlers as we want to be able to reuse them when the user goes back and forth through the steps
@@ -217,11 +218,10 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
  * Handler for when a user selects any of the options in the Game Mode dropdown
  * Will edit and show the second step of the status start wizard: Confirm Status
  */
-const goToConfirmStatus = async ({ interaction, nessie }) => {
+const goToConfirmStatus = async ({ interaction, nessie, mixpanel }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
-
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     const uuid = uuidv4();
@@ -229,13 +229,21 @@ const goToConfirmStatus = async ({ interaction, nessie }) => {
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
+  } finally {
+    sendMixpanelEvent({
+      user: interaction.user,
+      channel: interaction.channel,
+      guild: interaction.guild,
+      client: mixpanel,
+      customEventName: 'Click status start gamemode select menu',
+    });
   }
 };
 /**
  * Handler for when a user clicks the Back button in Confirm Status Step
  * Will edit and show the first step of the status start wizard: Confirm Status
  */
-const goBackToGameModeSelection = async ({ interaction, nessie }) => {
+const goBackToGameModeSelection = async ({ interaction, nessie, mixpanel }) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
     await interaction.deferUpdate();
@@ -246,6 +254,14 @@ const goBackToGameModeSelection = async ({ interaction, nessie }) => {
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
+  } finally {
+    sendMixpanelEvent({
+      user: interaction.user,
+      channel: interaction.channel,
+      guild: interaction.guild,
+      client: mixpanel,
+      customEventName: 'Click status start back button',
+    });
   }
 };
 /**
@@ -254,7 +270,7 @@ const goBackToGameModeSelection = async ({ interaction, nessie }) => {
  * Prepended an underscore as there's a function in announcement with the same name
  * TODO: Clean up the code there eventually
  */
-const _cancelStatusStart = async ({ interaction, nessie }) => {
+const _cancelStatusStart = async ({ interaction, nessie, mixpanel }) => {
   const embed = {
     description: 'Cancelled automatic map status config',
     color: 16711680,
@@ -268,6 +284,14 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
+  } finally {
+    sendMixpanelEvent({
+      user: interaction.user,
+      channel: interaction.channel,
+      guild: interaction.guild,
+      client: mixpanel,
+      customEventName: 'Click status start cancel button',
+    });
   }
 };
 /**
@@ -286,9 +310,15 @@ const _cancelStatusStart = async ({ interaction, nessie }) => {
  * TODO: Save status data in our database
  * TODO: Maybe separate ui and wiring up to respective files/folders for better readability
  */
-const createStatus = async ({ interaction, nessie }) => {
+const createStatus = async ({ interaction, nessie, mixpanel }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
+  const gameModeSelected =
+    isBattleRoyaleSelected && isArenasSelected
+      ? 'All'
+      : isBattleRoyaleSelected
+      ? 'Battle Royale'
+      : 'Arenas';
   const embedLoadingChannels = {
     description: `Loading Status Channels...`,
     color: 16776960,
@@ -390,12 +420,7 @@ const createStatus = async ({ interaction, nessie }) => {
       battleRoyaleWebhookToken: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.token : null,
       arenasWebhookToken: statusArenasWebhook ? statusArenasWebhook.token : null,
       originalChannelId: interaction.channelId,
-      gameModeSelected:
-        isBattleRoyaleSelected && isArenasSelected
-          ? 'All'
-          : isBattleRoyaleSelected
-          ? 'Battle Royale'
-          : 'Arenas',
+      gameModeSelected,
       createdBy: interaction.user.tag,
       createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
@@ -456,6 +481,17 @@ const createStatus = async ({ interaction, nessie }) => {
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
+  } finally {
+    sendMixpanelEvent({
+      user: interaction.user,
+      channel: interaction.channel,
+      guild: interaction.guild,
+      client: mixpanel,
+      customEventName: 'Click status start confirm button',
+      properties: {
+        game_mode_selected: gameModeSelected,
+      },
+    });
   }
 };
 /**

@@ -108,26 +108,28 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
 
     if (interaction.isCommand()) {
-      const { commandName } = interaction;
+      const { commandName, options } = interaction;
+      const usedOption = options.data[0];
+      const isArgument = usedOption && usedOption.type === 'STRING';
+      const isSubcommand = usedOption && usedOption.type === 'SUB_COMMAND';
       await appCommands[commandName].execute({ interaction, nessie, mixpanel });
       /**
        * Send event information to mixpanel for application commands
-       * This is for general commands that do not require arguments
-       * We can't do this here as we can only get the options within the command execution itself
-       * Hence, we have a separate handler for these commands in their own files instead of here
-       * TODO: Refactor conditional in the future, probably a better way to check since this isn't scalable
+       * This is called here so we don't have to repeatadly call them in tn their respective command handlers
+       * The sendMixpanelEvent handler is defaulted to send events as commands/subcommands
+       * For other interactions, we have to call them in their own handlers
+       * TODO: Cleanup analytics code; right now the handler is super smart but sacrifices readability
        */
-      if (commandName !== 'br' && commandName !== 'arenas' && commandName !== 'control') {
-        sendMixpanelEvent(
-          interaction.user,
-          interaction.channel,
-          interaction.guild,
-          commandName,
-          mixpanel,
-          null,
-          true
-        );
-      }
+      sendMixpanelEvent({
+        user: interaction.user,
+        channel: interaction.channel,
+        guild: interaction.guild,
+        command: commandName,
+        subcommand: isSubcommand ? usedOption.name : null,
+        arguments: isArgument ? usedOption.value : null,
+        client: mixpanel,
+        isApplicationCommand: true,
+      });
     }
     /**
      * Since components are also interactions, any user inputs from it go through this listener too
@@ -149,20 +151,28 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           color: 16711680,
         };
         await interaction.deferReply({ ephemeral: true });
+        sendMixpanelEvent({
+          user: interaction.user,
+          channel: interaction.channel,
+          guild: interaction.guild,
+          client: mixpanel,
+          arguments: interaction.customId,
+          customEventName: 'Click wrong user button',
+        });
         return interaction.editReply({ embeds: [wrongUserEmbed] });
       }
       switch (interaction.customId) {
         case 'statusStart__backButton':
-          return goBackToGameModeSelection({ interaction, nessie });
+          return goBackToGameModeSelection({ interaction, nessie, mixpanel });
         case 'statusStart__cancelButton':
-          return _cancelStatusStart({ interaction, nessie });
+          return _cancelStatusStart({ interaction, nessie, mixpanel });
         case 'statusStop__cancelButton':
-          return _cancelStatusStop({ interaction, nessie });
+          return _cancelStatusStop({ interaction, nessie, mixpanel });
         case 'statusStop__stopButton':
-          return deleteGuildStatus({ interaction, nessie });
+          return deleteGuildStatus({ interaction, nessie, mixpanel });
         default:
           if (interaction.customId.includes('statusStart__confirmButton')) {
-            return createStatus({ interaction, nessie });
+            return createStatus({ interaction, nessie, mixpanel });
           }
       }
     }
@@ -175,11 +185,19 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           color: 16711680,
         };
         await interaction.deferReply({ ephemeral: true });
+        sendMixpanelEvent({
+          user: interaction.user,
+          channel: interaction.channel,
+          guild: interaction.guild,
+          client: mixpanel,
+          arguments: interaction.customId,
+          customEventName: 'Click wrong user select menu',
+        });
         return interaction.editReply({ embeds: [wrongUserEmbed] });
       }
       switch (interaction.customId) {
         case 'statusStart__gameModeDropdown':
-          return goToConfirmStatus({ interaction, nessie });
+          return goToConfirmStatus({ interaction, nessie, mixpanel });
       }
     }
   });
