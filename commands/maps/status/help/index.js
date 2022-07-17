@@ -15,8 +15,14 @@ const {
  * Shows a success/warning at the end if any of the permissions are missing
  */
 const sendHelpInteraction = async ({ interaction, nessie }) => {
-  const { hasAdmin, hasManageChannels, hasManageWebhooks, hasSendMessages, hasMissingPermissions } =
-    checkMissingBotPermissions(interaction);
+  const {
+    hasAdmin,
+    hasManageChannels,
+    hasManageWebhooks,
+    hasViewChannel,
+    hasSendMessages,
+    hasMissingPermissions,
+  } = checkMissingBotPermissions(interaction);
   const isAdminUser = checkIfAdminUser(interaction);
 
   try {
@@ -41,7 +47,9 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
           name: 'Bot Permissions',
           value: `${hasAdmin || hasManageChannels ? '✅' : '❌'} Manage Channels\n${
             hasAdmin || hasManageWebhooks ? '✅' : '❌'
-          } Manage Webhooks\n${hasAdmin || hasSendMessages ? '✅' : '❌'} Send Messages\n\n${
+          } Manage Webhooks\n${hasAdmin || hasViewChannel ? '✅' : '❌'} View Channels\n${
+            hasAdmin || hasSendMessages ? '✅' : '❌'
+          } Send Messages\n\n${
             !isAdminUser || hasMissingPermissions
               ? 'Looks like there are missing permissions. Make sure to add the above permissions to be able to create automatic map updates!'
               : 'Looks like everything is set, use `/status start` to get started!'

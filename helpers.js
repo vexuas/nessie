@@ -388,17 +388,19 @@ const generateRankedEmbed = (data, type = 'Battle Royale') => {
 const checkMissingBotPermissions = (interaction) => {
   const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
   const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
+  const hasViewChannel = interaction.guild.me.permissions.has('VIEW_CHANNEL', false);
   const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
   const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
 
   const hasMissingPermissions =
-    (!hasManageChannels || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
+    (!hasManageChannels || !hasViewChannel || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
 
   return {
     hasAdmin,
     hasManageChannels,
     hasManageWebhooks,
     hasSendMessages,
+    hasViewChannel,
     hasMissingPermissions,
   };
 };
@@ -408,7 +410,7 @@ const checkIfAdminUser = (interaction) => {
 const sendMissingBotPermissionsError = async ({ interaction, title }) => {
   const embed = {
     title,
-    description: `Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• Send Messages\n\nFor more details, use ${codeBlock(
+    description: `Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create/stop automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nFor more details, use ${codeBlock(
       '/status help'
     )}`,
     color: 16711680,
@@ -418,7 +420,7 @@ const sendMissingBotPermissionsError = async ({ interaction, title }) => {
 const sendOnlyAdminError = async ({ interaction, title }) => {
   const embed = {
     title,
-    description: `Oops only Admins can create automatic map updates D:\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
+    description: `Oops only Admins can create/stop automatic map updates D:\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
       '/status help'
     )}`,
     color: 16711680,
@@ -428,7 +430,7 @@ const sendOnlyAdminError = async ({ interaction, title }) => {
 const sendMissingAllPermissionsError = async ({ interaction, title }) => {
   const embed = {
     title,
-    description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• Send Messages\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
+    description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
       '/status help'
     )}`,
     color: 16711680,

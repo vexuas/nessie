@@ -512,7 +512,7 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '5 */15 * * * *',
+    '5 */1 * * * *',
     async () => {
       getAllStatus(async (allStatus, client) => {
         const startTime = Date.now();
