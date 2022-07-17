@@ -12,10 +12,9 @@ const sendMixpanelEvent = ({
   client,
   arguments,
   isApplicationCommand,
+  customEventName,
 }) => {
-  const eventToSend = !subcommand
-    ? `Use ${command} command`
-    : `Use ${command} ${subcommand} command`; //Name of event; string interpolated with command as best to write an event as an action a user is doing
+  const eventName = !subcommand ? `Use ${command} command` : `Use ${command} ${subcommand} command`; //Name of event; string interpolated with command as best to write an event as an action a user is doing
   /**
    * Creates and updates a user profile
    * Sets properties everytime event is called and overrides if they're different
@@ -33,7 +32,7 @@ const sendMixpanelEvent = ({
      * Added relevant properties along with event such as user, channel and guild
      * Important to always send `distinct_id` as mixpanel-nodejs uses this as its unique identifier
      */
-    client.track(eventToSend, {
+    client.track(customEventName ? customEventName : eventName, {
       distinct_id: user.id,
       user: user.tag,
       user_name: user.username,
