@@ -97,17 +97,10 @@ const generateConfirmStatusMessage = ({ interaction }) => {
   const confirmButtonId = `statusStart__confirmButton${modeLength > 0 ? '?' : ''}${
     isBattleRoyaleSelected ? 'battle_royale' : ''
   }${modeLength > 1 ? '&' : ''}${isArenasSelected ? 'arenas' : ''}`; //Full selection: statusStart__confirmButton?battle_royale&arenas;
+  const selectionText = `${isBattleRoyaleSelected ? '*Battle Royale*' : ''} ${
+    modeLength > 1 ? 'and' : ''
+  } ${isArenasSelected ? '*Arenas*' : ''}`;
 
-  //TODO: Cleanup the selected game mode display below
-  const mapOptions = {
-    gameModeDropdown__battleRoyaleValue: 'Battle Royale',
-    gameModeDropdown__arenasValue: 'Arenas',
-  };
-
-  let selectedValues = '';
-  interaction.values.forEach((value, index) => {
-    selectedValues += `${index > 0 ? ', ' : ''}${mapOptions[value]}`;
-  });
   const row = new MessageActionRow()
     .addComponents(
       new MessageButton()
@@ -126,7 +119,11 @@ const generateConfirmStatusMessage = ({ interaction }) => {
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
-    description: `Selected ${selectedValues}\n\n• Show selected game modes\n• Explain what channels + webhooks will be created based on selection\n• By confirming below, Nessie will create yada yada yada`,
+    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${modeLength} text-channels and ${modeLength} webhooks for the automatic map updates:\n• ${codeBlock(
+      'Apex Legends Map Status'
+    )}\n${isBattleRoyaleSelected ? `• ${codeBlock('#apex-battle-royale')}\n` : ''}${
+      isArenasSelected ? `• ${codeBlock('#apex-arenas')}\n` : ''
+    }• Webhook for each text channel\n\nUpdates get sent to these channels **every 15 minutes**`,
     color: 3447003,
   };
   return {
