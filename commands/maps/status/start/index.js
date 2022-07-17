@@ -313,6 +313,12 @@ const _cancelStatusStart = async ({ interaction, nessie, mixpanel }) => {
 const createStatus = async ({ interaction, nessie, mixpanel }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
+  const gameModeSelected =
+    isBattleRoyaleSelected && isArenasSelected
+      ? 'All'
+      : isBattleRoyaleSelected
+      ? 'Battle Royale'
+      : 'Arenas';
   const embedLoadingChannels = {
     description: `Loading Status Channels...`,
     color: 16776960,
@@ -414,12 +420,7 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
       battleRoyaleWebhookToken: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.token : null,
       arenasWebhookToken: statusArenasWebhook ? statusArenasWebhook.token : null,
       originalChannelId: interaction.channelId,
-      gameModeSelected:
-        isBattleRoyaleSelected && isArenasSelected
-          ? 'All'
-          : isBattleRoyaleSelected
-          ? 'Battle Royale'
-          : 'Arenas',
+      gameModeSelected,
       createdBy: interaction.user.tag,
       createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
@@ -487,6 +488,9 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
       guild: interaction.guild,
       client: mixpanel,
       customEventName: 'Click status start confirm button',
+      properties: {
+        game_mode_selected: gameModeSelected,
+      },
     });
   }
 };

@@ -13,6 +13,7 @@ const sendMixpanelEvent = ({
   arguments,
   isApplicationCommand,
   customEventName,
+  properties,
 }) => {
   const eventName = !subcommand ? `Use ${command} command` : `Use ${command} ${subcommand} command`; //Name of event; string interpolated with command as best to write an event as an action a user is doing
   /**
@@ -44,6 +45,7 @@ const sendMixpanelEvent = ({
       subcommand: subcommand ? subcommand : 'none',
       arguments: arguments ? arguments : 'none',
       isApplicationCommand: isApplicationCommand, //undefined if command is a prefix command
+      ...properties,
     });
     /**
      * Sets a user profile properties only once
