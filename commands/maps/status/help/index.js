@@ -4,6 +4,7 @@ const {
   sendErrorLog,
   checkMissingBotPermissions,
   checkIfAdminUser,
+  codeBlock,
 } = require('../../../../helpers');
 
 /**
@@ -19,10 +20,18 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
   const isAdminUser = checkIfAdminUser(interaction);
 
   try {
-    const embedData = {
-      title: 'Status | Help',
-      description:
-        "• Explain the status command does\n• Explain what it'll create; channels, webhooks\n• Explain necessary user permissions; admin\n• Explain bot permissions; whatever nessie needs to operate",
+    const embedInformation = {
+      title: 'Information',
+      description: `This command will send automatic updates of Apex Legends Map Rotations. You will be able to choose which game modes, *Battle Royale or/and Arenas*, to get updates for both pubs and ranked.\n\nDepending on what you choose, Nessie will create a set of:\n• ${codeBlock(
+        'Category Channel'
+      )}\n• ${codeBlock('Text Channel(s)')}\n• ${codeBlock(
+        'Webhook(s)'
+      )}\nUpdates will then be sent in these channels **every 15 minutes**\n\n`,
+      color: 3447003,
+    };
+    const embedPermissions = {
+      title: 'Permissions',
+      description: `Nessie requires certain permissions to properly create automatic updates. See the checklist below for the full list.`,
       fields: [
         {
           name: 'User Permissions',
@@ -42,7 +51,13 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
       color: 3447003,
     };
 
-    return await interaction.editReply({ embeds: [embedData] });
+    return await interaction.editReply({
+      embeds: [
+        { title: 'Status | Help', description: '', color: 3447003 },
+        embedInformation,
+        embedPermissions,
+      ],
+    });
   } catch (error) {
     const uuid = uuidv4();
     const type = 'Status Help';
