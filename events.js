@@ -108,8 +108,6 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
 
     if (interaction.isCommand()) {
-      console.log(interaction.options);
-      console.log(interaction.options.data);
       const { commandName, options } = interaction;
       const usedOption = options.data[0];
       const isArgument = usedOption && usedOption.type === 'STRING';
@@ -153,6 +151,14 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           color: 16711680,
         };
         await interaction.deferReply({ ephemeral: true });
+        sendMixpanelEvent({
+          user: interaction.user,
+          channel: interaction.channel,
+          guild: interaction.guild,
+          client: mixpanel,
+          arguments: interaction.customId,
+          customEventName: 'Click Wrong User Button',
+        });
         return interaction.editReply({ embeds: [wrongUserEmbed] });
       }
       switch (interaction.customId) {
@@ -179,6 +185,14 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           color: 16711680,
         };
         await interaction.deferReply({ ephemeral: true });
+        sendMixpanelEvent({
+          user: interaction.user,
+          channel: interaction.channel,
+          guild: interaction.guild,
+          client: mixpanel,
+          arguments: interaction.customId,
+          customEventName: 'Click Wrong User Select Menu',
+        });
         return interaction.editReply({ embeds: [wrongUserEmbed] });
       }
       switch (interaction.customId) {
