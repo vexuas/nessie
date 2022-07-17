@@ -102,12 +102,17 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
         if (err) {
           console.log(err);
         }
-        client.query('COMMIT', (err) => {
+        client.query('DELETE FROM Status WHERE guild_id = ($1)', [guild.id.toString()], (err) => {
           if (err) {
             console.log(err);
           }
-          sendGuildUpdateNotification(nessie, guild, 'leave');
-          done();
+          client.query('COMMIT', (err) => {
+            if (err) {
+              console.log(err);
+            }
+            sendGuildUpdateNotification(nessie, guild, 'leave');
+            done();
+          });
         });
       });
     });
