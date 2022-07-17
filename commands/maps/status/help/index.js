@@ -51,7 +51,11 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
             hasAdmin || hasSendMessages ? '✅' : '❌'
           } Send Messages\n\n${
             !isAdminUser || hasMissingPermissions
-              ? 'Looks like there are missing permissions. Make sure to add the above permissions to be able to create automatic map updates!'
+              ? `Looks like there are missing permissions. Make sure to add the above permissions to be able to use automatic map updates!${
+                  isAdminUser
+                    ? `\nYou can refresh Nessie's permissions by reinviting using this [link](https://discord.com/api/oauth2/authorize?client_id=889135055430111252&permissions=536874000&scope=applications.commands%20bot)`
+                    : ''
+                }`
               : 'Looks like everything is set, use `/status start` to get started!'
           }`,
         },
