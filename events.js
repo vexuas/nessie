@@ -157,22 +157,22 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           guild: interaction.guild,
           client: mixpanel,
           arguments: interaction.customId,
-          customEventName: 'Click Wrong User Button',
+          customEventName: 'Click wrong user button',
         });
         return interaction.editReply({ embeds: [wrongUserEmbed] });
       }
       switch (interaction.customId) {
         case 'statusStart__backButton':
-          return goBackToGameModeSelection({ interaction, nessie });
+          return goBackToGameModeSelection({ interaction, nessie, mixpanel });
         case 'statusStart__cancelButton':
-          return _cancelStatusStart({ interaction, nessie });
+          return _cancelStatusStart({ interaction, nessie, mixpanel });
         case 'statusStop__cancelButton':
-          return _cancelStatusStop({ interaction, nessie });
+          return _cancelStatusStop({ interaction, nessie, mixpanel });
         case 'statusStop__stopButton':
-          return deleteGuildStatus({ interaction, nessie });
+          return deleteGuildStatus({ interaction, nessie, mixpanel });
         default:
           if (interaction.customId.includes('statusStart__confirmButton')) {
-            return createStatus({ interaction, nessie });
+            return createStatus({ interaction, nessie, mixpanel });
           }
       }
     }
@@ -191,7 +191,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
           guild: interaction.guild,
           client: mixpanel,
           arguments: interaction.customId,
-          customEventName: 'Click Wrong User Select Menu',
+          customEventName: 'Click wrong user select menu',
         });
         return interaction.editReply({ embeds: [wrongUserEmbed] });
       }

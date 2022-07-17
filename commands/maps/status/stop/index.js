@@ -11,6 +11,7 @@ const {
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { getStatus, deleteStatus } = require('../../../../database/handler');
+const { sendMixpanelEvent } = require('../../../../analytics');
 /**
  * Handler for when a user initiates the /status stop command
  * Calls the getStatus handler to see for existing status in the guild
@@ -77,7 +78,7 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
  * Handler for when a user clicks the cancel button of /status stop
  * Pretty straightforward; we just edit the initial message with a cancel message similar to the cancel start handler
  */
-const _cancelStatusStop = async ({ interaction, nessie }) => {
+const _cancelStatusStop = async ({ interaction, nessie, mixpanel }) => {
   const embed = {
     description: 'Cancelled automated map status deletion',
     color: 16711680,
@@ -91,6 +92,14 @@ const _cancelStatusStop = async ({ interaction, nessie }) => {
     const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
     await sendErrorLog({ nessie, error, interaction, type, uuid });
+  } finally {
+    sendMixpanelEvent({
+      user: interaction.user,
+      channel: interaction.channel,
+      guild: interaction.guild,
+      client: mixpanel,
+      customEventName: 'Click status stop cancel button',
+    });
   }
 };
 /**
@@ -105,7 +114,7 @@ const _cancelStatusStop = async ({ interaction, nessie }) => {
  *
  * We don't need to delete the webhooks as they'll be automatically deleted along with its channels
  */
-const deleteGuildStatus = async ({ interaction, nessie }) => {
+const deleteGuildStatus = async ({ interaction, nessie, mixpanel }) => {
   await interaction.deferUpdate();
   await deleteStatus(
     interaction.guildId,
@@ -153,6 +162,14 @@ const deleteGuildStatus = async ({ interaction, nessie }) => {
         const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
         await interaction.message.edit({ embeds: errorEmbed, components: [] });
         await sendErrorLog({ nessie, error, interaction, type, uuid });
+      } finally {
+        sendMixpanelEvent({
+          user: interaction.user,
+          channel: interaction.channel,
+          guild: interaction.guild,
+          client: mixpanel,
+          customEventName: 'Click status stop delete button',
+        });
       }
     },
     async (error) => {
