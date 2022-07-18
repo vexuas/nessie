@@ -2,7 +2,7 @@
   <img src="https://cdn.discordapp.com/attachments/248430185463021569/955497690735738900/Nessie_Logo_v2.png" width=120px/>
 </div>
 
-# nessie | v1.9.0 <br>Apex Legends Discord Bot | Map Status
+# nessie | v1.10.0 <br>Apex Legends Discord Bot | Map Status
 
 Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/
 
@@ -15,13 +15,22 @@ Instead of prefixes, Nessie uses Discord's new [Slash Commands](https://support.
 - `br`: map rotation for battle royale
 - `arenas`: map rotation for arenas
 - `control`: map rotation for control
-- `status`: information on how to get automatic map updates
+- `status help`: information on how to set up automatic map updates 
+- `status start`: display configuration steps to start automatic map updates
+- `status stop`: display configuration steps to stop existing automatic map updates
 - `about`: information hub of Nessie
 - `help`: list of commands and how to use them
 - `invite`: generates Nessie's invite link
 - `updates`: shows the latest news and current update of Nessie
 
-Currently there's an announcement command that does automatic map status while publishing those updates in an announcement channel. This is done temporarily as it's impossible to directly show this in individual server messages on a large scale due to [rate limits](https://shizuka.notion.site/Adventures-in-Discord-s-Rate-Limits-4ef7fa20481f4e3b8a388d9cdb1021e7). Made this solution so that people can use it for now while I work on an alternative approach with webhooks; something I have limited experience with hence longer development
+## Setting Up Automatic Map Status
+Gonna add a detailed guide here someday but use `status help` for now! It's probably straightforward enough. Probably.
+
+Cool links regarding the status command:
+- [Design Prototypes](https://www.figma.com/file/Zw83AgLQpObLpPlSoeEWjq/Automatic-Status-Prototype?node-id=144%3A4675)
+- [Adventures in Discord's Rate Limits](https://shizuka.notion.site/Adventures-in-Discord-s-Rate-Limits-4ef7fa20481f4e3b8a388d9cdb1021e7)
+- [Spike on Time Taken for Status Cycles](https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658)
+- [Edge Cases](https://shizuka.notion.site/Status-Command-Edge-Cases-c89b37cff26b4626a2c14adb86f88f3c)
 
 ## TODO
 Full list [here](https://shizuka.notion.site/To-dos-and-Nice-to-Have-s-4946e00c731d44839ad76bb1c72c0328). Kinda exhausted myself working on Nessie so most of these would probably only get picked up after October 2022; gonna be working on other projects in the meantime
