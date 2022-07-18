@@ -24,12 +24,19 @@ Instead of prefixes, Nessie uses Discord's new [Slash Commands](https://support.
 Currently there's an announcement command that does automatic map status while publishing those updates in an announcement channel. This is done temporarily as it's impossible to directly show this in individual server messages on a large scale due to [rate limits](https://shizuka.notion.site/Adventures-in-Discord-s-Rate-Limits-4ef7fa20481f4e3b8a388d9cdb1021e7). Made this solution so that people can use it for now while I work on an alternative approach with webhooks; something I have limited experience with hence longer development
 
 ## TODO
-- Automatic Map Status Updates
+Full list [here](https://shizuka.notion.site/To-dos-and-Nice-to-Have-s-4946e00c731d44839ad76bb1c72c0328). Kinda exhausted myself working on Nessie so most of these would probably only get picked up after October 2022; gonna be working on other projects in the meantime
 - Add installation guide to this readme
+- Create alternative branch to make Nessie easily self hosted
+- Create contribution guide
 - Restructure non-command files
 - Make command files object-oriented
 - Migrate to Typescript
 - Make error handling a reusable component
+- Use webhooks instead of manually sending logs through messages
+- Research multithreading
+- CircleCi Integration
+- Metabase Integration
+- Datadog Integration
 
 ## Tech Stack
 
