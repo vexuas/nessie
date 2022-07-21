@@ -31,6 +31,12 @@ const generateLimitedTimeEventEmbed = (data) => {
   };
   return embedData;
 };
+/**
+ * Handler for limited time events
+ * Tbh I'm not so sure what I want to do with this currently
+ * Since it's definitely not scalable to be updating and releasing everytime an event ends
+ * Maybe make it so that it'll always exist as a command and return a specific error if there's no ltm?
+ */
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ltm')
