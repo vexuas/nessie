@@ -1,3 +1,43 @@
+# v1.10.0 (Thu Jul 21 2022)
+
+#### 🚀 Enhancement
+
+- Add limited time event command [#105](https://github.com/vexuas/nessie/pull/105) ([@vexuas](https://github.com/vexuas))
+- Add wrong user ephemeral handler [#96](https://github.com/vexuas/nessie/pull/96) ([@vexuas](https://github.com/vexuas))
+- Revamp status flow [#95](https://github.com/vexuas/nessie/pull/95) ([@vexuas](https://github.com/vexuas))
+- Add permissions errors in status commands [#93](https://github.com/vexuas/nessie/pull/93) ([@vexuas](https://github.com/vexuas))
+- Initialise status scheduler [#92](https://github.com/vexuas/nessie/pull/92) ([@vexuas](https://github.com/vexuas))
+- Wire up status stop [#90](https://github.com/vexuas/nessie/pull/90) ([@vexuas](https://github.com/vexuas))
+- Wire up status start [#89](https://github.com/vexuas/nessie/pull/89) ([@vexuas](https://github.com/vexuas))
+- Create map status [#86](https://github.com/vexuas/nessie/pull/86) ([@vexuas](https://github.com/vexuas))
+- Create status start command [#85](https://github.com/vexuas/nessie/pull/85) ([@vexuas](https://github.com/vexuas))
+- Create status help command [#84](https://github.com/vexuas/nessie/pull/84) ([@vexuas](https://github.com/vexuas))
+
+#### 🐛 Bug Fix
+
+- Update todos and readme [#104](https://github.com/vexuas/nessie/pull/104) ([@vexuas](https://github.com/vexuas))
+- Update status copies [#103](https://github.com/vexuas/nessie/pull/103) ([@vexuas](https://github.com/vexuas))
+- Delete status when bot leaves server [#102](https://github.com/vexuas/nessie/pull/102) ([@vexuas](https://github.com/vexuas))
+- Add mixpanel tracking to status [#101](https://github.com/vexuas/nessie/pull/101) ([@vexuas](https://github.com/vexuas))
+- Clean up announcement command [#100](https://github.com/vexuas/nessie/pull/100) ([@vexuas](https://github.com/vexuas))
+- Add prompt to use status in map commands [#99](https://github.com/vexuas/nessie/pull/99) ([@vexuas](https://github.com/vexuas))
+- Add logging for status [#98](https://github.com/vexuas/nessie/pull/98) ([@vexuas](https://github.com/vexuas))
+- Error handling for status cycle errors [#97](https://github.com/vexuas/nessie/pull/97) ([@vexuas](https://github.com/vexuas))
+- Restructure command files [#91](https://github.com/vexuas/nessie/pull/91) ([@vexuas](https://github.com/vexuas))
+- Spike webhook status implementation [#88](https://github.com/vexuas/nessie/pull/88) ([@vexuas](https://github.com/vexuas))
+- Upgrade to v13.3.1 [#87](https://github.com/vexuas/nessie/pull/87) ([@vexuas](https://github.com/vexuas))
+- Spike menu selects [#83](https://github.com/vexuas/nessie/pull/83) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 06 26 [#82](https://github.com/vexuas/nessie/pull/82) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.9.0 (Sun Jun 26 2022)
 
 #### 🚀 Enhancement
