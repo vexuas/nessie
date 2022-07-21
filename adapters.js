@@ -93,6 +93,13 @@ exports.getControlPubs = async () => {
   console.log(data);
   return data;
 };
+exports.getLimitedTimeEvent = async () => {
+  const data = await axios.get(url).then((response) => {
+    return response.data.ltm;
+  });
+  console.log(data);
+  return data;
+};
 exports.getRotationData = async () => {
   const data = await axios.get(url).then((response) => {
     return response.data;
