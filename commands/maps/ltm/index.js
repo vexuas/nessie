@@ -1,8 +1,36 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { v4: uuidv4 } = require('uuid');
 const { getLimitedTimeEvent } = require('../../../adapters');
-const { generateErrorEmbed, generatePubsEmbed } = require('../../../helpers');
+const { generateErrorEmbed, getMapUrl, getCountdown, sendErrorLog } = require('../../../helpers');
 
+const generateLimitedTimeEventEmbed = (data) => {
+  const embedData = {
+    title: data.current.eventName,
+    description: '',
+    color: 15105570,
+    image: {
+      url:
+        getMapUrl(data.current.code).length > 0 ? getMapUrl(data.current.code) : data.current.asset,
+    },
+    timestamp: Date.now() + data.current.remainingSecs * 1000,
+    footer: {
+      text: `Next Map: ${data.next.map}`,
+    },
+    fields: [
+      {
+        name: 'Current map',
+        value: '```fix\n\n' + data.current.map + '```',
+        inline: true,
+      },
+      {
+        name: 'Time left',
+        value: '```xl\n\n' + getCountdown(data.current.remainingTimer) + '```',
+        inline: true,
+      },
+    ],
+  };
+  return embedData;
+};
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ltm')
@@ -11,8 +39,8 @@ module.exports = {
     try {
       await interaction.deferReply();
       const data = await getLimitedTimeEvent();
-      const embed = generatePubsEmbed(data, data.current.eventName);
-      interaction.editReply({ embeds: [embed] });
+      const embed = generateLimitedTimeEventEmbed(data);
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       const uuid = uuidv4();
       const type = 'Limited Time Event';
