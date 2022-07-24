@@ -3,10 +3,10 @@ const {
   sendErrorLog,
   codeBlock,
   checkMissingBotPermissions,
-  checkIfAdminUser,
   sendMissingAllPermissionsError,
   sendMissingBotPermissionsError,
-  sendOnlyAdminError,
+  checkIfUserHasManageServer,
+  sendMissingUserPermissionError,
 } = require('../../../../helpers');
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageButton } = require('discord.js');
@@ -23,14 +23,15 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
     interaction.guildId,
     async (status) => {
       const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
-      const isAdminUser = checkIfAdminUser(interaction);
+      const isManageServerUser = checkIfUserHasManageServer(interaction);
       if (status) {
-        if (hasMissingPermissions && !isAdminUser) {
+        if (hasMissingPermissions && !isManageServerUser) {
           return sendMissingAllPermissionsError({ interaction, title: 'Status | Stop' });
         } else {
           if (hasMissingPermissions)
             return sendMissingBotPermissionsError({ interaction, title: 'Status | Stop' });
-          if (!isAdminUser) return sendOnlyAdminError({ interaction, title: 'Status | Stop' });
+          if (!isManageServerUser)
+            return sendMissingUserPermissionError({ interaction, title: 'Status | Stop' });
         }
       }
       const embed = {
