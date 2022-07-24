@@ -1,3 +1,19 @@
+# v1.10.1 (Sun Jul 24 2022)
+
+#### 🐛 Bug Fix
+
+- Change user permission for status [#107](https://github.com/vexuas/nessie/pull/107) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 07 21 [#106](https://github.com/vexuas/nessie/pull/106) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.10.0 (Thu Jul 21 2022)
 
 #### 🚀 Enhancement
