@@ -3,7 +3,6 @@ const {
   sendErrorLog,
   codeBlock,
   checkMissingBotPermissions,
-  checkIfAdminUser,
   sendMissingAllPermissionsError,
   sendMissingBotPermissionsError,
   checkIfUserHasManageServer,
@@ -24,15 +23,14 @@ const sendStopInteraction = async ({ interaction, nessie }) => {
     interaction.guildId,
     async (status) => {
       const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
-      const isAdminUser = checkIfAdminUser(interaction);
-      const hasManageServer = checkIfUserHasManageServer(interaction);
+      const isManageServerUser = checkIfUserHasManageServer(interaction);
       if (status) {
-        if (hasMissingPermissions && !isAdminUser) {
+        if (hasMissingPermissions && !isManageServerUser) {
           return sendMissingAllPermissionsError({ interaction, title: 'Status | Stop' });
         } else {
           if (hasMissingPermissions)
             return sendMissingBotPermissionsError({ interaction, title: 'Status | Stop' });
-          if (!(isAdminUser || hasManageServer))
+          if (!isManageServerUser)
             return sendMissingUserPermissionError({ interaction, title: 'Status | Stop' });
         }
       }

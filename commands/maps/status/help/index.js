@@ -3,8 +3,8 @@ const {
   generateErrorEmbed,
   sendErrorLog,
   checkMissingBotPermissions,
-  checkIfAdminUser,
   codeBlock,
+  checkIfUserHasManageServer,
 } = require('../../../../helpers');
 
 /**
@@ -23,7 +23,7 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
     hasSendMessages,
     hasMissingPermissions,
   } = checkMissingBotPermissions(interaction);
-  const isAdminUser = checkIfAdminUser(interaction);
+  const isManageServerUser = checkIfUserHasManageServer(interaction);
 
   try {
     const embedInformation = {
@@ -41,7 +41,7 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
       fields: [
         {
           name: 'User Permissions',
-          value: `${isAdminUser ? '✅' : '❌'} Administrator`,
+          value: `${isManageServerUser ? '✅' : '❌'} Manage Server`,
         },
         {
           name: 'Bot Permissions',
@@ -50,9 +50,9 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
           } Manage Webhooks\n${hasAdmin || hasViewChannel ? '✅' : '❌'} View Channels\n${
             hasAdmin || hasSendMessages ? '✅' : '❌'
           } Send Messages\n\n${
-            !isAdminUser || hasMissingPermissions
+            !isManageServerUser || hasMissingPermissions
               ? `Looks like there are missing permissions. Make sure to add the above permissions to be able to use automatic map updates!${
-                  isAdminUser
+                  isManageServerUser
                     ? `\nYou can refresh Nessie's permissions by reinviting using this [link](https://discord.com/api/oauth2/authorize?client_id=889135055430111252&permissions=536874000&scope=applications.commands%20bot)`
                     : ''
                 }`
