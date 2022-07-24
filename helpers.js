@@ -407,6 +407,9 @@ const checkMissingBotPermissions = (interaction) => {
 const checkIfAdminUser = (interaction) => {
   return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
 };
+const checkIfUserHasManageServer = (interaction) => {
+  return interaction.member.permissions.has('MANAGE_GUILD'); //Checks if user who initiated command has the Manage Server/Guild permission
+};
 const sendMissingBotPermissionsError = async ({ interaction, title }) => {
   const embed = {
     title,
@@ -417,10 +420,12 @@ const sendMissingBotPermissionsError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
-const sendOnlyAdminError = async ({ interaction, title }) => {
+const sendMissingUserPermissionError = async ({ interaction, title }) => {
   const embed = {
     title,
-    description: `Oops only Admins can create/stop automatic map updates D:\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
+    description: `Oops only users with the ${codeBlock(
+      'Manage Server'
+    )} permission can create/stop automatic map updates D:\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${codeBlock(
       '/status help'
     )}`,
     color: 16711680,
@@ -430,7 +435,7 @@ const sendOnlyAdminError = async ({ interaction, title }) => {
 const sendMissingAllPermissionsError = async ({ interaction, title }) => {
   const embed = {
     title,
-    description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nRequired User Permissions:\n• Administrator\n\nFor more details, use ${codeBlock(
+    description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${codeBlock(
       '/status help'
     )}`,
     color: 16711680,
@@ -453,8 +458,9 @@ module.exports = {
   generateRankedEmbed,
   checkMissingBotPermissions,
   checkIfAdminUser,
+  checkIfUserHasManageServer,
   sendMissingBotPermissionsError,
-  sendOnlyAdminError,
+  sendMissingUserPermissionError,
   sendMissingAllPermissionsError,
   sendStatusErrorLog,
 };

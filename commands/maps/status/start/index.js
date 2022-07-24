@@ -8,10 +8,11 @@ const {
   checkMissingBotPermissions,
   sendMissingBotPermissionsError,
   checkIfAdminUser,
-  sendOnlyAdminError,
   sendMissingAllPermissionsError,
   codeBlock,
   sendStatusErrorLog,
+  checkIfUserHasManageServer,
+  sendMissingUserPermissionError,
 } = require('../../../../helpers');
 const { getRotationData } = require('../../../../adapters');
 const { nessieLogo } = require('../../../../constants');
@@ -183,6 +184,7 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
       const { embed, row } = generateGameModeSelectionMessage(status);
       const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
       const isAdminUser = checkIfAdminUser(interaction);
+      const hasManageServer = checkIfUserHasManageServer(interaction);
       try {
         if (!status) {
           if (hasMissingPermissions && !isAdminUser) {
@@ -190,7 +192,8 @@ const sendStartInteraction = async ({ interaction, nessie }) => {
           } else {
             if (hasMissingPermissions)
               return sendMissingBotPermissionsError({ interaction, title: 'Status | Start' });
-            if (!isAdminUser) return sendOnlyAdminError({ interaction, title: 'Status | Start' });
+            if (!(isAdminUser || hasManageServer))
+              return sendMissingUserPermissionError({ interaction, title: 'Status | Start' });
           }
         }
         await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
