@@ -40,7 +40,7 @@ const generateLimitedTimeEventEmbed = (data) => {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ltm')
-    .setDescription('Shows current limited event map rotation'),
+    .setDescription('Shows current limited time mode map rotation'),
   async execute({ nessie, interaction }) {
     try {
       await interaction.deferReply();

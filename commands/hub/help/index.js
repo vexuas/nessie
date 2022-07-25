@@ -9,11 +9,15 @@ module.exports = {
       fields: [
         {
           name: 'Maps',
-          value: '`br`, `arenas`, `control`, `status`',
+          value: '`br`, `arenas`, `ltm`',
         },
         {
           name: 'Information',
           value: '`about`, `help`, `invite`, `updates`',
+        },
+        {
+          name: 'Automation',
+          value: '`status help`, `status start`, `status stop`',
         },
       ],
     };
