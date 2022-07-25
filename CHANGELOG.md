@@ -1,3 +1,19 @@
+# v1.10.2 (Mon Jul 25 2022)
+
+#### 🐛 Bug Fix
+
+- Update help commands [#109](https://github.com/vexuas/nessie/pull/109) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 07 24 [#108](https://github.com/vexuas/nessie/pull/108) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.10.1 (Sun Jul 24 2022)
 
 #### 🐛 Bug Fix
