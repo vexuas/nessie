@@ -515,7 +515,7 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '5 */15 * * * *',
+    '5 * * * * *',
     async () => {
       errorNotification.count = 0;
       errorNotification.message = '';
@@ -601,6 +601,7 @@ const handleStatusCycle = async ({
   arenasStatusEmbeds,
 }) => {
   try {
+    throw new Error('test error');
     const brWebhook =
       status.br_webhook_id &&
       status.br_webhook_token &&
@@ -663,10 +664,29 @@ const handleStatusCycle = async ({
       await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
   } catch (error) {
-    errorNotification.count = errorNotification + 1;
-    errorNotification.message = error;
+    errorNotification.count = errorNotification.count + 1;
+    errorNotification.message = error.message;
     const uuid = uuidv4();
-    errorNotification.count < 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
+    errorNotification.count <= 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
+    if (errorNotification.count !== 0 && index === totalCount - 1) {
+      const errorChannel = nessie.channels.cache.get('938441853542465548');
+      const errorEmbed = {
+        title: 'Error Summary | Status Cycle',
+        color: 16711680,
+        description: `Error: ${codeBlock(errorNotification.message)}`,
+        fields: [
+          {
+            name: 'Number of guilds affected',
+            value: errorNotification.count.toString(),
+          },
+          {
+            name: 'Timestamp',
+            value: format(new Date(), 'dd MMM yyyy, h:mm:ss a'),
+          },
+        ],
+      };
+      await errorChannel.send({ embeds: [errorEmbed] });
+    }
 
     if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
       deleteStatus(status.guild_id, async (status) => {
