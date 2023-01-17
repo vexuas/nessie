@@ -517,6 +517,8 @@ const scheduleStatus = (nessie) => {
   return new Scheduler(
     '5 */15 * * * *',
     async () => {
+      errorNotification.count = 0;
+      errorNotification.message = '';
       getAllStatus(async (allStatus, client) => {
         const startTime = Date.now();
         try {
