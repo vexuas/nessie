@@ -1,3 +1,21 @@
+# v1.10.3 (Wed Jan 18 2023)
+
+#### 🐛 Bug Fix
+
+- Simplify error status cycle notifications [#113](https://github.com/vexuas/nessie/pull/113) ([@vexuas](https://github.com/vexuas))
+- Add template [#112](https://github.com/vexuas/nessie/pull/112) ([@vexuas](https://github.com/vexuas))
+- Add image for broken moon [#111](https://github.com/vexuas/nessie/pull/111) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 07 25 [#110](https://github.com/vexuas/nessie/pull/110) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.10.2 (Mon Jul 25 2022)
 
 #### 🐛 Bug Fix
