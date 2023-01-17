@@ -515,7 +515,7 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
  */
 const scheduleStatus = (nessie) => {
   return new Scheduler(
-    '5 * * * * *',
+    '5 */15 * * * *',
     async () => {
       errorNotification.count = 0;
       errorNotification.message = '';
@@ -601,7 +601,6 @@ const handleStatusCycle = async ({
   arenasStatusEmbeds,
 }) => {
   try {
-    throw new Error('test error');
     const brWebhook =
       status.br_webhook_id &&
       status.br_webhook_token &&
@@ -664,6 +663,15 @@ const handleStatusCycle = async ({
       await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
   } catch (error) {
+    /**
+     * Previously we sent an error notification to a channel whenever a status errors within a cycle
+     * This was fine in the beginning so that I can be notified relatively fast
+     * However with nessie supporting over a hundred statuses now, it's become quite insane being greeted with dozens of notifcations
+     * To avoid the spam and potential api abuse, I've added a simple system on error notification below
+     * Granted it does use a global object for now but I'm allowing this sin since the latter would require complicated refactors (Im not really feeling it now)
+     * Essentially, we only log a max of 3 individual guild error messages before sending an error summary of guilds affected and message at the end of the cycle
+     * Resets error notification meta every cycle
+     */
     errorNotification.count = errorNotification.count + 1;
     errorNotification.message = error.message;
     const uuid = uuidv4();
