@@ -557,12 +557,13 @@ const scheduleStatus = (nessie) => {
               },
             },
           ].concat(await generateErrorEmbed(error, uuid, nessie));
-          allStatus.forEach(async (status) => {
+          allStatus.forEach(async (status, index) => {
             await handleStatusCycle({
               nessie,
               status,
               brStatusEmbeds: errorEmbed,
               arenasStatusEmbeds: errorEmbed,
+              index,
             });
           });
           await sendErrorLog({ nessie, error, type, uuid, ping: true });
@@ -660,8 +661,11 @@ const handleStatusCycle = async ({
       await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
   } catch (error) {
+    errorNotification.count = errorNotification + 1;
+    errorNotification.message = error;
     const uuid = uuidv4();
-    await sendStatusErrorLog({ nessie, uuid, error, status });
+    errorNotification.count < 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
+
     if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
       deleteStatus(status.guild_id, async (status) => {
         try {
