@@ -298,8 +298,10 @@ const getMapUrl = (map) => {
       return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
     case 'storm_point_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
+    case 'broken_moon_rotation':
+      return 'https://cdn.discordapp.com/attachments/896544134813319168/1064934640739164240/broken_moon.jpg';
     default:
-      return '';
+      return null;
   }
 };
 /**
