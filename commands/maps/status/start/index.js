@@ -24,6 +24,11 @@ const {
 } = require('../../../../database/handler');
 const Scheduler = require('../../../../scheduler');
 const { sendMixpanelEvent } = require('../../../../analytics');
+
+const errorNotification = {
+  count: 0,
+  message: '',
+};
 /**
  * Handler for generating the UI for Game Mode Selection Step as well as Confirm Status step below
  * This is separated from the interaction handlers as we want to be able to reuse them when the user goes back and forth through the steps
