@@ -4,13 +4,13 @@ const { getLimitedTimeEvent } = require('../../../adapters');
 const { generateErrorEmbed, getMapUrl, getCountdown, sendErrorLog } = require('../../../helpers');
 
 const generateLimitedTimeEventEmbed = (data) => {
+  const mapURL = getMapUrl(data.current.code);
   const embedData = {
     title: data.current.eventName,
     description: '',
     color: 15105570,
     image: {
-      url:
-        getMapUrl(data.current.code).length > 0 ? getMapUrl(data.current.code) : data.current.asset,
+      url: mapURL && mapURL.length > 0 ? mapURL : data.current.asset,
     },
     timestamp: Date.now() + data.current.remainingSecs * 1000,
     footer: {
