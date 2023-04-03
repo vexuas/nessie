@@ -1,3 +1,20 @@
+# v1.10.4 (Mon Apr 03 2023)
+
+#### 🐛 Bug Fix
+
+- Fix LTM command [#116](https://github.com/vexuas/nessie/pull/116) ([@vexuas](https://github.com/vexuas))
+- Reinstall discordjs package [#115](https://github.com/vexuas/nessie/pull/115) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2022 01 18 [#114](https://github.com/vexuas/nessie/pull/114) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.10.3 (Wed Jan 18 2023)
 
 #### 🐛 Bug Fix
