@@ -1,3 +1,35 @@
+# v1.10.5 (Tue Apr 18 2023)
+
+#### 🐛 Bug Fix
+
+- Add information for Missing Access error [#132](https://github.com/vexuas/nessie/pull/132) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 04 03 [#117](https://github.com/vexuas/nessie/pull/117) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Upgrade nodemon [#131](https://github.com/vexuas/nessie/pull/131) ([@vexuas](https://github.com/vexuas))
+- Bump node-fetch from 2.6.2 to 2.6.7 [#130](https://github.com/vexuas/nessie/pull/130) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump minimatch from 3.0.4 to 3.1.2 [#128](https://github.com/vexuas/nessie/pull/128) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Upgrade auto [#129](https://github.com/vexuas/nessie/pull/129) ([@vexuas](https://github.com/vexuas))
+- Upgrade mocha [#127](https://github.com/vexuas/nessie/pull/127) ([@vexuas](https://github.com/vexuas))
+- Bump ansi-regex from 3.0.0 to 3.0.1 [#126](https://github.com/vexuas/nessie/pull/126) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump moment-timezone from 0.5.34 to 0.5.43 [#125](https://github.com/vexuas/nessie/pull/125) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump http-cache-semantics from 4.1.0 to 4.1.1 [#124](https://github.com/vexuas/nessie/pull/124) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump minimist from 1.2.5 to 1.2.8 [#123](https://github.com/vexuas/nessie/pull/123) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump follow-redirects from 1.14.4 to 1.15.2 [#120](https://github.com/vexuas/nessie/pull/120) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump sqlite3 from 5.0.2 to 5.1.5 [#121](https://github.com/vexuas/nessie/pull/121) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump moment from 2.29.1 to 2.29.4 [#119](https://github.com/vexuas/nessie/pull/119) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.10.4 (Mon Apr 03 2023)
 
 #### 🐛 Bug Fix
