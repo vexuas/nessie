@@ -24,6 +24,6 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "auto": "^10.32.0"
+    "auto": "^10.44.0"
   }
 }
