@@ -158,8 +158,13 @@ const generateErrorEmbed = async (error, uuid, nessie) => {
     errorMessage.lastIndexOf(']') - 3
   );
 
+  const missingAccessAlert =
+    'Oops looks like Nessie has missing access! This sometimes happens in servers where there are permission overwrites for default roles. An example of these are `View Channel` and `Send Messages` permissions that might not be enabled by default for new users/bots.\n\nTo grant access and use automatic map status, enable the `View Channels` and `Send Messages` permissions for Nessie through Server Settings -> Roles';
+
   const embed = {
-    description: `${errorAlert}\n\nError: ${
+    description: `${
+      error.message.includes('Missing Access') ? missingAccessAlert : errorAlert
+    }\n\nError: ${
       error.message ? codeBlock(error.message) : codeBlock('Unexpected Error')
     }\nError ID: ${codeBlock(
       uuid
