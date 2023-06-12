@@ -1,8 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getControlPubs } = require('../../../adapters');
-const { sendErrorLog, generatePubsEmbed, codeBlock } = require('../../../helpers');
+const { getControlPubs } = require('../../../services/adapters');
+const { sendErrorLog, generatePubsEmbed, codeBlock } = require('../../../utils/helpers');
 const { v4: uuidv4 } = require('uuid');
-const { sendMixpanelEvent } = require('../../../analytics');
 
 module.exports = {
   data: new SlashCommandBuilder()

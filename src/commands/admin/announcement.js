@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { codeBlock } = require('../../helpers');
+const { codeBlock } = require('../../utils/helpers');
 
 /**
  * We no longer have use for announcements with the status feature being released soon

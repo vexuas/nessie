@@ -22,7 +22,7 @@ const {
   getAllStatus,
   deleteStatus,
 } = require('../../../../services/database');
-const Scheduler = require('../../../../../scheduler');
+const Scheduler = require('../../../../services/scheduler');
 const { sendMixpanelEvent } = require('../../../../services/analytics');
 
 const errorNotification = {

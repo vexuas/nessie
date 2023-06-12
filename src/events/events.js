@@ -17,7 +17,7 @@ const {
 } = require('../utils/helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { getApplicationCommands } = require('../../commands');
+const { getApplicationCommands } = require('../commands/commands');
 const {
   createGuildTable,
   insertNewGuild,
@@ -31,8 +31,8 @@ const {
   _cancelStatusStart,
   createStatus,
   scheduleStatus,
-} = require('./commands/maps/status/start');
-const { _cancelStatusStop, deleteGuildStatus } = require('./commands/maps/status/stop');
+} = require('../commands/maps/status/start');
+const { _cancelStatusStop, deleteGuildStatus } = require('../commands/maps/status/stop');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
