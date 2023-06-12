@@ -13,7 +13,7 @@ const {
   checkIfUserHasManageServer,
   sendMissingUserPermissionError,
 } = require('../../../../../helpers');
-const { getRotationData } = require('../../../../../adapters');
+const { getRotationData } = require('../../../../services/adapters');
 const { nessieLogo } = require('../../../../../constants');
 const { format, differenceInSeconds, differenceInMilliseconds } = require('date-fns');
 const {
@@ -23,7 +23,7 @@ const {
   deleteStatus,
 } = require('../../../../../database/handler');
 const Scheduler = require('../../../../../scheduler');
-const { sendMixpanelEvent } = require('../../../../../analytics');
+const { sendMixpanelEvent } = require('../../../../services/analytics');
 
 const errorNotification = {
   count: 0,

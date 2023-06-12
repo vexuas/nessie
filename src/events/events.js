@@ -6,8 +6,8 @@
  * But that would be in another time heh
  */
 const { guildIDs, token } = require('../../config/nessie.json');
-const { getBattleRoyalePubs } = require('../../adapters');
-const { sendMixpanelEvent } = require('../../analytics');
+const { getBattleRoyalePubs } = require('../services/adapters');
+const { sendMixpanelEvent } = require('../services/analytics');
 const {
   sendHealthLog,
   sendGuildUpdateNotification,
