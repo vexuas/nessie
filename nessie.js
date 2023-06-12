@@ -12,7 +12,7 @@ const nessie = new Discord.Client({
     Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING,
   ],
 });
-const { token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./config/nessie.json'); //Get config data from config folder
+const { token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./src/config/nessie.json'); //Get config data from config folder
 const { checkIfInDevelopment } = require('./src/utils/helpers');
 const { AutoPoster } = require('topgg-autoposter');
 const { registerEventHandlers } = require('./src/events/events');

@@ -5,7 +5,7 @@
  * The next good move is to separate each event handler on its own file and have this as the main initialisation
  * But that would be in another time heh
  */
-const { guildIDs, token } = require('../../config/nessie.json');
+const { guildIDs, token } = require('../config/nessie.json');
 const { getBattleRoyalePubs } = require('../services/adapters');
 const { sendMixpanelEvent } = require('../services/analytics');
 const {
