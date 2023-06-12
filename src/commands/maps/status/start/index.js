@@ -12,18 +12,18 @@ const {
   sendStatusErrorLog,
   checkIfUserHasManageServer,
   sendMissingUserPermissionError,
-} = require('../../../../helpers');
-const { getRotationData } = require('../../../../adapters');
-const { nessieLogo } = require('../../../../constants');
+} = require('../../../../../helpers');
+const { getRotationData } = require('../../../../../adapters');
+const { nessieLogo } = require('../../../../../constants');
 const { format, differenceInSeconds, differenceInMilliseconds } = require('date-fns');
 const {
   insertNewStatus,
   getStatus,
   getAllStatus,
   deleteStatus,
-} = require('../../../../database/handler');
-const Scheduler = require('../../../../scheduler');
-const { sendMixpanelEvent } = require('../../../../analytics');
+} = require('../../../../../database/handler');
+const Scheduler = require('../../../../../scheduler');
+const { sendMixpanelEvent } = require('../../../../../analytics');
 
 const errorNotification = {
   count: 0,

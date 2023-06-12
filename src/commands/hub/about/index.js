@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { format } = require('date-fns');
-const { nessieLogo } = require('../../../constants');
-const { version } = require('../../../package.json');
+const { nessieLogo } = require('../../../../constants');
+const { version } = require('../../../../package.json');
 
 const sendAboutEmbed = async ({ nessie, interaction }) => {
   const embed = {
