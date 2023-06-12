@@ -21,7 +21,7 @@ const {
   getStatus,
   getAllStatus,
   deleteStatus,
-} = require('../../../../../database/handler');
+} = require('../../../../services/database');
 const Scheduler = require('../../../../../scheduler');
 const { sendMixpanelEvent } = require('../../../../services/analytics');
 

@@ -23,7 +23,7 @@ const {
   insertNewGuild,
   removeServerDataFromNessie,
   createStatusTable,
-} = require('../../database/handler');
+} = require('../services/database');
 const { v4: uuidv4 } = require('uuid');
 const {
   goToConfirmStatus,
