@@ -15,7 +15,7 @@ const nessie = new Discord.Client({
 const { token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./config/nessie.json'); //Get config data from config folder
 const { checkIfInDevelopment } = require('./helpers');
 const { AutoPoster } = require('topgg-autoposter');
-const { registerEventHandlers } = require('./events');
+const { registerEventHandlers } = require('./src/events/events');
 let mixpanel;
 
 //----------

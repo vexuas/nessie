@@ -5,25 +5,25 @@
  * The next good move is to separate each event handler on its own file and have this as the main initialisation
  * But that would be in another time heh
  */
-const { guildIDs, token } = require('./config/nessie.json');
-const { getBattleRoyalePubs } = require('./adapters');
-const { sendMixpanelEvent } = require('./analytics');
+const { guildIDs, token } = require('../../config/nessie.json');
+const { getBattleRoyalePubs } = require('../../adapters');
+const { sendMixpanelEvent } = require('../../analytics');
 const {
   sendHealthLog,
   sendGuildUpdateNotification,
   checkIfInDevelopment,
   sendErrorLog,
   codeBlock,
-} = require('./helpers');
+} = require('../../helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { getApplicationCommands } = require('./commands');
+const { getApplicationCommands } = require('../../commands');
 const {
   createGuildTable,
   insertNewGuild,
   removeServerDataFromNessie,
   createStatusTable,
-} = require('./database/handler');
+} = require('../../database/handler');
 const { v4: uuidv4 } = require('uuid');
 const {
   goToConfirmStatus,
