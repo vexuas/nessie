@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 const { databaseConfig } = require('../config/database');
-const { sendGuildUpdateNotification } = require('../helpers');
+const { sendGuildUpdateNotification } = require('../src/utils/helpers');
 const { defaultPrefix } = require('../config/nessie.json');
 
 exports.pool = new Pool(databaseConfig); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling

@@ -12,9 +12,9 @@ const {
   sendStatusErrorLog,
   checkIfUserHasManageServer,
   sendMissingUserPermissionError,
-} = require('../../../../../helpers');
+} = require('../../../../utils/helpers');
 const { getRotationData } = require('../../../../services/adapters');
-const { nessieLogo } = require('../../../../../constants');
+const { nessieLogo } = require('../../../../utils/constants');
 const { format, differenceInSeconds, differenceInMilliseconds } = require('date-fns');
 const {
   insertNewStatus,

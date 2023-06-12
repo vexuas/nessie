@@ -14,7 +14,7 @@ const {
   checkIfInDevelopment,
   sendErrorLog,
   codeBlock,
-} = require('../../helpers');
+} = require('../utils/helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { getApplicationCommands } = require('../../commands');
