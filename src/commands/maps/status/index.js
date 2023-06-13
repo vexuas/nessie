@@ -32,7 +32,7 @@ module.exports = {
       subCommand.setName('stop').setDescription('Stops existing automatic map updates')
     ),
 
-  async execute({ nessie, interaction, mixpanel }) {
+  async execute({ nessie, interaction }) {
     const statusOption = interaction.options.getSubcommand();
     try {
       await interaction.deferReply();

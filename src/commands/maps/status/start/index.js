@@ -519,7 +519,7 @@ const scheduleStatus = (nessie) => {
     async () => {
       errorNotification.count = 0;
       errorNotification.message = '';
-      getAllStatus(async (allStatus, client) => {
+      getAllStatus(async (allStatus) => {
         const startTime = Date.now();
         try {
           if (allStatus) {

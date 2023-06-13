@@ -14,7 +14,7 @@ module.exports = {
         .setRequired(true)
         .addChoice('pubs', 'control_pubs')
     ),
-  async execute({ nessie, interaction, mixpanel }) {
+  async execute({ nessie, interaction }) {
     let data;
     let embed;
     try {

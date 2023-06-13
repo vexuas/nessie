@@ -95,15 +95,6 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     }
   });
   //------
-  /**
-   * Event handler for when a message is sent in a channel that nessie is in
-   * As of May 22 2022, removed any implementations for this event
-   * Discord would be limiting this event for special applications and only be used on a per request basis
-   * As nessie doesn't need this, we're deprecating the need of listening to messages and instead using interactions
-   * Keeping this in for now until it's officially gone in August
-   */
-  nessie.on('messageCreate', async (message) => {});
-
   nessie.on('interactionCreate', async (interaction) => {
     if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
 

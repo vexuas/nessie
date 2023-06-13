@@ -10,7 +10,6 @@ const sendMixpanelEvent = ({
   command,
   subcommand,
   client,
-  arguments,
   isApplicationCommand,
   customEventName,
   properties,
