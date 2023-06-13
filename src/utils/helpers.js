@@ -1,4 +1,5 @@
 const { format } = require('date-fns');
+const { ENV } = require('../config/environment');
 const { nessieLogo } = require('./constants');
 //----------
 /**
@@ -113,26 +114,13 @@ const serverEmbed = async (client, guild, status) => {
  */
 const sendGuildUpdateNotification = async (client, guild, type) => {
   const embed = await serverEmbed(client, guild, type);
-  const channelId = checkIfInDevelopment(client) ? '889212328539725824' : '896710863459844136';
+  const channelId = ENV === 'dev' ? '889212328539725824' : '896710863459844136';
   const channelToSend = client.channels.cache.get(channelId);
 
   channelToSend.send({ embeds: embed });
-  if (!checkIfInDevelopment(client)) {
+  if (ENV === 'prod') {
     channelToSend.setTopic(`Servers: ${client.guilds.cache.size}`);
   }
-};
-//----------
-/**
- * As I use Lochness for development and testing of new features, it is a bit annoying to clear testing notifications from channels that Nessie stores data in
- * This comes from hardcoding channels to log data in the event handlers.
- * To avoid dirtying the data and cluttering production channels, this function determines if the client is Bisolen and is being used for development
- * *** Updating to use Shizuka Test for all bot development needs ***
- * Lochness ID - 889208189017538572
- * Nessie ID - 889135055430111252
- * Shizuka Test ID - 929421200797626388
- */
-const checkIfInDevelopment = (client) => {
-  return client.user.id === '929421200797626388'; //Lochnesss' id (Development Bot)
 };
 //---------
 /**
@@ -451,7 +439,6 @@ const sendMissingAllPermissionsError = async ({ interaction, title }) => {
 };
 //---------
 module.exports = {
-  checkIfInDevelopment,
   sendGuildUpdateNotification,
   serverEmbed,
   codeBlock,

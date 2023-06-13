@@ -1,8 +1,8 @@
 const axios = require('axios');
-const { apiKey } = require('../config/nessie.json');
+const { ALS_API_KEY } = require('../config/environment');
 
 //Documentation on API: https://apexlegendsapi.com/documentation.php
-const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${apiKey}`;
+const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
 /**
  * Full example response 
  * {
