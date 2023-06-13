@@ -28,7 +28,7 @@ module.exports = {
    * This is pretty cool as discord will treat it as a normal response and we can do whatever we want with it within 15 minutes
    * which is editing the reply with the relevant information after the promise resolves
    **/
-  async execute({ nessie, interaction, mixpanel }) {
+  async execute({ nessie, interaction }) {
     /**
      * Temporary database query to check if there's an existing status in the guild
      * This is so we can conditionally show the status prompt to lessen visual clutter

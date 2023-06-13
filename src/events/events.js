@@ -5,13 +5,11 @@
  * The next good move is to separate each event handler on its own file and have this as the main initialisation
  * But that would be in another time heh
  */
-const { guildIDs, token } = require('../config/nessie.json');
 const { getBattleRoyalePubs } = require('../services/adapters');
 const { sendMixpanelEvent } = require('../services/analytics');
 const {
   sendHealthLog,
   sendGuildUpdateNotification,
-  checkIfInDevelopment,
   sendErrorLog,
   codeBlock,
 } = require('../utils/helpers');
@@ -33,6 +31,7 @@ const {
   scheduleStatus,
 } = require('../commands/maps/status/start');
 const { _cancelStatusStop, deleteGuildStatus } = require('../commands/maps/status/stop');
+const { ENV, GUILD_ID, BOT_TOKEN } = require('../config/environment');
 
 const appCommands = getApplicationCommands(); //Get list of application commands
 
@@ -95,15 +94,6 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     }
   });
   //------
-  /**
-   * Event handler for when a message is sent in a channel that nessie is in
-   * As of May 22 2022, removed any implementations for this event
-   * Discord would be limiting this event for special applications and only be used on a per request basis
-   * As nessie doesn't need this, we're deprecating the need of listening to messages and instead using interactions
-   * Keeping this in for now until it's officially gone in August
-   */
-  nessie.on('messageCreate', async (message) => {});
-
   nessie.on('interactionCreate', async (interaction) => {
     if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
 
@@ -257,8 +247,8 @@ const setCurrentMapStatus = (data, channel, nessie) => {
  * While global commands can be used to every server that bot is in
  * Main difference between the two apart from server constraints are that app commands are instantly registered in guilds while global would take up to an hour for changes to appear
  */
-const registerApplicationCommands = async (nessie) => {
-  const isInDevelopment = checkIfInDevelopment(nessie);
+const registerApplicationCommands = async () => {
+  const isInDevelopment = ENV === 'dev';
   const publicCommandList = Object.keys(appCommands)
     .map((key) => !appCommands[key].isAdmin && appCommands[key].data)
     .filter((command) => command)
@@ -272,12 +262,12 @@ const registerApplicationCommands = async (nessie) => {
     .filter((command) => command)
     .map((command) => command.toJSON());
 
-  const rest = new REST({ version: '9' }).setToken(token);
+  const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
 
   if (isInDevelopment) {
     //Guild register
     try {
-      await rest.put(Routes.applicationGuildCommands('929421200797626388', guildIDs), {
+      await rest.put(Routes.applicationGuildCommands('929421200797626388', GUILD_ID), {
         body: fullCommandList,
       });
       console.log('Successfully registered guild application commands');
@@ -290,7 +280,7 @@ const registerApplicationCommands = async (nessie) => {
     //TODO: Make fetching of bot id dynamic as it will either use production or testing id
     try {
       await rest.put(Routes.applicationCommands('889135055430111252'), { body: publicCommandList });
-      await rest.put(Routes.applicationGuildCommands('889135055430111252', guildIDs), {
+      await rest.put(Routes.applicationGuildCommands('889135055430111252', GUILD_ID), {
         body: adminCommandList,
       });
       console.log('Successfully registered global application commands');

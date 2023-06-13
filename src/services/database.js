@@ -1,9 +1,8 @@
 const { Pool } = require('pg');
-const { databaseConfig } = require('../config/database');
 const { sendGuildUpdateNotification } = require('../utils/helpers');
-const { defaultPrefix } = require('../config/nessie.json');
+const { DATABASE_CONFIG } = require('../config/environment');
 
-exports.pool = new Pool(databaseConfig); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling
+exports.pool = new Pool(DATABASE_CONFIG); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling
 /**
  * Creates Guild table inside the nessie database in digital ocean
  * Gets called in the client.once("ready") hook
@@ -16,9 +15,9 @@ exports.pool = new Pool(databaseConfig); //Intialise pool to connect to our clou
  */
 exports.createGuildTable = (guilds, nessie) => {
   // Starts a transaction; similar to sqlite's serialize so we can group all the relevant queries and call them in order
-  this.pool.connect((err, client, done) => {
+  this.pool.connect((_, client, done) => {
     //Maybe put an error handler here someday
-    client.query('BEGIN', (err) => {
+    client.query('BEGIN', () => {
       // Creates Guilds Table with the relevant columns if it does not exists
       client.query(
         'CREATE TABLE IF NOT EXISTS Guild(uuid TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, member_count INTEGER NOT NULL, owner_id TEXT NOT NULL, prefix TEXT NOT NULL, use_prefix BOOLEAN NOT NULL DEFAULT TRUE)'
@@ -42,8 +41,8 @@ exports.createGuildTable = (guilds, nessie) => {
           if (!isInDatabase) {
             client.query(
               'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)',
-              [guild.id, guild.name, guild.memberCount, guild.ownerId, defaultPrefix, false],
-              (err, res) => {
+              [guild.id, guild.name, guild.memberCount, guild.ownerId, '$nes-', false],
+              (err) => {
                 if (err) {
                   console.log(err);
                 }
@@ -68,12 +67,12 @@ exports.createGuildTable = (guilds, nessie) => {
  * @param guild - guild that nessie is newly invited in
  */
 exports.insertNewGuild = (guild) => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
+  this.pool.connect((_, client, done) => {
+    client.query('BEGIN', () => {
       client.query(
         'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)',
-        [guild.id, guild.name, guild.memberCount, guild.ownerId, defaultPrefix, false],
-        (err, res) => {
+        [guild.id, guild.name, guild.memberCount, guild.ownerId, '$nes-', false],
+        (err) => {
           if (err) {
             console.log(err);
           }
@@ -96,8 +95,8 @@ exports.insertNewGuild = (guild) => {
  * @param guild - guild in which nessie was kicked in
  */
 exports.removeServerDataFromNessie = (nessie, guild) => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
+  this.pool.connect((_, client, done) => {
+    client.query('BEGIN', () => {
       client.query('DELETE FROM Guild WHERE uuid = ($1)', [`${guild.id}`], (err) => {
         if (err) {
           console.log(err);
@@ -125,12 +124,12 @@ exports.removeServerDataFromNessie = (nessie, guild) => {
  * TODO: Maybe document all the necessary columns we need to create a status in notion
  */
 exports.createStatusTable = () => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
+  this.pool.connect((_, client, done) => {
+    client.query('BEGIN', () => {
       client.query(
         'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT, br_channel_id TEXT, arenas_channel_id TEXT, br_message_id TEXT, arenas_message_id TEXT, br_webhook_id TEXT, arenas_webhook_id TEXT, br_webhook_token TEXT, arenas_webhook_token TEXT, original_channel_id TEXT NOT NULL, game_mode_selected TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)'
       );
-      client.query('COMMIT', (err) => {
+      client.query('COMMIT', () => {
         done();
       });
     });
@@ -145,8 +144,8 @@ exports.createStatusTable = () => {
  * @param onError - function to call when queries throw an error
  */
 exports.insertNewStatus = async (status, onSuccess, onError) => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
+  this.pool.connect((_, client, done) => {
+    client.query('BEGIN', () => {
       client.query(
         'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, arenas_channel_id, br_message_id, arenas_message_id, br_webhook_id, arenas_webhook_id, br_webhook_token, arenas_webhook_token, original_channel_id, game_mode_selected, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)',
         [
@@ -166,7 +165,7 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
           status.createdBy,
           status.createdAt,
         ],
-        (err, res) => {
+        (err) => {
           if (err) {
             onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
             return done();
@@ -192,8 +191,8 @@ exports.insertNewStatus = async (status, onSuccess, onError) => {
  * @param onError - function to call when queries throw an error
  */
 exports.getStatus = async (guildId, onSuccess, onError) => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
+  this.pool.connect((_, client, done) => {
+    client.query('BEGIN', () => {
       client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
         if (err) {
           onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
@@ -211,8 +210,8 @@ exports.getStatus = async (guildId, onSuccess, onError) => {
  * @param onError - function to call when queries throw an error
  */
 exports.getAllStatus = async (onSuccess, onError) => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
+  this.pool.connect((_, client, done) => {
+    client.query('BEGIN', () => {
       client.query('SELECT * FROM Status', (err, res) => {
         if (err) {
           onError && onError(err.message ? err.message : { message: 'Unexpected Error' });
@@ -237,8 +236,8 @@ exports.getAllStatus = async (onSuccess, onError) => {
  * @param onError - function to call when queries throws an error
  */
 exports.deleteStatus = async (guildId, onSuccess, onError) => {
-  this.pool.connect((err, client, done) => {
-    client.query('BEGIN', (err) => {
+  this.pool.connect((_, client, done) => {
+    client.query('BEGIN', () => {
       client.query('SELECT * FROM Status WHERE guild_id = ($1)', [guildId], (err, res) => {
         if (err) {
           //Returning on done to close the connecting to the db; will really need to figure out a better way for error handling here

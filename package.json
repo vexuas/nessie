@@ -24,6 +24,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "auto": "^10.44.0"
+    "auto": "^10.44.0",
+    "eslint": "^8.42.0",
+    "eslint-plugin-unused-imports": "^2.0.0"
   }
 }

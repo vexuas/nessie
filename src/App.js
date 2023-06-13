@@ -12,11 +12,9 @@ const nessie = new Discord.Client({
     Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING,
   ],
 });
-const { token, lochnessMixpanel, nessieMixpanel, topggToken } = require('./config/nessie.json'); //Get config data from config folder
-const { checkIfInDevelopment } = require('./utils/helpers');
 const { AutoPoster } = require('topgg-autoposter');
 const { registerEventHandlers } = require('./events/events');
-let mixpanel;
+const { MIXPANEL_ID, TOP_GG_TOKEN, BOT_TOKEN } = require('./config/environment');
 
 //----------
 /**
@@ -25,9 +23,9 @@ let mixpanel;
  * TODO: Refactor to use environment variables instead
  */
 const initialize = async () => {
-  await nessie.login(token);
-  mixpanel = Mixpanel.init(checkIfInDevelopment(nessie) ? lochnessMixpanel : nessieMixpanel); //Checks if client is initialising as the development bot
-  !checkIfInDevelopment(nessie) && AutoPoster(topggToken, nessie); //Check if this is a one time thing per reboot or it actually auto posts when stats change
+  await nessie.login(BOT_TOKEN);
+  const mixpanel = Mixpanel.init(MIXPANEL_ID);
+  TOP_GG_TOKEN && TOP_GG_TOKEN.length !== 0 && AutoPoster(TOP_GG_TOKEN, nessie);
   registerEventHandlers({ nessie, mixpanel });
 };
 initialize();
