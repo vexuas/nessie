@@ -17,6 +17,7 @@
     "date-fns": "^2.24.0",
     "discord-api-types": "^0.26.1",
     "discord.js": "13.3.1",
+    "lodash": "^4.17.21",
     "mixpanel": "^0.13.0",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.22",
@@ -26,6 +27,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.195",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
     "auto": "^10.44.0",
