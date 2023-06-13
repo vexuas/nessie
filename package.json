@@ -3,6 +3,8 @@
   "version": "1.10.5",
   "description": "Apex Legends Map Rotation Discord Bot",
   "scripts": {
+    "start": "yarn build && node dist/App.js",
+    "build": "tsc",
     "auto:version": "yarn version --`auto version`"
   },
   "main": "index.js",
