@@ -1,5 +1,5 @@
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types';
+import { Routes } from 'discord-api-types/v10';
 import { scheduleStatus } from '../../commands/maps/status/start';
 import { BOT_TOKEN, ENV, GUILD_ID } from '../../config/environment';
 import { getBattleRoyalePubs } from '../../services/adapters';
