@@ -79,33 +79,20 @@ const setCurrentMapStatus = (data: any, channel: any, nessie: any) => {
 };
 
 export default function ({ nessie, appCommands }: EventModule) {
-  //------
-  /**
-   * Event handler that fires once when nessie boots up and succesfully logs in
-   */
   nessie.once('ready', async () => {
     await registerApplicationCommands(appCommands);
     try {
       const testChannel = nessie.channels.cache.get('889212328539725824');
       const logChannel = nessie.channels.cache.get('899620845436141609');
       testChannel && testChannel.isText() && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
-      /**
-       * Initialise Database and its tables
-       * Will create them if they don't exist
-       * See relevant files under database/* for more information
-       */
+
       createGuildTable(nessie.guilds.cache, nessie);
       createStatusTable();
-      /**
-       * Changes Nessie's activity when the current map has switched over to the next
-       * Refer to the setCurrentMapStatus function for more information
-       */
-      const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
-      nessie.user && nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
-      sendHealthLog(brPubsData, logChannel, true); //For logging purpose
-      setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
-      // const statusScheduler = initialiseStatusScheduler(nessie); //Initialises auto status scheduler
-      // statusScheduler.start(); //Starts the scheduler
+
+      const brPubsData = await getBattleRoyalePubs();
+      nessie.user && nessie.user.setActivity(brPubsData.current.map);
+      sendHealthLog(brPubsData, logChannel, true);
+      setCurrentMapStatus(brPubsData, logChannel, nessie);
 
       const statusSchedule = scheduleStatus(nessie);
       statusSchedule.start();

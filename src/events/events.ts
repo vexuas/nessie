@@ -1,33 +1,16 @@
 import { Client } from 'discord.js';
 import { Mixpanel } from 'mixpanel';
 import { getApplicationCommands } from '../commands/commands';
-
-const { getBattleRoyalePubs } = require('../services/adapters');
 const { sendMixpanelEvent } = require('../services/analytics');
-const {
-  sendHealthLog,
-  sendGuildUpdateNotification,
-  sendErrorLog,
-  codeBlock,
-} = require('../utils/helpers');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const {
-  createGuildTable,
-  insertNewGuild,
-  removeServerDataFromNessie,
-  createStatusTable,
-} = require('../services/database');
+const { sendErrorLog, codeBlock } = require('../utils/helpers');
 const { v4: uuidv4 } = require('uuid');
 const {
   goToConfirmStatus,
   goBackToGameModeSelection,
   _cancelStatusStart,
   createStatus,
-  scheduleStatus,
 } = require('../commands/maps/status/start');
 const { _cancelStatusStop, deleteGuildStatus } = require('../commands/maps/status/stop');
-const { ENV, GUILD_ID, BOT_TOKEN } = require('../config/environment');
 
 const appCommands: any = getApplicationCommands(); //Get list of application commands
 
@@ -42,30 +25,6 @@ export type EventModule = {
 };
 
 export function registerEventHandlers({ nessie, mixpanel }: Props) {
-  //------
-  /**
-   * Event handlers for when nessie is invited to a new server and when he is kicked. Will be opting out of guild update as I don't really need to do anything with that
-   * Sends notification to channel in Nessie's Canyon
-   * guildCreate - called when Nessie is invited to a server
-   * guildDelete - called when Nessie is kicked from server
-   * More information about each function in their relevant database files
-   */
-  nessie.on('guildCreate', (guild) => {
-    try {
-      insertNewGuild(guild);
-      sendGuildUpdateNotification(nessie, guild, 'join');
-    } catch (e) {
-      console.log(e); // Add proper handling
-    }
-  });
-  nessie.on('guildDelete', (guild) => {
-    try {
-      removeServerDataFromNessie(nessie, guild);
-    } catch (e) {
-      console.log(e); // Add proper handling
-    }
-  });
-  //------
   nessie.on('interactionCreate', async (interaction) => {
     if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
 
