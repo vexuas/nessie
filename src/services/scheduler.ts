@@ -1,7 +1,10 @@
-const CronJob = require('cron').CronJob;
+import { CronJob } from 'cron';
 
-module.exports = class Scheduler {
-  constructor(cronExpression, callback) {
+export default class Scheduler {
+  cronExpression: string;
+  job: CronJob;
+
+  constructor(cronExpression: string, callback: () => void) {
     this.cronExpression = cronExpression;
     this.job = new CronJob(cronExpression, callback, null, false, 'Asia/Singapore');
   }
@@ -11,4 +14,4 @@ module.exports = class Scheduler {
   stop() {
     this.job.stop();
   }
-};
+}
