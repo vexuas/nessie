@@ -1,10 +1,7 @@
-/**
- * File to contain relevant event handlers that nessie needs
- * Moved to its own individual file as housing this inside nessie.js was making it unreadable
- * Granted this isn't much better as it now looks cluttered here than it being there
- * The next good move is to separate each event handler on its own file and have this as the main initialisation
- * But that would be in another time heh
- */
+import { Client } from 'discord.js';
+import { Mixpanel } from 'mixpanel';
+import { getApplicationCommands } from '../commands/commands';
+
 const { getBattleRoyalePubs } = require('../services/adapters');
 const { sendMixpanelEvent } = require('../services/analytics');
 const {
@@ -15,7 +12,6 @@ const {
 } = require('../utils/helpers');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { getApplicationCommands } = require('../commands/commands');
 const {
   createGuildTable,
   insertNewGuild,
@@ -33,19 +29,29 @@ const {
 const { _cancelStatusStop, deleteGuildStatus } = require('../commands/maps/status/stop');
 const { ENV, GUILD_ID, BOT_TOKEN } = require('../config/environment');
 
-const appCommands = getApplicationCommands(); //Get list of application commands
+const appCommands: any = getApplicationCommands(); //Get list of application commands
 
-exports.registerEventHandlers = ({ nessie, mixpanel }) => {
+interface Props {
+  nessie: Client;
+  mixpanel: Mixpanel | null;
+}
+export type EventModule = {
+  nessie: Client;
+  appCommands?: any[];
+  mixpanel?: Mixpanel | null;
+};
+
+export function registerEventHandlers({ nessie, mixpanel }: Props) {
   //------
   /**
    * Event handler that fires once when nessie boots up and succesfully logs in
    */
   nessie.once('ready', async () => {
-    await registerApplicationCommands(nessie);
+    await registerApplicationCommands();
     try {
       const testChannel = nessie.channels.cache.get('889212328539725824');
       const logChannel = nessie.channels.cache.get('899620845436141609');
-      testChannel && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
+      testChannel && testChannel.isText() && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
       /**
        * Initialise Database and its tables
        * Will create them if they don't exist
@@ -58,7 +64,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Refer to the setCurrentMapStatus function for more information
        */
       const brPubsData = await getBattleRoyalePubs(); //Get data of br map rotation
-      nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
+      nessie.user && nessie.user.setActivity(brPubsData.current.map); //Set current br map as activity status
       sendHealthLog(brPubsData, logChannel, true); //For logging purpose
       setCurrentMapStatus(brPubsData, logChannel, nessie); //Calls status display function
       // const statusScheduler = initialiseStatusScheduler(nessie); //Initialises auto status scheduler
@@ -133,7 +139,10 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
        * Fortunately discord has the original interaction attached to the current one's payload which makes this straightforward
        * We'll send the wrong user an ephemeral reply indicating that they can only use their own commands
        */
-      if (interaction.user.id !== interaction.message.interaction.user.id) {
+      if (
+        interaction.message.interaction &&
+        interaction.user.id !== interaction.message.interaction.user.id
+      ) {
         const wrongUserEmbed = {
           description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
             '/help'
@@ -167,7 +176,10 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
       }
     }
     if (interaction.isSelectMenu()) {
-      if (interaction.user.id !== interaction.message.interaction.user.id) {
+      if (
+        interaction.message.interaction &&
+        interaction.user.id !== interaction.message.interaction.user.id
+      ) {
         const wrongUserEmbed = {
           description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
             '/help'
@@ -201,7 +213,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
     };
     await sendErrorLog({ nessie, error, type, uuid, ping: true });
   });
-};
+}
 
 //TODO: Maybe move these functions in their separate files at some point
 /**
@@ -210,7 +222,7 @@ exports.registerEventHandlers = ({ nessie, mixpanel }) => {
  * Accomplished this by creating a intervalRequest function that has a setTimeout that calls itself as its callback
  * Inside the interval function we can then properly get the current timer and update accordingly
  */
-const setCurrentMapStatus = (data, channel, nessie) => {
+const setCurrentMapStatus = (data: any, channel: any, nessie: any) => {
   const fiveSecondsBuffer = 5000;
   let currentBrPubsData = data;
   let currentTimer = data.current.remainingSecs * 1000 + fiveSecondsBuffer;
