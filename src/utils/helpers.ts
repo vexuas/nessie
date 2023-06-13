@@ -8,7 +8,7 @@ const { nessieLogo } = require('./constants');
  * @channel - log channel in Nessie's Canyon (#health: 899620845436141609)
  * @isAccurate - whether the data received is up-to-date
  */
-const sendHealthLog = (data, channel, isAccurate) => {
+export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
   const utcStart = new Date(data.current.readableDate_start);
   const sgtStart = new Date(utcStart.getTime() + 28800000);
   const utcEnd = new Date(data.current.readableDate_end);
@@ -53,7 +53,7 @@ const sendHealthLog = (data, channel, isAccurate) => {
  * Function to create a text into a discord code block
  * @param text - text to transform
  */
-const codeBlock = (text) => {
+export const codeBlock = (text: any) => {
   return '`' + text + '`';
 };
 //----------
@@ -61,7 +61,7 @@ const codeBlock = (text) => {
  * Server Embed for when bot joining and leaving a server
  * Add iconURL logic to always return a png extension
  */
-const serverEmbed = async (client, guild, status) => {
+export const serverEmbed = async (client: any, guild: any, status: any) => {
   let embedTitle;
   let embedColor;
   const defaultIcon =
@@ -91,7 +91,9 @@ const serverEmbed = async (client, guild, status) => {
         name: 'Owner',
         value:
           status === 'join'
-            ? await guild.members.fetch(guild.ownerId).then((guildMember) => guildMember.user.tag)
+            ? await guild.members
+                .fetch(guild.ownerId)
+                .then((guildMember: any) => guildMember.user.tag)
             : '-',
         inline: true,
       },
@@ -112,7 +114,7 @@ const serverEmbed = async (client, guild, status) => {
  * @param client - initialising discord client
  * @param guild  - guild data
  */
-const sendGuildUpdateNotification = async (client, guild, type) => {
+export const sendGuildUpdateNotification = async (client: any, guild: any, type: any) => {
   const embed = await serverEmbed(client, guild, type);
   const channelId = ENV === 'dev' ? '889212328539725824' : '896710863459844136';
   const channelToSend = client.channels.cache.get(channelId);
@@ -135,7 +137,7 @@ const sendGuildUpdateNotification = async (client, guild, type) => {
  * @param uuid - error uuid
  * @param nessie = client
  */
-const generateErrorEmbed = async (error, uuid, nessie) => {
+export const generateErrorEmbed = async (error: any, uuid: any, nessie: any) => {
   //To get a specific message, we need to get the channel it's in before fetching it
   const alertChannel = nessie.channels.cache.get('973977422699573258');
   const messageObject = await alertChannel.messages.fetch('973981539731922946');
@@ -174,7 +176,15 @@ const generateErrorEmbed = async (error, uuid, nessie) => {
  * @param uuid - error uuid
  * @param ping - whether to ping me if an error occured; default false
  */
-const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid, ping = false }) => {
+export const sendErrorLog = async ({
+  nessie,
+  error,
+  message,
+  interaction,
+  type,
+  uuid,
+  ping = false,
+}: any) => {
   const errorChannel = nessie.channels.cache.get('938441853542465548');
   const embed = {
     title: message ? `Error | ${type} Prefix Command` : `Error | ${type} Application Command`,
@@ -224,7 +234,7 @@ const sendErrorLog = async ({ nessie, error, message, interaction, type, uuid, p
  * Handler for errors concerning status cycles
  * Same as above, only difference is the embed content
  */
-const sendStatusErrorLog = async ({ nessie, uuid, error, status }) => {
+export const sendStatusErrorLog = async ({ nessie, uuid, error, status }: any) => {
   const errorChannel = nessie.channels.cache.get('938441853542465548');
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
   const errorEmbed = {
@@ -256,7 +266,7 @@ const sendStatusErrorLog = async ({ nessie, uuid, error, status }) => {
   };
   await errorChannel.send({ embeds: [errorEmbed], content: '<@183444648360935424>' });
 };
-const generateAnnouncementMessage = (prefix) => {
+export const generateAnnouncementMessage = (prefix: any) => {
   return (
     '```diff\n' +
     `- Prefix commands will no longer be supported\n- Full information: ${prefix}announcement` +
@@ -273,7 +283,7 @@ const generateAnnouncementMessage = (prefix) => {
  * Manually wiring them up to our images isn't scalable either
  * I'll just leave this comment so I get reminded about it in the future
  */
-const getMapUrl = (map) => {
+export const getMapUrl = (map: any) => {
   switch (map) {
     case 'kings_canyon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
@@ -303,7 +313,7 @@ const getMapUrl = (map) => {
  * Function returns hr hrs min mins sec secs (01 hrs 02 mins 03 secs);
  * Might want to think of using the number of remaining seconds instead of splitting the timer string in the future
  */
-const getCountdown = (timer) => {
+export const getCountdown = (timer: any) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
   const isOverADay = countdown[0] && parseInt(countdown[0]) >= 24;
@@ -321,7 +331,7 @@ const getCountdown = (timer) => {
  * Added a hack to display the time for next map regardless of timezone
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  */
-const generatePubsEmbed = (data, type = 'Battle Royale') => {
+export const generatePubsEmbed = (data: any, type = 'Battle Royale') => {
   const embedData = {
     title: `${type} | Pubs`,
     color: 3066993,
@@ -351,8 +361,8 @@ const generatePubsEmbed = (data, type = 'Battle Royale') => {
  * Embed design for any ranked map
  * Fairly simple, don't need any fancy timers and footers
  */
-const generateRankedEmbed = (data, type = 'Battle Royale') => {
-  const embedData = {
+export const generateRankedEmbed = (data: any, type = 'Battle Royale') => {
+  const embedData: any = {
     title: `${type} | Ranked`,
     color: 7419530,
     image: {
@@ -380,7 +390,7 @@ const generateRankedEmbed = (data, type = 'Battle Royale') => {
   return embedData;
 };
 
-const checkMissingBotPermissions = (interaction) => {
+export const checkMissingBotPermissions = (interaction: any) => {
   const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
   const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
   const hasViewChannel = interaction.guild.me.permissions.has('VIEW_CHANNEL', false);
@@ -399,13 +409,13 @@ const checkMissingBotPermissions = (interaction) => {
     hasMissingPermissions,
   };
 };
-const checkIfAdminUser = (interaction) => {
+export const checkIfAdminUser = (interaction: any) => {
   return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
 };
-const checkIfUserHasManageServer = (interaction) => {
+export const checkIfUserHasManageServer = (interaction: any) => {
   return interaction.member.permissions.has('MANAGE_GUILD'); //Checks if user who initiated command has the Manage Server/Guild permission
 };
-const sendMissingBotPermissionsError = async ({ interaction, title }) => {
+export const sendMissingBotPermissionsError = async ({ interaction, title }: any) => {
   const embed = {
     title,
     description: `Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create/stop automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nFor more details, use ${codeBlock(
@@ -415,7 +425,7 @@ const sendMissingBotPermissionsError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
-const sendMissingUserPermissionError = async ({ interaction, title }) => {
+export const sendMissingUserPermissionError = async ({ interaction, title }: any) => {
   const embed = {
     title,
     description: `Oops only users with the ${codeBlock(
@@ -427,7 +437,7 @@ const sendMissingUserPermissionError = async ({ interaction, title }) => {
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
-const sendMissingAllPermissionsError = async ({ interaction, title }) => {
+export const sendMissingAllPermissionsError = async ({ interaction, title }: any) => {
   const embed = {
     title,
     description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${codeBlock(
@@ -436,25 +446,4 @@ const sendMissingAllPermissionsError = async ({ interaction, title }) => {
     color: 16711680,
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
-};
-//---------
-module.exports = {
-  sendGuildUpdateNotification,
-  serverEmbed,
-  codeBlock,
-  sendHealthLog,
-  sendErrorLog,
-  generateErrorEmbed,
-  generateAnnouncementMessage,
-  getMapUrl,
-  getCountdown,
-  generatePubsEmbed,
-  generateRankedEmbed,
-  checkMissingBotPermissions,
-  checkIfAdminUser,
-  checkIfUserHasManageServer,
-  sendMissingBotPermissionsError,
-  sendMissingUserPermissionError,
-  sendMissingAllPermissionsError,
-  sendStatusErrorLog,
 };
