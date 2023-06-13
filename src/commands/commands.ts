@@ -3,7 +3,7 @@
  * Creating this extra file for easier readability of commands
  * TODO: Instead of importing individually, auto import whatever is under the commands folder
  */
-exports.getApplicationCommands = () => {
+export const getApplicationCommands = () => {
   return {
     //Hub
     about: require('./hub/about'),

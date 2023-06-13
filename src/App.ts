@@ -8,12 +8,6 @@ const nessie = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_TYPING],
 });
 
-//----------
-/**
- * Initialize nessie to log in and establish a connection to Discord
- * Wrapped in an async function as we want to wait for the promise to end so that our mixpanel instance knows which project to initialize in
- * TODO: Refactor to use environment variables instead
- */
 const initialize = async () => {
   await nessie.login(BOT_TOKEN);
   const mixpanel = MIXPANEL_ID && MIXPANEL_ID.length !== 0 ? Mixpanel.init(MIXPANEL_ID) : null;
