@@ -573,6 +573,11 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.0.tgz#591c1ce3a702c45ee15f47a42ade72c2fd78978a"
   integrity sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==
 
+"@types/uuid@^9.0.2":
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.2.tgz#ede1d1b1e451548d44919dc226253e32a6952c4b"
+  integrity sha512-kNnC1GFBLuhImSnV7w4njQkUiJi0ZXUycu1rUaouPqiKlXkh77JKgdRnTAp1x5eBwcIwbtI+3otwzuIDEuDoxQ==
+
 "@types/ws@^8.2.0":
   version "8.5.4"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.4.tgz#bb10e36116d6e570dd943735f86c933c1587b8a5"
@@ -1229,10 +1234,15 @@ discord-api-types@^0.25.2:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.25.2.tgz#e50ed152e6d48fe7963f5de1002ca6f2df57c61b"
   integrity sha512-O243LXxb5gLLxubu5zgoppYQuolapGVWPw3ll0acN0+O8TnPUE2kFp9Bt3sTRYodw8xFIknOVxjSeyWYBpVcEQ==
 
-discord-api-types@^0.26.0, discord-api-types@^0.26.1:
+discord-api-types@^0.26.0:
   version "0.26.1"
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.26.1.tgz#726f766ddc37d60da95740991d22cb6ef2ed787b"
   integrity sha512-T5PdMQ+Y1MEECYMV5wmyi9VEYPagEDEi4S0amgsszpWY0VB9JJ/hEvM6BgLhbdnKky4gfmZEXtEEtojN8ZKJQQ==
+
+discord-api-types@^0.37.43:
+  version "0.37.43"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.43.tgz#94ae2b949e3aa092f5e93b0f3cf8e6620583749c"
+  integrity sha512-bBhDWU3TF9KADxR/mHp1K4Bvu/LRtFQdGyBjADu4e66F3ZnD4kp12W/SJCttIaCcMXzPV3sfty6eDGRNRph51Q==
 
 discord.js@13.3.1:
   version "13.3.1"
