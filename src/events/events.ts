@@ -2,8 +2,7 @@ import { Client } from 'discord.js';
 import { Mixpanel } from 'mixpanel';
 import { getApplicationCommands } from '../commands/commands';
 const { sendMixpanelEvent } = require('../services/analytics');
-const { sendErrorLog, codeBlock } = require('../utils/helpers');
-const { v4: uuidv4 } = require('uuid');
+const { codeBlock } = require('../utils/helpers');
 const {
   goToConfirmStatus,
   goBackToGameModeSelection,
@@ -127,15 +126,5 @@ export function registerEventHandlers({ nessie, mixpanel }: Props) {
           return goToConfirmStatus({ interaction, nessie, mixpanel });
       }
     }
-  });
-  nessie.on('rateLimit', async (data) => {
-    const uuid = uuidv4();
-    const type = 'Rate Limited';
-    const error = {
-      message: data
-        ? `\n• Timeout: ${data.timeout}ms\n• Limit: ${data.limit}\n• Method: ${data.method}\n• Path: ${data.path}\n• Route: ${data.route}\n• Global: ${data.global}`
-        : 'Unexpected rate limit error',
-    };
-    await sendErrorLog({ nessie, error, type, uuid, ping: true });
   });
 }
