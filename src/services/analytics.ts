@@ -1,4 +1,4 @@
-import { Guild, GuildTextBasedChannel, TextBasedChannels, User } from 'discord.js';
+import { Guild, GuildTextBasedChannel, User } from 'discord.js';
 import { Mixpanel } from 'mixpanel';
 import { capitalize } from 'lodash';
 
@@ -6,7 +6,7 @@ import { capitalize } from 'lodash';
 type CommandEvent = {
   client: Mixpanel;
   user: User;
-  channel: TextBasedChannels | null;
+  channel: GuildTextBasedChannel | null;
   guild: Guild | null;
   command: string;
   options?: string;
@@ -15,7 +15,7 @@ type CommandEvent = {
 type UserProfile = {
   client: Mixpanel;
   user: User;
-  channel: TextBasedChannels | null;
+  channel: GuildTextBasedChannel | null;
   guild: Guild | null;
   command?: string;
 };

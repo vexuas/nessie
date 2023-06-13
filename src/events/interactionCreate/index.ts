@@ -5,7 +5,7 @@ import {
   goToConfirmStatus,
 } from '../../commands/maps/status/start';
 import { deleteGuildStatus, _cancelStatusStop } from '../../commands/maps/status/stop';
-import { sendCommandEvent } from '../../services/analytics';
+import { codeBlock } from '../../utils/helpers';
 import { EventModule } from '../events';
 
 export default function ({ nessie, mixpanel, appCommands }: EventModule) {
@@ -21,15 +21,14 @@ export default function ({ nessie, mixpanel, appCommands }: EventModule) {
       // const isSubcommand = usedOption && usedOption.type === 'SUB_COMMAND';
       await appCommands[commandName as any].execute({ interaction, nessie, mixpanel });
 
-      //TODO: Handle sub commands and options
-      mixpanel &&
-        sendCommandEvent({
-          user: interaction.user,
-          channel: interaction.channel,
-          guild: interaction.guild,
-          command: commandName,
-          client: mixpanel,
-        });
+      // mixpanel &&
+      //   sendCommandEvent({
+      //     user: interaction.user,
+      //     channel: interaction.channel,
+      //     guild: interaction.guild,
+      //     command: commandName,
+      //     client: mixpanel,
+      //   });
     }
     /**
      * Since components are also interactions, any user inputs from it go through this listener too
