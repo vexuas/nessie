@@ -22,8 +22,8 @@ const {
   getAllStatus,
   deleteStatus,
 } = require('../../../../services/database');
-const Scheduler = require('../../../../services/scheduler');
 const { sendMixpanelEvent } = require('../../../../services/analytics');
+const { default: Scheduler } = require('../../../../services/scheduler');
 
 const errorNotification = {
   count: 0,

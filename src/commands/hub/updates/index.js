@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { nessieLogo } = require('../../../utils/constants');
-const { version } = require('../../../../package.json');
 
 /**
  * Send the latest news and updates of Nessie
@@ -24,7 +23,7 @@ const sendUpdatesEmbed = async ({ nessie, interaction }) => {
     updateMessage.lastIndexOf('}')
   );
   const embed = {
-    title: `v${version} | ${updateDate}`,
+    title: `vWIP | ${updateDate}`, //TODO: Add version file
     color: 3447003,
     description: updateAlert,
     thumbnail: {

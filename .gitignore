@@ -1,6 +1,9 @@
 # dependencies
 node_modules
 
+# Compiled files
+dist
+
 # config
 .env
-src/config
+/src/config

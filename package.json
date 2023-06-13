@@ -3,6 +3,8 @@
   "version": "1.10.5",
   "description": "Apex Legends Map Rotation Discord Bot",
   "scripts": {
+    "start": "yarn build && node dist/App.js",
+    "build": "tsc",
     "auto:version": "yarn version --`auto version`"
   },
   "main": "index.js",
@@ -15,6 +17,7 @@
     "date-fns": "^2.24.0",
     "discord-api-types": "^0.26.1",
     "discord.js": "13.3.1",
+    "lodash": "^4.17.21",
     "mixpanel": "^0.13.0",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.22",
@@ -24,8 +27,13 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/cron": "^2.0.1",
+    "@types/lodash": "^4.14.195",
+    "@typescript-eslint/eslint-plugin": "^5.59.11",
+    "@typescript-eslint/parser": "^5.59.11",
     "auto": "^10.44.0",
     "eslint": "^8.42.0",
-    "eslint-plugin-unused-imports": "^2.0.0"
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "typescript": "^5.1.3"
   }
 }
