@@ -18,7 +18,7 @@ export default {
   commandType: 'Information',
   data: new SlashCommandBuilder()
     .setName('invite')
-    .setDescription('Generates an invite link for My App'),
+    .setDescription('Generates an invite link for Nessie'),
   async execute({ interaction }: AppCommandOptions) {
     try {
       const embed = generateInviteEmbed();
