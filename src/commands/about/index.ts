@@ -1,10 +1,16 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { format } = require('date-fns');
-const { nessieLogo } = require('../../../utils/constants');
+import { BOT_UPDATED_AT, BOT_VERSION } from '../../version';
+import { AppCommand, AppCommandOptions } from '../commands';
+import { format } from 'date-fns';
+import { sendErrorLog } from '../../utils/helpers';
+import { Client } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { nessieLogo } from '../../utils/constants';
 
-const sendAboutEmbed = async ({ nessie, interaction }) => {
+//TODO: Add typing after upgrading to djs v14
+//TODO: Update description
+export const generateAboutEmbed = (app?: Client) => {
   const embed = {
-    title: 'About',
+    title: 'Info',
     description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nTry out my new beta feature: **Automatic Map Updates**! To check out what it is, use \`/status help\`!\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!\n\nFor the latest news, check out \`/updates\`!`,
     color: 3447003,
     thumbnail: {
@@ -13,17 +19,18 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
     fields: [
       {
         name: 'Creator',
-        value: 'Vexuas#8141',
+        value: '-',
         inline: true,
       },
       {
         name: 'Date Created',
-        value: format(nessie.user.createdTimestamp, 'dd-MMM-yyyy'),
+        value:
+          app && app.application ? format(app.application.createdTimestamp, 'dd-MM-yyyy') : 'N/A',
         inline: true,
       },
       {
         name: 'Version',
-        value: 'WIP', //TODO: Add version file
+        value: BOT_VERSION,
         inline: true,
       },
       {
@@ -32,25 +39,30 @@ const sendAboutEmbed = async ({ nessie, interaction }) => {
         inline: true,
       },
       {
-        name: 'Last Update',
-        value: '03-April-2023',
+        name: 'Last Updated',
+        value: BOT_UPDATED_AT,
         inline: true,
       },
       {
         name: 'Support Server',
-        value: '[Link](https://discord.gg/FyxVrAbRAd)',
+        value: '-',
         inline: true,
       },
     ],
   };
-  return await interaction.reply({ embeds: [embed] });
+  return embed;
 };
-
-module.exports = {
+export default {
+  commandType: 'Information',
   data: new SlashCommandBuilder()
     .setName('about')
     .setDescription('Displays information about Nessie'),
-  async execute({ nessie, interaction }) {
-    return await sendAboutEmbed({ nessie, interaction });
+  async execute({ interaction, app }: AppCommandOptions) {
+    try {
+      const embed = generateAboutEmbed(app);
+      await interaction.reply({ embeds: [embed] });
+    } catch (error) {
+      sendErrorLog({ error, interaction });
+    }
   },
-};
+} as AppCommand;

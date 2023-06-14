@@ -2,7 +2,7 @@ import { Client } from 'discord.js';
 import fs from 'fs';
 import { Mixpanel } from 'mixpanel';
 import path from 'path';
-import { getApplicationCommands } from '../commands/commands';
+import { AppCommand, getApplicationCommands } from '../commands/commands';
 import { sendErrorLog } from '../utils/helpers';
 
 const appCommands = getApplicationCommands();
@@ -12,11 +12,11 @@ interface Props {
   mixpanel: Mixpanel | null;
 }
 type ExportedEventModule = {
-  default: (data: any) => void;
+  default: (data: EventModule) => void;
 };
 export type EventModule = {
   nessie: Client;
-  appCommands?: any[];
+  appCommands?: AppCommand[];
   mixpanel?: Mixpanel | null;
 };
 export function registerEventHandlers({ nessie, mixpanel }: Props): void {

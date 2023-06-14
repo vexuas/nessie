@@ -174,7 +174,7 @@ export async function insertNewStatus(status: any) {
     }
   }
 }
-export async function getStatus(guildId: string): Promise<QueryResult<StatusRecord> | undefined> {
+export async function getStatus(guildId: string): Promise<StatusRecord | undefined | null> {
   if (!pool) return;
   const client = await pool.connect();
   if (client) {
@@ -182,7 +182,7 @@ export async function getStatus(guildId: string): Promise<QueryResult<StatusReco
       await client.query('BEGIN');
       const getStatusQuery = 'SELECT * FROM Status WHERE guild_id = ($1)';
       const status: QueryResult<StatusRecord> = await client.query(getStatusQuery, [guildId]);
-      return status;
+      return status.rows.length > 0 ? status.rows[0] : null;
     } catch (error) {
       await client.query('ROLLBACK');
       console.log(error); //TODO: Add error handling
@@ -191,7 +191,7 @@ export async function getStatus(guildId: string): Promise<QueryResult<StatusReco
     }
   }
 }
-export async function getAllStatus(): Promise<QueryResult<StatusRecord> | undefined> {
+export async function getAllStatus(): Promise<StatusRecord[] | undefined> {
   if (!pool) return;
   const client = await pool.connect();
   if (client) {
@@ -199,7 +199,7 @@ export async function getAllStatus(): Promise<QueryResult<StatusRecord> | undefi
       await client.query('BEGIN');
       const getAllStatusQuery = 'SELECT * FROM Status';
       const allStatus: QueryResult<StatusRecord> = await client.query(getAllStatusQuery);
-      return allStatus;
+      return allStatus.rows;
     } catch (error) {
       await client.query('ROLLBACK');
       console.log(error); //TODO: Add error handling
@@ -208,9 +208,7 @@ export async function getAllStatus(): Promise<QueryResult<StatusRecord> | undefi
     }
   }
 }
-export async function deleteStatus(
-  guildId: string
-): Promise<QueryResult<StatusRecord> | undefined> {
+export async function deleteStatus(guildId: string): Promise<StatusRecord | undefined | null> {
   if (!pool) return;
   const client = await pool.connect();
   if (client) {
@@ -221,7 +219,7 @@ export async function deleteStatus(
       const deleteStatusQuery = 'DELETE FROM Status WHERE guild_id = ($1)';
       await client.query(deleteStatusQuery, [guildId]);
       await client.query('COMMIT');
-      return status;
+      return status.rows.length > 0 ? status.rows[0] : null;
     } catch (error) {
       await client.query('ROLLBACK');
       console.log(error); //TODO: Add error handling
