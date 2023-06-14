@@ -1,12 +1,13 @@
-const { v4: uuidv4 } = require('uuid');
-const {
-  generateErrorEmbed,
-  sendErrorLog,
+import {
+  checkIfUserHasManageServer,
   checkMissingBotPermissions,
   codeBlock,
-  checkIfUserHasManageServer,
-} = require('../../../utils/helpers');
+  generateErrorEmbed,
+  sendErrorLog,
+} from '../../../utils/helpers';
+import { v4 as uuidV4 } from 'uuid';
 
+//TODO: Add typing and refactor handlers
 /**
  * Handler for when a user initiates the /status help command
  * Displays information of status command, explains what it does and permissions it needs
@@ -14,7 +15,7 @@ const {
  * Will either show a tick or mark if the permission is missing
  * Shows a success/warning at the end if any of the permissions are missing
  */
-const sendHelpInteraction = async ({ interaction, nessie }) => {
+export const sendHelpInteraction = async ({ interaction, app }: any) => {
   const {
     hasAdmin,
     hasManageChannels,
@@ -71,14 +72,10 @@ const sendHelpInteraction = async ({ interaction, nessie }) => {
       ],
     });
   } catch (error) {
-    const uuid = uuidv4();
+    const uuid = uuidV4();
     const type = 'Status Help';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    const errorEmbed = await generateErrorEmbed(error, uuid, app);
     await interaction.editReply({ embeds: errorEmbed });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
   }
-};
-
-module.exports = {
-  sendHelpInteraction,
 };
