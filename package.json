@@ -5,7 +5,8 @@
   "scripts": {
     "start": "yarn build && node dist/App.js",
     "build": "tsc",
-    "auto:version": "yarn version --`auto version`"
+    "auto:version": "yarn version --`auto version`",
+    "update:version": "node -p \"'export const BOT_VERSION = ' + JSON.stringify(require('./package.json').version) + ';' + 'export const BOT_UPDATED_AT = ' + JSON.stringify('$(date +'%d-%b-%Y')')\" > src/version.ts"
   },
   "main": "index.js",
   "dependencies": {
