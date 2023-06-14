@@ -10,25 +10,20 @@ import { EventModule } from '../events';
 
 export default function ({ nessie, mixpanel, appCommands }: EventModule) {
   nessie.on('interactionCreate', async (interaction) => {
-    if (!appCommands) return;
-    if (!interaction.inGuild()) return; //Only respond in server channels or if it's an actual command
+    if (!interaction.inGuild() || !appCommands) return;
 
     if (interaction.isCommand()) {
       const { commandName } = interaction;
-
-      // const usedOption = options.data[0];
-      // const isArgument = usedOption && usedOption.type === 'STRING';
-      // const isSubcommand = usedOption && usedOption.type === 'SUB_COMMAND';
-      await appCommands[commandName as any].execute({ interaction, nessie, mixpanel });
-
+      const command = appCommands.find((command) => command.data.name === commandName);
+      command && (await command.execute({ interaction, app: nessie, appCommands }));
       // mixpanel &&
-      //   sendCommandEvent({
-      //     user: interaction.user,
-      //     channel: interaction.channel,
-      //     guild: interaction.guild,
-      //     command: commandName,
-      //     client: mixpanel,
-      //   });
+      // 	sendCommandEvent({
+      // 		user: interaction.user,
+      // 		channel: interaction.channel,
+      // 		guild: interaction.guild,
+      // 		command: commandName,
+      // 		client: mixpanel,
+      // 	});
     }
     /**
      * Since components are also interactions, any user inputs from it go through this listener too

@@ -1,53 +1,35 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
+import { AppCommand } from '../../commands/commands';
 import { scheduleStatus } from '../../commands/maps/status/start';
-import { BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
+import { BOT_ID, BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
 import { getBattleRoyalePubs } from '../../services/adapters';
 import { createGuildTable, createStatusTable, populateGuilds } from '../../services/database';
-import { sendHealthLog } from '../../utils/helpers';
+import { sendErrorLog, sendHealthLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
 const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
 
-const registerApplicationCommands = async (appCommands?: any[]) => {
-  if (!appCommands) return;
-  const isInDevelopment = ENV === 'dev';
-  const publicCommandList = Object.keys(appCommands)
-    .map((key: any) => !appCommands[key].isAdmin && appCommands[key].data)
-    .filter((command) => command)
-    .map((command) => command.toJSON());
-  const adminCommandList = Object.keys(appCommands)
-    .map((key: any) => appCommands[key].isAdmin && appCommands[key].data)
-    .filter((command) => command)
-    .map((command) => command.toJSON());
-  const fullCommandList = Object.keys(appCommands)
-    .map((key: any) => appCommands[key].data)
-    .filter((command) => command)
-    .map((command) => command.toJSON());
+const registerApplicationCommands = async (commands?: AppCommand[]) => {
+  if (!commands) return;
+  const commandList = commands.map((command) => command.data.toJSON());
 
-  if (isInDevelopment) {
-    //Guild register
-    try {
-      await rest.put(Routes.applicationGuildCommands('929421200797626388', GUILD_ID), {
-        body: fullCommandList,
-      });
-      console.log('Successfully registered guild application commands');
-    } catch (e) {
-      console.log(e);
-    }
-  } else {
-    //Global Register
-    //TODO: Maybe create a script one day to delete global commands for test bot
-    //TODO: Make fetching of bot id dynamic as it will either use production or testing id
-    try {
-      await rest.put(Routes.applicationCommands('889135055430111252'), { body: publicCommandList });
-      await rest.put(Routes.applicationGuildCommands('889135055430111252', GUILD_ID), {
-        body: adminCommandList,
-      });
+  try {
+    if (ENV === 'dev') {
+      if (GUILD_ID) {
+        //Registering guild-only commands to the bot i.e. only specified servers will see commands; I like to use a different bot when in development
+        await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
+          body: commandList,
+        });
+        console.log('Successfully registered guild application commands');
+      }
+    } else {
+      //Registering global commands for the bot i.e. every server bot is in will see commands; use this in production
+      await rest.put(Routes.applicationCommands(BOT_ID), { body: commandList });
       console.log('Successfully registered global application commands');
-    } catch (e) {
-      console.log(e);
     }
+  } catch (error) {
+    sendErrorLog({ error });
   }
 };
 
