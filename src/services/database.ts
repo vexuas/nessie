@@ -72,6 +72,7 @@ export async function populateGuilds(existingGuilds: Collection<string, Guild>) 
       const isInDatabase =
         guildsInDatabase && guildsInDatabase.rows.some((guildDb) => guildDb.uuid === guild.id);
       if (!isInDatabase) {
+        await insertNewGuild(guild);
       }
     });
   } catch (error) {
