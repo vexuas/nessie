@@ -68,7 +68,7 @@ export const sendStopInteraction = async ({ interaction }: any) => {
  * Handler for when a user clicks the cancel button of /status stop
  * Pretty straightforward; we just edit the initial message with a cancel message similar to the cancel start handler
  */
-export const _cancelStatusStop = async ({ interaction, app }: any) => {
+export const _cancelStatusStop = async ({ interaction, nessie }: any) => {
   const embed = {
     description: 'Cancelled automated map status deletion',
     color: 16711680,
@@ -79,9 +79,9 @@ export const _cancelStatusStop = async ({ interaction, app }: any) => {
   } catch (error) {
     const uuid = uuidV4();
     const type = 'Status Stop Cancel';
-    const errorEmbed = await generateErrorEmbed(error, uuid, app);
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -104,7 +104,7 @@ export const _cancelStatusStop = async ({ interaction, app }: any) => {
  *
  * We don't need to delete the webhooks as they'll be automatically deleted along with its channels
  */
-export const deleteGuildStatus = async ({ interaction, app }: any) => {
+export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
   const status = await deleteStatus(interaction.guildId);
   try {
     await interaction.deferUpdate();
@@ -115,11 +115,11 @@ export const deleteGuildStatus = async ({ interaction, app }: any) => {
       };
       await interaction.message.edit({ embeds: [embedLoading], components: [] });
       const battleRoyaleStatusChannel =
-        status.br_channel_id && (await app.channels.fetch(status.br_channel_id));
+        status.br_channel_id && (await nessie.channels.fetch(status.br_channel_id));
       const arenasStatusChannel =
-        status.arenas_channel_id && (await app.channels.fetch(status.arenas_channel_id));
+        status.arenas_channel_id && (await nessie.channels.fetch(status.arenas_channel_id));
       const categoryStatusChannel =
-        status.category_channel_id && (await app.channels.fetch(status.category_channel_id));
+        status.category_channel_id && (await nessie.channels.fetch(status.category_channel_id));
 
       battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
       arenasStatusChannel && (await arenasStatusChannel.delete());
@@ -131,7 +131,7 @@ export const deleteGuildStatus = async ({ interaction, app }: any) => {
       };
       await interaction.message.edit({ embeds: [embedSuccess], components: [] });
       //Sends status deletion log after everything is done
-      const statusLogChannel = app.channels.cache.get('976863441526595644');
+      const statusLogChannel = nessie.channels.cache.get('976863441526595644');
       const statusLogEmbed = {
         title: 'Status Deleted',
         color: 16711680,
@@ -147,9 +147,9 @@ export const deleteGuildStatus = async ({ interaction, app }: any) => {
   } catch (error) {
     const uuid = uuidV4();
     const type = 'Status Stop Button';
-    const errorEmbed = await generateErrorEmbed(error, uuid, app);
+    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
     await interaction.message.edit({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+    await sendErrorLog({ nessie, error, interaction, type, uuid });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
