@@ -1,83 +1,109 @@
-const { Pool } = require('pg');
+import { Collection, Guild } from 'discord.js';
+import { Pool, QueryResult } from 'pg';
 const { sendGuildUpdateNotification } = require('../utils/helpers');
 const { DATABASE_CONFIG } = require('../config/environment');
 
 const pool = DATABASE_CONFIG ? new Pool(DATABASE_CONFIG) : null;
 
-exports.createGuildTable = (guilds, nessie) => {
-  // Starts a transaction; similar to sqlite's serialize so we can group all the relevant queries and call them in order
-  this.pool.connect((_, client, done) => {
-    //Maybe put an error handler here someday
-    client.query('BEGIN', () => {
-      // Creates Guilds Table with the relevant columns if it does not exists
-      client.query(
-        'CREATE TABLE IF NOT EXISTS Guild(uuid TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, member_count INTEGER NOT NULL, owner_id TEXT NOT NULL, prefix TEXT NOT NULL, use_prefix BOOLEAN NOT NULL DEFAULT TRUE)'
-      );
-      /**
-       * Before we were iterating through each guild of nessie and making a query to the database
-       * This doesn't seem like a good idea moving forward as performance will definitely take a hit with bigger guild size
-       * To refactor this, we only query once for all the guilds in our database and based on the response
-       * - We iterate through each guild nessie is in
-       * - For each guild, we will check if it exists in the response
-       * - If it doesn't, we insert the relevant guild to the database
-       */
-      client.query('SELECT * FROM Guild', (err, res) => {
-        if (err) {
-          console.log(err);
-        }
-        const guildsInDatabase = res.rows;
-        console.log(guildsInDatabase);
-        guilds.forEach((guild) => {
-          const isInDatabase = guildsInDatabase.find((guildDb) => guildDb.uuid === guild.id);
-          if (!isInDatabase) {
-            client.query(
-              'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)',
-              [guild.id, guild.name, guild.memberCount, guild.ownerId, '$nes-', false],
-              (err) => {
-                if (err) {
-                  console.log(err);
-                }
-                sendGuildUpdateNotification(nessie, guild, 'join');
-                client.query('COMMIT', (err) => {
-                  // Permanently saves changes in database; without this changes won't be reflected the next time a connection opens
-                  if (err) {
-                    console.log(err);
-                  }
-                });
-              }
-            );
-          }
-        });
-        done(); //Closes connection with database
-      });
-    });
-  });
+type GuildRecord = {
+  uuid: string;
+  name: string;
+  member_count: number;
+  owner_id: string;
+  prefix: string;
+  use_prefix: boolean;
 };
-/**
- * Adds new guild to Guild table
- * @param guild - guild that nessie is newly invited in
- */
-exports.insertNewGuild = (guild) => {
-  this.pool.connect((_, client, done) => {
-    client.query('BEGIN', () => {
-      client.query(
-        'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)',
-        [guild.id, guild.name, guild.memberCount, guild.ownerId, '$nes-', false],
-        (err) => {
-          if (err) {
-            console.log(err);
-          }
-          client.query('COMMIT', (err) => {
-            if (err) {
-              console.log(err);
-            }
-            done();
-          });
-        }
-      );
+
+export async function createGuildTable() {
+  if (!pool) return;
+  const client = await pool.connect();
+  if (client) {
+    try {
+      await client.query('BEGIN');
+      const createGuildTableQuery =
+        'CREATE TABLE IF NOT EXISTS Guild(uuid TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, member_count INTEGER NOT NULL, owner_id TEXT NOT NULL, prefix TEXT NOT NULL, use_prefix BOOLEAN NOT NULL DEFAULT TRUE)';
+      await client.query(createGuildTableQuery);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.log(error); //TODO: Add error handling
+    } finally {
+      client.release();
+    }
+  }
+}
+export async function getGuilds(): Promise<QueryResult<GuildRecord> | undefined> {
+  if (!pool) return;
+  const client = await pool.connect();
+  if (client) {
+    try {
+      await client.query('BEGIN');
+      const getAllGuildsQuery = 'SELECT * FROM Guild';
+      const allGuilds = await client.query(getAllGuildsQuery);
+      return allGuilds;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.log(error); //TODO: Add error handling
+    } finally {
+      client.release();
+    }
+  }
+}
+export async function populateGuilds(existingGuilds: Collection<string, Guild>) {
+  try {
+    const guildsInDatabase = await getGuilds();
+    existingGuilds.forEach(async (guild) => {
+      const isInDatabase =
+        guildsInDatabase && guildsInDatabase.rows.some((guildDb) => guildDb.uuid === guild.id);
+      if (!isInDatabase) {
+      }
     });
-  });
-};
+  } catch (error) {
+    console.log(error); //TODO: Add error handling
+  }
+}
+export async function insertNewGuild(newGuild: Guild) {
+  if (!pool) return;
+  const client = await pool.connect();
+  if (client) {
+    try {
+      await client.query('BEGIN');
+      const insertNewGuildQuery =
+        'INSERT INTO Guild (uuid, name, member_count, owner_id, prefix, use_prefix) VALUES ($1, $2, $3, $4, $5, $6)';
+      await client.query(insertNewGuildQuery, [
+        newGuild.id,
+        newGuild.name,
+        newGuild.memberCount,
+        newGuild.ownerId,
+        '$nes-',
+        false,
+      ]);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.log(error); //TODO: Add error handling
+    } finally {
+      client.release();
+    }
+  }
+}
+export async function deleteGuild(existingGuild: Guild) {
+  if (!pool) return;
+  const client = await pool.connect();
+  if (client) {
+    try {
+      await client.query('BEGIN');
+      const deleteGuildQuery = 'DELETE from Guild WHERE uuid = ($1)';
+      await client.query(deleteGuildQuery, [existingGuild.id]);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.log(error); //TODO: Add error handling
+    } finally {
+      client.release();
+    }
+  }
+}
 /**
  * Function to delete all the relevant data in our database when nessie is removed from a server
  * Removes:
