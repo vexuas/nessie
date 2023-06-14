@@ -1,9 +1,9 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 import { scheduleStatus } from '../../commands/maps/status/start';
-import { BOT_TOKEN, ENV, GUILD_ID } from '../../config/environment';
+import { BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
 import { getBattleRoyalePubs } from '../../services/adapters';
-import { createGuildTable, createStatusTable } from '../../services/database';
+import { createGuildTable, createStatusTable, populateGuilds } from '../../services/database';
 import { sendHealthLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
@@ -86,8 +86,11 @@ export default function ({ nessie, appCommands }: EventModule) {
       const logChannel = nessie.channels.cache.get('899620845436141609');
       testChannel && testChannel.isText() && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
 
-      createGuildTable(nessie.guilds.cache, nessie);
-      createStatusTable();
+      if (DATABASE_CONFIG) {
+        await createGuildTable();
+        await populateGuilds(nessie.guilds.cache);
+        await createStatusTable();
+      }
 
       const brPubsData = await getBattleRoyalePubs();
       nessie.user && nessie.user.setActivity(brPubsData.current.map);
