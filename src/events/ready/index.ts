@@ -1,7 +1,7 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 import { AppCommand } from '../../commands/commands';
-import { scheduleStatus } from '../../commands/maps/status/start';
+import { scheduleStatus } from '../../commands/status/start';
 import { BOT_ID, BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
 import { getBattleRoyalePubs } from '../../services/adapters';
 import { createGuildTable, createStatusTable, populateGuilds } from '../../services/database';

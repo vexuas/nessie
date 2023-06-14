@@ -3,8 +3,8 @@ import {
   goBackToGameModeSelection,
   _cancelStatusStart,
   goToConfirmStatus,
-} from '../../commands/maps/status/start';
-import { deleteGuildStatus, _cancelStatusStop } from '../../commands/maps/status/stop';
+} from '../../commands/status/start';
+import { deleteGuildStatus, _cancelStatusStop } from '../../commands/status/stop';
 import { codeBlock } from '../../utils/helpers';
 import { EventModule } from '../events';
 

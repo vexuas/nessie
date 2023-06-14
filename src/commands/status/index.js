@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { generateErrorEmbed, sendErrorLog } = require('../../../utils/helpers');
+const { generateErrorEmbed, sendErrorLog } = require('../../utils/helpers');
 const { v4: uuidv4 } = require('uuid');
 const { sendHelpInteraction } = require('./help');
 const { sendStartInteraction } = require('./start');

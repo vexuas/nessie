@@ -5,7 +5,7 @@ const {
   checkMissingBotPermissions,
   codeBlock,
   checkIfUserHasManageServer,
-} = require('../../../../utils/helpers');
+} = require('../../../utils/helpers');
 
 /**
  * Handler for when a user initiates the /status help command

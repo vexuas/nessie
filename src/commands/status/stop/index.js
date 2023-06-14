@@ -7,11 +7,11 @@ const {
   sendMissingBotPermissionsError,
   checkIfUserHasManageServer,
   sendMissingUserPermissionError,
-} = require('../../../../utils/helpers');
+} = require('../../../utils/helpers');
 const { v4: uuidv4 } = require('uuid');
 const { MessageActionRow, MessageButton } = require('discord.js');
-const { getStatus, deleteStatus } = require('../../../../services/database');
-const { sendMixpanelEvent } = require('../../../../services/analytics');
+const { getStatus, deleteStatus } = require('../../../services/database');
+const { sendMixpanelEvent } = require('../../../services/analytics');
 /**
  * Handler for when a user initiates the /status stop command
  * Calls the getStatus handler to see for existing status in the guild
