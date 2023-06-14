@@ -1,4 +1,4 @@
-import { Collection, Guild, Status } from 'discord.js';
+import { Collection, Guild } from 'discord.js';
 import { Pool, QueryResult } from 'pg';
 const { DATABASE_CONFIG } = require('../config/environment');
 
