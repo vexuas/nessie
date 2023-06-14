@@ -1,12 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { v4: uuidv4 } = require('uuid');
-const { getLimitedTimeEvent } = require('../../../services/adapters');
+const { getLimitedTimeEvent } = require('../../services/adapters');
 const {
   generateErrorEmbed,
   getMapUrl,
   getCountdown,
   sendErrorLog,
-} = require('../../../utils/helpers');
+} = require('../../utils/helpers');
 
 const generateLimitedTimeEventEmbed = (data) => {
   const mapURL = getMapUrl(data.current.code);

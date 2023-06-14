@@ -1,14 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getArenasPubs, getArenasRanked } = require('../../../services/adapters');
+const { getArenasPubs, getArenasRanked } = require('../../services/adapters');
 const {
   sendErrorLog,
   generateErrorEmbed,
   generatePubsEmbed,
   generateRankedEmbed,
   codeBlock,
-} = require('../../../utils/helpers');
+} = require('../../utils/helpers');
 const { v4: uuidv4 } = require('uuid');
-const { getStatus } = require('../../../services/database');
+const { getStatus } = require('../../services/database');
 
 module.exports = {
   data: new SlashCommandBuilder()
