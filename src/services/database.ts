@@ -191,7 +191,7 @@ export async function getStatus(guildId: string): Promise<StatusRecord | undefin
     }
   }
 }
-export async function getAllStatus(): Promise<QueryResult<StatusRecord> | undefined> {
+export async function getAllStatus(): Promise<StatusRecord[] | undefined> {
   if (!pool) return;
   const client = await pool.connect();
   if (client) {
@@ -199,7 +199,7 @@ export async function getAllStatus(): Promise<QueryResult<StatusRecord> | undefi
       await client.query('BEGIN');
       const getAllStatusQuery = 'SELECT * FROM Status';
       const allStatus: QueryResult<StatusRecord> = await client.query(getAllStatusQuery);
-      return allStatus;
+      return allStatus.rows;
     } catch (error) {
       await client.query('ROLLBACK');
       console.log(error); //TODO: Add error handling

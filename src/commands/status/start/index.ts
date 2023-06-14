@@ -1,29 +1,23 @@
-const { MessageActionRow, MessageSelectMenu, MessageButton, WebhookClient } = require('discord.js');
-const { v4: uuidv4 } = require('uuid');
-const {
-  generateErrorEmbed,
-  sendErrorLog,
+import { MessageActionRow, MessageButton, MessageSelectMenu, WebhookClient } from 'discord.js';
+import { deleteStatus, getAllStatus, getStatus, insertNewStatus } from '../../../services/database';
+import {
   generatePubsEmbed,
+  codeBlock,
   generateRankedEmbed,
   checkMissingBotPermissions,
-  sendMissingBotPermissionsError,
-  sendMissingAllPermissionsError,
-  codeBlock,
-  sendStatusErrorLog,
   checkIfUserHasManageServer,
+  sendMissingAllPermissionsError,
+  sendMissingBotPermissionsError,
   sendMissingUserPermissionError,
-} = require('../../../utils/helpers');
-const { getRotationData } = require('../../../services/adapters');
-const { nessieLogo } = require('../../../utils/constants');
-const { format, differenceInSeconds, differenceInMilliseconds } = require('date-fns');
-const {
-  insertNewStatus,
-  getStatus,
-  getAllStatus,
-  deleteStatus,
-} = require('../../../services/database');
-const { sendMixpanelEvent } = require('../../../services/analytics');
-const { default: Scheduler } = require('../../../services/scheduler');
+  generateErrorEmbed,
+  sendErrorLog,
+  sendStatusErrorLog,
+} from '../../../utils/helpers';
+import { v4 as uuidV4 } from 'uuid';
+import { getRotationData } from '../../../services/adapters';
+import { nessieLogo } from '../../../utils/constants';
+import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
+import Scheduler from '../../../services/scheduler';
 
 const errorNotification = {
   count: 0,
@@ -40,7 +34,7 @@ const errorNotification = {
  * - TODO: Don't forget to add copy for the explanation of webhooks/channels creation + status update cycles
  * - Has 3 buttons: Back goes to Step 1, Cancel stops the wizard entirely, Confirm creates a status for the guild
  */
-const generateGameModeSelectionMessage = (status) => {
+const generateGameModeSelectionMessage = (status?: any) => {
   let embed, row;
   if (!status) {
     row = new MessageActionRow().addComponents(
@@ -84,7 +78,7 @@ const generateGameModeSelectionMessage = (status) => {
     row,
   };
 };
-const generateConfirmStatusMessage = ({ interaction }) => {
+const generateConfirmStatusMessage = ({ interaction }: any) => {
   /**
    * The game mode selections are passed down from the dropdown interaction in step 1
    * However, there's no direct way of passing them down along with the confirm button interaction
@@ -92,10 +86,10 @@ const generateConfirmStatusMessage = ({ interaction }) => {
    * Going to treat them like query params (?x&y)
    */
   const isBattleRoyaleSelected = interaction.values.find(
-    (value) => value === 'gameModeDropdown__battleRoyaleValue'
+    (value: any) => value === 'gameModeDropdown__battleRoyaleValue'
   );
   const isArenasSelected = interaction.values.find(
-    (value) => value === 'gameModeDropdown__arenasValue'
+    (value: any) => value === 'gameModeDropdown__arenasValue'
   );
   const modeLength = interaction.values.length;
 
@@ -142,7 +136,7 @@ const generateConfirmStatusMessage = ({ interaction }) => {
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
  */
-const generateBattleRoyaleStatusEmbeds = (data) => {
+const generateBattleRoyaleStatusEmbeds = (data: any) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
   const informationEmbed = {
@@ -161,7 +155,7 @@ const generateBattleRoyaleStatusEmbeds = (data) => {
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
  */
-const generateArenasStatusEmbeds = (data) => {
+const generateArenasStatusEmbeds = (data: any) => {
   const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
   const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
@@ -181,90 +175,79 @@ const generateArenasStatusEmbeds = (data) => {
  * We want to show permissions errors only when status do not exist
  * We want to show them existing status details but block them if they want to create one
  */
-const sendStartInteraction = async ({ interaction, nessie }) => {
-  await getStatus(
-    interaction.guildId,
-    async (status) => {
-      const { embed, row } = generateGameModeSelectionMessage(status);
-      const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
-      const isManageServerUser = checkIfUserHasManageServer(interaction);
-      try {
-        if (!status) {
-          if (hasMissingPermissions && !isManageServerUser) {
-            return sendMissingAllPermissionsError({ interaction, title: 'Status | Start' });
-          } else {
-            if (hasMissingPermissions)
-              return sendMissingBotPermissionsError({ interaction, title: 'Status | Start' });
-            if (!isManageServerUser)
-              return sendMissingUserPermissionError({ interaction, title: 'Status | Start' });
-          }
-        }
-        await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
-      } catch (error) {
-        const uuid = uuidv4();
-        const type = 'Status Start';
-        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-        await interaction.editReply({ embeds: errorEmbed });
-        await sendErrorLog({ nessie, error, interaction, type, uuid });
+export const sendStartInteraction = async ({ interaction, app }: any) => {
+  const status = await getStatus(interaction.guildId);
+  const { embed, row } = generateGameModeSelectionMessage(status);
+  const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
+  const isManageServerUser = checkIfUserHasManageServer(interaction);
+  try {
+    if (!status) {
+      if (hasMissingPermissions && !isManageServerUser) {
+        return sendMissingAllPermissionsError({ interaction, title: 'Status | Start' });
+      } else {
+        if (hasMissingPermissions)
+          return sendMissingBotPermissionsError({ interaction, title: 'Status | Start' });
+        if (!isManageServerUser)
+          return sendMissingUserPermissionError({ interaction, title: 'Status | Start' });
       }
-    },
-    async (error) => {
-      const uuid = uuidv4();
-      const type = 'Getting Status in Database (Start)';
-      const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-      interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie, error, interaction, type, uuid });
     }
-  );
+    await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
+  } catch (error) {
+    const uuid = uuidV4();
+    const type = 'Status Start';
+    const errorEmbed = await generateErrorEmbed(error, uuid, app);
+    await interaction.editReply({ embeds: errorEmbed });
+    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+  }
 };
 /**
  * Handler for when a user selects any of the options in the Game Mode dropdown
  * Will edit and show the second step of the status start wizard: Confirm Status
  */
-const goToConfirmStatus = async ({ interaction, nessie, mixpanel }) => {
+export const goToConfirmStatus = async ({ interaction, app }: any) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
-    const uuid = uuidv4();
+    const uuid = uuidV4();
     const type = 'Status Start Confirm';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    const errorEmbed = await generateErrorEmbed(error, uuid, app);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
   } finally {
-    sendMixpanelEvent({
-      user: interaction.user,
-      channel: interaction.channel,
-      guild: interaction.guild,
-      client: mixpanel,
-      customEventName: 'Click status start gamemode select menu',
-    });
+    // sendMixpanelEvent({
+    //   user: interaction.user,
+    //   channel: interaction.channel,
+    //   guild: interaction.guild,
+    //   client: mixpanel,
+    //   customEventName: 'Click status start gamemode select menu',
+    // });
   }
 };
 /**
  * Handler for when a user clicks the Back button in Confirm Status Step
  * Will edit and show the first step of the status start wizard: Confirm Status
  */
-const goBackToGameModeSelection = async ({ interaction, nessie, mixpanel }) => {
+export const goBackToGameModeSelection = async ({ interaction, app }: any) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
-    const uuid = uuidv4();
+    const uuid = uuidV4();
     const type = 'Status Start Back';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    const errorEmbed = await generateErrorEmbed(error, uuid, app);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
   } finally {
-    sendMixpanelEvent({
-      user: interaction.user,
-      channel: interaction.channel,
-      guild: interaction.guild,
-      client: mixpanel,
-      customEventName: 'Click status start back button',
-    });
+    // sendMixpanelEvent({
+    //   user: interaction.user,
+    //   channel: interaction.channel,
+    //   guild: interaction.guild,
+    //   client: mixpanel,
+    //   customEventName: 'Click status start back button',
+    // });
   }
 };
 /**
@@ -273,7 +256,7 @@ const goBackToGameModeSelection = async ({ interaction, nessie, mixpanel }) => {
  * Prepended an underscore as there's a function in announcement with the same name
  * TODO: Clean up the code there eventually
  */
-const _cancelStatusStart = async ({ interaction, nessie, mixpanel }) => {
+export const _cancelStatusStart = async ({ interaction, app }: any) => {
   const embed = {
     description: 'Cancelled automatic map status config',
     color: 16711680,
@@ -282,19 +265,19 @@ const _cancelStatusStart = async ({ interaction, nessie, mixpanel }) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [] });
   } catch (error) {
-    const uuid = uuidv4();
+    const uuid = uuidV4();
     const type = 'Status Start Cancel';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    const errorEmbed = await generateErrorEmbed(error, uuid, app);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
   } finally {
-    sendMixpanelEvent({
-      user: interaction.user,
-      channel: interaction.channel,
-      guild: interaction.guild,
-      client: mixpanel,
-      customEventName: 'Click status start cancel button',
-    });
+    // sendMixpanelEvent({
+    //   user: interaction.user,
+    //   channel: interaction.channel,
+    //   guild: interaction.guild,
+    //   client: mixpanel,
+    //   customEventName: 'Click status start cancel button',
+    // });
   }
 };
 /**
@@ -313,7 +296,7 @@ const _cancelStatusStart = async ({ interaction, nessie, mixpanel }) => {
  * TODO: Save status data in our database
  * TODO: Maybe separate ui and wiring up to respective files/folders for better readability
  */
-const createStatus = async ({ interaction, nessie, mixpanel }) => {
+export const createStatus = async ({ interaction, app }: any) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
   const gameModeSelected =
@@ -342,7 +325,9 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
      * Gets the @everyone role of the guild
      * Important so w can't prevent non-admin users from sending any messages in status channels
      */
-    const everyoneRole = interaction.guild.roles.cache.find((role) => role.name === '@everyone');
+    const everyoneRole = interaction.guild.roles.cache.find(
+      (role: any) => role.name === '@everyone'
+    );
 
     const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
       type: 'GUILD_CATEGORY',
@@ -411,7 +396,7 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
      * * Passes a success and error callback with the former editing the original message with a success embed
      */
     const newStatus = {
-      uuid: uuidv4(),
+      uuid: uuidV4(),
       guildId: interaction.guildId,
       categoryChannelId: statusCategory.id,
       battleRoyaleChannelId: statusBattleRoyaleChannel ? statusBattleRoyaleChannel.id : null,
@@ -428,73 +413,62 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
       createdAt: format(new Date(), 'dd MMM yyyy, h:mm a'),
     };
 
-    await insertNewStatus(
-      newStatus,
-      async () => {
-        const embedSuccess = {
-          description: '',
-          color: 3066993,
-        };
-        //TODO: Probably figure out a better way of handling string manipulation
-        isBattleRoyaleSelected && isArenasSelected
-          ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
-          : null;
-        isBattleRoyaleSelected && !isArenasSelected
-          ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel}`)
-          : null;
-        !isBattleRoyaleSelected && isArenasSelected
-          ? (embedSuccess.description = `Created map status at ${statusArenasChannel}`)
-          : null;
+    await insertNewStatus(newStatus); //TODO: Add typing
+    const embedSuccess = {
+      description: '',
+      color: 3066993,
+    };
+    //TODO: Probably figure out a better way of handling string manipulation
+    isBattleRoyaleSelected && isArenasSelected
+      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
+      : null;
+    isBattleRoyaleSelected && !isArenasSelected
+      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel}`)
+      : null;
+    !isBattleRoyaleSelected && isArenasSelected
+      ? (embedSuccess.description = `Created map status at ${statusArenasChannel}`)
+      : null;
 
-        await interaction.message.edit({ embeds: [embedSuccess], components: [] });
-        //Sends status creation log after everything is done
-        const statusLogChannel = nessie.channels.cache.get('976863441526595644');
-        const statusLogEmbed = {
-          title: 'New Status Created',
-          color: 3066993,
-          fields: [
-            {
-              name: 'Guild',
-              value: interaction.guild.name,
-            },
-            {
-              name: 'Game Modes',
-              value:
-                isBattleRoyaleSelected && isArenasSelected
-                  ? 'All'
-                  : isBattleRoyaleSelected
-                  ? 'Battle Royale'
-                  : 'Arenas',
-            },
-          ],
-        };
-        await statusLogChannel.send({ embeds: [statusLogEmbed] });
-      },
-      async (error) => {
-        const uuid = uuidv4();
-        const type = 'Inserting New Status in Database';
-        const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-        await interaction.message.edit({ embeds: errorEmbed, components: [] });
-        await sendErrorLog({ nessie, error, interaction, type, uuid });
-      }
-    );
+    await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+    //Sends status creation log after everything is done
+    const statusLogChannel = app.channels.cache.get('976863441526595644');
+    const statusLogEmbed = {
+      title: 'New Status Created',
+      color: 3066993,
+      fields: [
+        {
+          name: 'Guild',
+          value: interaction.guild.name,
+        },
+        {
+          name: 'Game Modes',
+          value:
+            isBattleRoyaleSelected && isArenasSelected
+              ? 'All'
+              : isBattleRoyaleSelected
+              ? 'Battle Royale'
+              : 'Arenas',
+        },
+      ],
+    };
+    await statusLogChannel.send({ embeds: [statusLogEmbed] });
   } catch (error) {
-    const uuid = uuidv4();
+    const uuid = uuidV4();
     const type = 'Status Start Confirm';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
+    const errorEmbed = await generateErrorEmbed(error, uuid, app);
     await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
   } finally {
-    sendMixpanelEvent({
-      user: interaction.user,
-      channel: interaction.channel,
-      guild: interaction.guild,
-      client: mixpanel,
-      customEventName: 'Click status start confirm button',
-      properties: {
-        game_mode_selected: gameModeSelected,
-      },
-    });
+    // sendMixpanelEvent({
+    //   user: interaction.user,
+    //   channel: interaction.channel,
+    //   guild: interaction.guild,
+    //   client: mixpanel,
+    //   customEventName: 'Click status start confirm button',
+    //   properties: {
+    //     game_mode_selected: gameModeSelected,
+    //   },
+    // });
   }
 };
 /**
@@ -513,71 +487,65 @@ const createStatus = async ({ interaction, nessie, mixpanel }) => {
  * Might have to revisit this in the near future when we're supporting a lot of guilds
  * More detailed explanation here: https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658
  */
-const scheduleStatus = (nessie) => {
-  return new Scheduler(
-    '5 */15 * * * *',
-    async () => {
-      errorNotification.count = 0;
-      errorNotification.message = '';
-      getAllStatus(async (allStatus) => {
-        const startTime = Date.now();
-        try {
-          if (allStatus) {
-            const rotationData = await getRotationData();
-            const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
-            const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
-            allStatus.forEach(async (status, index) => {
-              await handleStatusCycle({
-                nessie,
-                status,
-                index,
-                startTime,
-                totalCount: allStatus.length,
-                brStatusEmbeds,
-                arenasStatusEmbeds,
-              });
-            });
-          }
-        } catch (error) {
-          /**
-           * Different error handling from status cycles
-           * Specifically due to this is where we catch API issues
-           * Should really make these errors distinguishable from the others but assumming the errors comes from the API here is alright for now
-           * Since technically the status is working fine, we still want to edit the status messages in every guild
-           * Only difference is instead of the rotation data, we're showing the information embed + an error message
-           */
-          const uuid = uuidv4();
-          const type = 'Status Scheduler Config';
-          const errorEmbed = [
-            {
-              description:
-                '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
-              color: 3447003,
-              timestamp: Date.now(),
-              footer: {
-                text: 'Last Update',
-              },
-            },
-          ].concat(await generateErrorEmbed(error, uuid, nessie));
-          allStatus.forEach(async (status, index) => {
-            await handleStatusCycle({
-              nessie,
-              status,
-              brStatusEmbeds: errorEmbed,
-              arenasStatusEmbeds: errorEmbed,
-              index,
-            });
+export const scheduleStatus = (nessie: any) => {
+  return new Scheduler('5 */15 * * * *', async () => {
+    errorNotification.count = 0;
+    errorNotification.message = '';
+    const startTime = Date.now();
+    const allStatus = await getAllStatus();
+    try {
+      if (allStatus) {
+        const rotationData = await getRotationData();
+        const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
+        const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
+        allStatus.forEach(async (status, index) => {
+          await handleStatusCycle({
+            nessie,
+            status,
+            index,
+            startTime,
+            totalCount: allStatus.length,
+            brStatusEmbeds,
+            arenasStatusEmbeds,
           });
-          await sendErrorLog({ nessie, error, type, uuid, ping: true });
-        }
-      });
-    },
-    async (error) => {
-      const uuid = uuidv4();
-      const type = 'Status Scheduler (Database)';
+        });
+      }
+    } catch (error) {
+      /**
+       * Different error handling from status cycles
+       * Specifically due to this is where we catch API issues
+       * Should really make these errors distinguishable from the others but assumming the errors comes from the API here is alright for now
+       * Since technically the status is working fine, we still want to edit the status messages in every guild
+       * Only difference is instead of the rotation data, we're showing the information embed + an error message
+       */
+      const uuid = uuidV4();
+      const type = 'Status Scheduler Config';
+      const errorEmbed: any = [
+        {
+          description:
+            '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+          color: 3447003,
+          timestamp: Date.now(),
+          footer: {
+            text: 'Last Update',
+          },
+        },
+      ];
+      const extraError = await generateErrorEmbed(error, uuid, nessie);
+      errorEmbed.concat(extraError);
+      allStatus &&
+        allStatus.forEach(async (status, index) => {
+          await handleStatusCycle({
+            nessie,
+            status,
+            brStatusEmbeds: errorEmbed,
+            arenasStatusEmbeds: errorEmbed,
+            index,
+          });
+        });
       await sendErrorLog({ nessie, error, type, uuid, ping: true });
     }
-  );
+  });
 };
 /**
  * Handler for the status cycle execution
@@ -599,7 +567,7 @@ const handleStatusCycle = async ({
   totalCount,
   brStatusEmbeds,
   arenasStatusEmbeds,
-}) => {
+}: any) => {
   try {
     const brWebhook =
       status.br_webhook_id &&
@@ -662,7 +630,7 @@ const handleStatusCycle = async ({
       };
       await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
-  } catch (error) {
+  } catch (error: any) {
     /**
      * Previously we sent an error notification to a channel whenever a status errors within a cycle
      * This was fine in the beginning so that I can be notified relatively fast
@@ -674,7 +642,7 @@ const handleStatusCycle = async ({
      */
     errorNotification.count = errorNotification.count + 1;
     errorNotification.message = error.message;
-    const uuid = uuidv4();
+    const uuid = uuidV4();
     errorNotification.count <= 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
     if (errorNotification.count !== 0 && index === totalCount - 1) {
       const errorChannel = nessie.channels.cache.get('938441853542465548');
@@ -697,45 +665,36 @@ const handleStatusCycle = async ({
     }
 
     if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
-      deleteStatus(status.guild_id, async (status) => {
-        try {
-          //Uses cache on status channels so it doesn't fail when they dont exist
-          //Might have to revamp these when we have to do sharding
-          const battleRoyaleStatusChannel =
-            status.br_channel_id && (await nessie.channels.cache.get(status.br_channel_id));
-          const arenasStatusChannel =
-            status.arenas_channel_id && (await nessie.channels.cache.get(status.arenas_channel_id));
-          const categoryStatusChannel =
-            status.category_channel_id &&
-            (await nessie.channels.cache.get(status.category_channel_id));
-          battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
-          arenasStatusChannel && (await arenasStatusChannel.delete());
-          categoryStatusChannel && (await categoryStatusChannel.delete());
-          const originalChannel = await nessie.channels.fetch(status.original_channel_id);
-          await originalChannel.send({
-            embeds: [
-              {
-                title: 'Automatic Map Status Error',
-                description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${codeBlock(
-                  '/status start'
-                )}`,
-                color: 16711680,
-              },
-            ],
-          });
-        } catch (error) {
-          const uuid = uuidv4();
-          await sendStatusErrorLog({ nessie, uuid, error, status });
-        }
-      });
+      await deleteStatus(status.guild_id);
+      try {
+        //Uses cache on status channels so it doesn't fail when they dont exist
+        //Might have to revamp these when we have to do sharding
+        const battleRoyaleStatusChannel =
+          status.br_channel_id && (await nessie.channels.cache.get(status.br_channel_id));
+        const arenasStatusChannel =
+          status.arenas_channel_id && (await nessie.channels.cache.get(status.arenas_channel_id));
+        const categoryStatusChannel =
+          status.category_channel_id &&
+          (await nessie.channels.cache.get(status.category_channel_id));
+        battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
+        arenasStatusChannel && (await arenasStatusChannel.delete());
+        categoryStatusChannel && (await categoryStatusChannel.delete());
+        const originalChannel = await nessie.channels.fetch(status.original_channel_id);
+        await originalChannel.send({
+          embeds: [
+            {
+              title: 'Automatic Map Status Error',
+              description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${codeBlock(
+                '/status start'
+              )}`,
+              color: 16711680,
+            },
+          ],
+        });
+      } catch (error) {
+        const uuid = uuidV4();
+        await sendStatusErrorLog({ nessie, uuid, error, status });
+      }
     }
   }
-};
-module.exports = {
-  goToConfirmStatus,
-  goBackToGameModeSelection,
-  _cancelStatusStart,
-  createStatus,
-  sendStartInteraction,
-  scheduleStatus,
 };
