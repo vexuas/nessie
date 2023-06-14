@@ -2,17 +2,8 @@ const { Pool } = require('pg');
 const { sendGuildUpdateNotification } = require('../utils/helpers');
 const { DATABASE_CONFIG } = require('../config/environment');
 
-exports.pool = new Pool(DATABASE_CONFIG); //Intialise pool to connect to our cloud database; more information https://node-postgres.com/features/pooling
-/**
- * Creates Guild table inside the nessie database in digital ocean
- * Gets called in the client.once("ready") hook
- * Seems quite scuffed atm but I'm prioritizing speed over elegance
- * Also doesn't help I only have a day's experience with posgres orz
- * But hey this seems to be working and as far as my manual testing goes, it doesn't seem to be breaking anything and looks as normal as it was in sqlite :shrug:
- * Tho might want to revisit these in the future; definitely need error handling and better readability
- * @param guilds - guilds that nessie is in
- * @param nessie - nessie client
- */
+const pool = DATABASE_CONFIG ? new Pool(DATABASE_CONFIG) : null;
+
 exports.createGuildTable = (guilds, nessie) => {
   // Starts a transaction; similar to sqlite's serialize so we can group all the relevant queries and call them in order
   this.pool.connect((_, client, done) => {
