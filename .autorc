@@ -1,0 +1,57 @@
+{
+  "baseBranch": "develop",
+  "labels": [
+    {
+      "name": "major",
+      "changelogTitle": "💥 Breaking Change",
+      "description": "Increment the major version when merged",
+      "releaseType": "major"
+    },
+    {
+      "name": "enhancement",
+      "changelogTitle": "🚀 Enhancement",
+      "description": "Increment the minor version when merged",
+      "releaseType": "minor"
+    },
+    {
+      "name": "bugs",
+      "changelogTitle": "🐛 Fixes",
+      "description": "For bug fixes. Increments the patch version when merged",
+      "releaseType": "patch"
+    },
+    {
+      "name": "tests",
+      "changelogTitle": "Tests",
+      "description": "Changes only affect tests. Increments the patch version when merged",
+      "releaseType": "patch"
+    },
+    {
+      "name": "tweaks",
+      "changelogTitle": "🔧 Tweaks",
+      "description": "Small changes that aren't bug fixes or tests. Increments the patch version when merged",
+      "releaseType": "patch"
+    },
+    {
+      "name": "skip-release",
+      "description": "Preserve the current version when merged",
+      "releaseType": "skip"
+    },
+    {
+      "name": "release",
+      "description": "Create a release when this pr is merged",
+      "releaseType": "release"
+    },
+    {
+      "name": "internal",
+      "changelogTitle": "🏠 Internal",
+      "description": "Changes only affect the internal API",
+      "releaseType": "none"
+    },
+    {
+      "name": "documentation",
+      "changelogTitle": "📝 Documentation",
+      "description": "Changes only affect the documentation",
+      "releaseType": "none"
+    }
+  ]
+}
