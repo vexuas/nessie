@@ -1,6 +1,8 @@
-const { format } = require('date-fns');
-const { ENV } = require('../config/environment');
-const { nessieLogo } = require('./constants');
+import { format } from 'date-fns';
+import { Channel, Client } from 'discord.js';
+import { BOOT_NOTIFICATION_CHANNEL_ID } from '../config/environment';
+import { nessieLogo } from './constants';
+import { isEmpty } from 'lodash';
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
@@ -105,24 +107,6 @@ export const serverEmbed = async (client: any, guild: any, status: any) => {
     ],
   };
   return [embed];
-};
-//----------
-/**
- * Sends a notification embed message to a specific channel
- * 889212328539725824: bot-development channel for Lochness development
- * 896710863459844136: servers channel for Nessie real guild data tracker
- * @param client - initialising discord client
- * @param guild  - guild data
- */
-export const sendGuildUpdateNotification = async (client: any, guild: any, type: any) => {
-  const embed = await serverEmbed(client, guild, type);
-  const channelId = ENV === 'dev' ? '889212328539725824' : '896710863459844136';
-  const channelToSend = client.channels.cache.get(channelId);
-
-  channelToSend.send({ embeds: embed });
-  if (ENV === 'prod') {
-    channelToSend.setTopic(`Servers: ${client.guilds.cache.size}`);
-  }
 };
 //---------
 /**
@@ -446,4 +430,14 @@ export const sendMissingAllPermissionsError = async ({ interaction, title }: any
     color: 16711680,
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
+};
+export const sendBootNotification = async (app: Client) => {
+  console.log("I'm booting up! (◕ᴗ◕✿)");
+  const bootNotificationChannel: Channel | undefined =
+    BOOT_NOTIFICATION_CHANNEL_ID && !isEmpty(BOOT_NOTIFICATION_CHANNEL_ID)
+      ? app.channels.cache.get(BOOT_NOTIFICATION_CHANNEL_ID)
+      : undefined;
+  bootNotificationChannel &&
+    bootNotificationChannel.isText() &&
+    (await bootNotificationChannel.send("I'm booting up! (◕ᴗ◕✿)"));
 };
