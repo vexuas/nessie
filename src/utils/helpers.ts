@@ -108,24 +108,6 @@ export const serverEmbed = async (client: any, guild: any, status: any) => {
   };
   return [embed];
 };
-//----------
-/**
- * Sends a notification embed message to a specific channel
- * 889212328539725824: bot-development channel for Lochness development
- * 896710863459844136: servers channel for Nessie real guild data tracker
- * @param client - initialising discord client
- * @param guild  - guild data
- */
-export const sendGuildUpdateNotification = async (client: any, guild: any, type: any) => {
-  const embed = await serverEmbed(client, guild, type);
-  const channelId = ENV === 'dev' ? '889212328539725824' : '896710863459844136';
-  const channelToSend = client.channels.cache.get(channelId);
-
-  channelToSend.send({ embeds: embed });
-  if (ENV === 'prod') {
-    channelToSend.setTopic(`Servers: ${client.guilds.cache.size}`);
-  }
-};
 //---------
 /**
  * Generates an error embed to be replied to the user when an error occurs with a command
