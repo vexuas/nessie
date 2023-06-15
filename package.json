@@ -2,17 +2,29 @@
   "name": "nessie",
   "version": "1.10.5",
   "description": "Apex Legends Map Rotation Discord Bot",
+  "license": "MIT",
   "scripts": {
-    "start": "yarn build && node dist/App.js",
+    "config:init": "yarn config:file && yarn config:bot && yarn config:als && yarn config:env && yarn config:notification && yarn config:database && yarn config:product && yarn config:topgg",
+    "config:file": "mkdir src/config && touch src/config/environment.ts",
+    "config:bot": "echo \"//Bot Configuration; Required\nexport const BOT_TOKEN = '';\nexport const BOT_ID = '';\nexport const GUILD_ID = '';\n\" >> src/config/environment.ts",
+    "config:als": "echo \"//API key to retrieve apex data\nexport const ALS_API_KEY = '';\n\" >> src/config/environment.ts",
+    "config:env": "echo \"//Environment\nexport const ENV = 'dev';\n\" >> src/config/environment.ts",
+    "config:notification": "echo \"//Notifications\nexport const GUILD_NOTIFICATION_WEBHOOK_URL = '';\nexport const ERROR_NOTIFICATION_WEBHOOK_URL = '';\nexport const BOOT_NOTIFICATION_CHANNEL_ID = '';\n\" >> src/config/environment.ts",
+    "config:database": "echo \"//Database\nexport const DATABASE_CONFIG = null;\n\" >> src/config/environment.ts",
+    "config:product": "echo \"//Product Tracking\nexport const MIXPANEL_ID = '';\n\" >> src/config/environment.ts",
+    "config:topgg": "echo \"//TopGG Tracking\nexport const TOP_GG_TOKEN = '';\n\" >> src/config/environment.ts",
+    "start": "yarn build && yarn build:watch",
     "build": "tsc",
+    "build:watch": "yarn tsc-watch --onSuccess 'node dist/App.js'",
+    "update:version": "node -p \"'export const BOT_VERSION = ' + JSON.stringify(require('./package.json').version) + ';' + 'export const BOT_UPDATED_AT = ' + JSON.stringify('$(date +'%d-%b-%Y')')\" > src/version.ts",
+    "auto:changelog": "yarn auto changelog",
     "auto:version": "yarn version --`auto version`",
-    "update:version": "node -p \"'export const BOT_VERSION = ' + JSON.stringify(require('./package.json').version) + ';' + 'export const BOT_UPDATED_AT = ' + JSON.stringify('$(date +'%d-%b-%Y')')\" > src/version.ts"
+    "auto:release": "yarn auto:changelog && yarn auto:version",
+    "release": "git fetch --tags --force && git checkout -b release/$(date +'%Y-%m-%d') && yarn auto:release && yarn update:version && git add . && git commit -m 'Update version' && git push -u origin head"
   },
-  "main": "index.js",
   "dependencies": {
     "@discordjs/builders": "^0.11.0",
     "@discordjs/rest": "^0.2.0-canary.0",
-    "@top-gg/sdk": "^3.1.2",
     "axios": "^0.22.0",
     "cron": "^1.8.2",
     "date-fns": "^2.24.0",
@@ -20,10 +32,7 @@
     "discord.js": "13.3.1",
     "lodash": "^4.17.21",
     "mixpanel": "^0.13.0",
-    "mocha": "^10.2.0",
-    "nodemon": "^2.0.22",
     "pg": "^8.7.3",
-    "sqlite3": "^5.1.5",
     "topgg-autoposter": "^2.0.0",
     "uuid": "^8.3.2"
   },
@@ -37,6 +46,7 @@
     "auto": "^10.44.0",
     "eslint": "^8.42.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "tsc-watch": "^6.0.4",
     "typescript": "^5.1.3"
   }
 }
