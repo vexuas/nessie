@@ -21,7 +21,6 @@
     "mixpanel": "^0.13.0",
     "nodemon": "^2.0.22",
     "pg": "^8.7.3",
-    "sqlite3": "^5.1.5",
     "topgg-autoposter": "^2.0.0",
     "uuid": "^8.3.2"
   },
