@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { Channel, Client } from 'discord.js';
-import { BOOT_NOTIFICATION_CHANNEL_ID, ENV } from '../config/environment';
+import { BOOT_NOTIFICATION_CHANNEL_ID } from '../config/environment';
 import { nessieLogo } from './constants';
 import { isEmpty } from 'lodash';
 //----------
