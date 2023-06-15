@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Channel, Client } from 'discord.js';
+import { Channel, Client, Guild } from 'discord.js';
 import { BOOT_NOTIFICATION_CHANNEL_ID } from '../config/environment';
 import { nessieLogo } from './constants';
 import { isEmpty } from 'lodash';
@@ -59,29 +59,29 @@ export const codeBlock = (text: any) => {
   return '`' + text + '`';
 };
 //----------
-/**
- * Server Embed for when bot joining and leaving a server
- * Add iconURL logic to always return a png extension
- */
-export const serverEmbed = async (client: any, guild: any, status: any) => {
-  let embedTitle;
-  let embedColor;
+export const serverNotificationEmbed = async ({
+  app,
+  guild,
+  type,
+}: {
+  app: Client;
+  guild: Guild;
+  type: 'join' | 'leave';
+}): Promise<any> => {
   const defaultIcon =
     'https://cdn.discordapp.com/attachments/248430185463021569/614789995596742656/Wallpaper2.png';
-  if (status === 'join') {
-    embedTitle = 'Joined a new server';
-    embedColor = 55296;
-  } else if (status === 'leave') {
-    embedTitle = 'Left a server';
-    embedColor = 16711680;
-  }
+  const guildIcon = guild.icon && guild.iconURL();
+  const guildOwner =
+    type === 'join'
+      ? await guild.members.fetch(guild.ownerId).then((guildMember) => guildMember.user.tag)
+      : '-';
 
   const embed = {
-    title: embedTitle,
-    description: `I'm now in **${client.guilds.cache.size}** servers!`, //Removed users for now
-    color: embedColor,
+    title: type === 'join' ? 'Joined a new server' : 'Left a server',
+    description: `I'm now in **${app.guilds.cache.size}** servers!`,
+    color: getEmbedColor(type === 'join' ? '#33FF33' : '#FF0000'),
     thumbnail: {
-      url: guild.icon ? guild.iconURL().replace(/jpeg|jpg/gi, 'png') : defaultIcon,
+      url: guildIcon ? guildIcon.replace(/jpeg|jpg/gi, 'png') : defaultIcon,
     },
     fields: [
       {
@@ -91,22 +91,17 @@ export const serverEmbed = async (client: any, guild: any, status: any) => {
       },
       {
         name: 'Owner',
-        value:
-          status === 'join'
-            ? await guild.members
-                .fetch(guild.ownerId)
-                .then((guildMember: any) => guildMember.user.tag)
-            : '-',
+        value: guildOwner,
         inline: true,
       },
       {
         name: 'Members',
-        value: `${guild.memberCount}`,
+        value: guild.memberCount.toString(),
         inline: true,
       },
     ],
   };
-  return [embed];
+  return embed;
 };
 //---------
 /**
@@ -431,6 +426,7 @@ export const sendMissingAllPermissionsError = async ({ interaction, title }: any
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
 };
+
 export const sendBootNotification = async (app: Client) => {
   console.log("I'm booting up! (◕ᴗ◕✿)");
   const bootNotificationChannel: Channel | undefined =
@@ -440,4 +436,10 @@ export const sendBootNotification = async (app: Client) => {
   bootNotificationChannel &&
     bootNotificationChannel.isText() &&
     (await bootNotificationChannel.send("I'm booting up! (◕ᴗ◕✿)"));
+};
+
+//Helper to pass in a hexadecimal string color that converts it to a number code that discord accepts
+//Returns a default color if no argument is passed
+export const getEmbedColor = (color?: string): number => {
+  return parseInt(color ? color.replace('#', '0x') : '#3399FF'.replace('#', '0x'));
 };

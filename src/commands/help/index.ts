@@ -1,6 +1,6 @@
 import { inlineCode, SlashCommandBuilder } from '@discordjs/builders';
 import { isEmpty, reduce, uniq } from 'lodash';
-import { sendErrorLog } from '../../utils/helpers';
+import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
 //TODO: Add typing after upgrading to djs v14
@@ -29,7 +29,7 @@ export const generateHelpEmbed = (appCommands?: AppCommand[]) => {
     };
   });
   const embed = {
-    color: 3447003,
+    color: getEmbedColor(),
     description: 'Below you can see all the commands that I know!',
     fields: commandFields,
   };

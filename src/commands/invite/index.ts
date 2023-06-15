@@ -1,5 +1,5 @@
 import { AppCommand, AppCommandOptions } from '../commands';
-import { sendErrorLog } from '../../utils/helpers';
+import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
 import { hyperlink, SlashCommandBuilder } from '@discordjs/builders';
 
 //TODO: Add typing after upgrading to djs v14
@@ -9,7 +9,7 @@ export const generateInviteEmbed = () => {
       'Add me to your servers! (◕ᴗ◕✿)',
       'https://discord.com/api/oauth2/authorize?client_id=889135055430111252&permissions=536874000&scope=applications.commands%20bot'
     ),
-    color: 3447003,
+    color: getEmbedColor(),
   };
   return embed;
 };
