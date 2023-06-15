@@ -1,0 +1,50 @@
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+# Typescript and our jest tests will fail in the workflow since there are missing config files
+# To fix this, we need to manually load them to their respected files
+# Initially used secret variables to do this but decided to just hard code the declarations for simpler setup
+# We dont really need to add values to the variables, just need them defined in a file
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: 'Run lint checks'
+        run: 'yarn lint'
+
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Load environment config
+        run: yarn config:init
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Typescript checks
+        run: yarn tsc --noEmit
+# TODO: Add jest tests

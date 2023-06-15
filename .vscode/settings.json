@@ -1,0 +1,5 @@
+{
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": "file:///Users/gabr/Projects/nessie/.github/workflows/tests.yml"
+  }
+}
