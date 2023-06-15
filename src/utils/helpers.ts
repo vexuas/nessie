@@ -1,6 +1,8 @@
-const { format } = require('date-fns');
-const { ENV } = require('../config/environment');
-const { nessieLogo } = require('./constants');
+import { format } from 'date-fns';
+import { Channel, Client } from 'discord.js';
+import { BOOT_NOTIFICATION_CHANNEL_ID, ENV } from '../config/environment';
+import { nessieLogo } from './constants';
+import { isEmpty } from 'lodash';
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
@@ -446,4 +448,14 @@ export const sendMissingAllPermissionsError = async ({ interaction, title }: any
     color: 16711680,
   };
   return await interaction.editReply({ embeds: [embed], components: [] });
+};
+export const sendBootNotification = async (app: Client) => {
+  console.log("I'm booting up! (◕ᴗ◕✿)");
+  const bootNotificationChannel: Channel | undefined =
+    BOOT_NOTIFICATION_CHANNEL_ID && !isEmpty(BOOT_NOTIFICATION_CHANNEL_ID)
+      ? app.channels.cache.get(BOOT_NOTIFICATION_CHANNEL_ID)
+      : undefined;
+  bootNotificationChannel &&
+    bootNotificationChannel.isText() &&
+    (await bootNotificationChannel.send("I'm booting up! (◕ᴗ◕✿)"));
 };

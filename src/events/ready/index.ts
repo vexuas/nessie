@@ -5,7 +5,7 @@ import { scheduleStatus } from '../../commands/status/start';
 import { BOT_ID, BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
 import { getBattleRoyalePubs } from '../../services/adapters';
 import { createGuildTable, createStatusTable, populateGuilds } from '../../services/database';
-import { sendErrorLog, sendHealthLog } from '../../utils/helpers';
+import { sendBootNotification, sendErrorLog, sendHealthLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
 const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
@@ -62,18 +62,17 @@ const setCurrentMapStatus = (data: any, channel: any, nessie: any) => {
 
 export default function ({ nessie, appCommands }: EventModule) {
   nessie.once('ready', async () => {
-    await registerApplicationCommands(appCommands);
     try {
-      const testChannel = nessie.channels.cache.get('889212328539725824');
-      const logChannel = nessie.channels.cache.get('899620845436141609');
-      testChannel && testChannel.isText() && testChannel.send("I'm booting up! (◕ᴗ◕✿)"); //Sends to test bot channel in nessie's canyon
-
+      await registerApplicationCommands(appCommands);
       if (DATABASE_CONFIG) {
         await createGuildTable();
         await populateGuilds(nessie.guilds.cache);
         await createStatusTable();
       }
+      await sendBootNotification(nessie);
 
+      //TODO: See if we even need the health log
+      const logChannel = nessie.channels.cache.get('899620845436141609');
       const brPubsData = await getBattleRoyalePubs();
       nessie.user && nessie.user.setActivity(brPubsData.current.map);
       sendHealthLog(brPubsData, logChannel, true);
