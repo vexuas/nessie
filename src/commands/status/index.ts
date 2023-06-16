@@ -20,16 +20,16 @@ export default {
     .addSubcommand((subCommand) =>
       subCommand.setName('stop').setDescription('Stops existing automatic map updates')
     ),
-  async execute({ app, interaction }: AppCommandOptions) {
+  async execute({ interaction }: AppCommandOptions) {
     const subCommand = interaction.options.getSubcommand();
     await interaction.deferReply();
     switch (subCommand) {
       case 'help':
         return sendHelpInteraction({ interaction, subCommand });
       case 'start':
-        return sendStartInteraction({ interaction, nessie: app });
+        return sendStartInteraction({ interaction, subCommand });
       case 'stop':
-        return sendStopInteraction({ interaction, nessie: app });
+        return sendStopInteraction({ interaction, subCommand });
     }
   },
 } as AppCommand;

@@ -1,4 +1,10 @@
-import { MessageActionRow, MessageButton, MessageSelectMenu, WebhookClient } from 'discord.js';
+import {
+  CommandInteraction,
+  MessageActionRow,
+  MessageButton,
+  MessageSelectMenu,
+  WebhookClient,
+} from 'discord.js';
 import { deleteStatus, getAllStatus, getStatus, insertNewStatus } from '../../../services/database';
 import {
   generatePubsEmbed,
@@ -175,7 +181,13 @@ const generateArenasStatusEmbeds = (data: any) => {
  * We want to show permissions errors only when status do not exist
  * We want to show them existing status details but block them if they want to create one
  */
-export const sendStartInteraction = async ({ interaction }: any) => {
+export const sendStartInteraction = async ({
+  interaction,
+  subCommand,
+}: {
+  interaction: CommandInteraction;
+  subCommand: string;
+}) => {
   const status = await getStatus(interaction.guildId);
   const { embed, row } = generateGameModeSelectionMessage(status);
   const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
@@ -193,7 +205,7 @@ export const sendStartInteraction = async ({ interaction }: any) => {
     }
     await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
   } catch (error) {
-    sendErrorLog({ error, interaction });
+    sendErrorLog({ error, interaction, subCommand });
   }
 };
 /**

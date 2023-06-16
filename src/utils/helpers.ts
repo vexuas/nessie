@@ -425,7 +425,7 @@ export const sendMissingBotPermissionsError = async ({ interaction, title }: any
     )}`,
     color: 16711680,
   };
-  return await interaction.editReply({ embeds: [embed], components: [] });
+  await interaction.editReply({ embeds: [embed], components: [] });
 };
 export const sendMissingUserPermissionError = async ({ interaction, title }: any) => {
   const embed = {
@@ -437,7 +437,7 @@ export const sendMissingUserPermissionError = async ({ interaction, title }: any
     )}`,
     color: 16711680,
   };
-  return await interaction.editReply({ embeds: [embed], components: [] });
+  interaction.editReply({ embeds: [embed], components: [] });
 };
 export const sendMissingAllPermissionsError = async ({ interaction, title }: any) => {
   const embed = {
@@ -447,7 +447,7 @@ export const sendMissingAllPermissionsError = async ({ interaction, title }: any
     )}`,
     color: 16711680,
   };
-  return await interaction.editReply({ embeds: [embed], components: [] });
+  await interaction.editReply({ embeds: [embed], components: [] });
 };
 
 export const sendBootNotification = async (app: Client) => {
