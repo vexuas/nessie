@@ -4,13 +4,11 @@ import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
   codeBlock,
-  generateErrorEmbed,
   sendErrorLog,
   sendMissingAllPermissionsError,
   sendMissingBotPermissionsError,
   sendMissingUserPermissionError,
 } from '../../../utils/helpers';
-import { v4 as uuidV4 } from 'uuid';
 
 /**
  * Handler for when a user initiates the /status stop command

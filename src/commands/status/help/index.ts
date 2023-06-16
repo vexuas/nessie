@@ -2,10 +2,8 @@ import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
   codeBlock,
-  generateErrorEmbed,
   sendErrorLog,
 } from '../../../utils/helpers';
-import { v4 as uuidV4 } from 'uuid';
 
 //TODO: Add typing and refactor handlers
 /**
@@ -15,7 +13,7 @@ import { v4 as uuidV4 } from 'uuid';
  * Will either show a tick or mark if the permission is missing
  * Shows a success/warning at the end if any of the permissions are missing
  */
-export const sendHelpInteraction = async ({ interaction, app }: any) => {
+export const sendHelpInteraction = async ({ interaction }: any) => {
   const {
     hasAdmin,
     hasManageChannels,

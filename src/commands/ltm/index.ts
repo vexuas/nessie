@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getLimitedTimeEvent } from '../../services/adapters';
-import { generateErrorEmbed, getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
+import { getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
-import { v4 as uuidV4 } from 'uuid';
 
 //TODO: Add typing after upgrading to djs v14
 export const generateLimitedTimeEventEmbed = (data: any) => {

@@ -1,11 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getArenasPubs, getArenasRanked } from '../../services/adapters';
-import {
-  generateErrorEmbed,
-  generatePubsEmbed,
-  generateRankedEmbed,
-  sendErrorLog,
-} from '../../utils/helpers';
+import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
 export default {
