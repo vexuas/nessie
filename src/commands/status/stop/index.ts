@@ -68,7 +68,7 @@ export const sendStopInteraction = async ({ interaction }: any) => {
  * Handler for when a user clicks the cancel button of /status stop
  * Pretty straightforward; we just edit the initial message with a cancel message similar to the cancel start handler
  */
-export const _cancelStatusStop = async ({ interaction, nessie }: any) => {
+export const _cancelStatusStop = async ({ interaction }: any) => {
   const embed = {
     description: 'Cancelled automated map status deletion',
     color: 16711680,
@@ -77,11 +77,7 @@ export const _cancelStatusStop = async ({ interaction, nessie }: any) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [] });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Stop Cancel';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -145,11 +141,7 @@ export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
       await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Stop Button';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.message.edit({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,

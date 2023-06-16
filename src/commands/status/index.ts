@@ -3,8 +3,7 @@ import { AppCommand, AppCommandOptions } from '../commands';
 import { sendHelpInteraction } from './help';
 import { sendStartInteraction } from './start';
 import { sendStopInteraction } from './stop';
-import { v4 as uuidV4 } from 'uuid';
-import { generateErrorEmbed, sendErrorLog } from '../../utils/helpers';
+import { sendErrorLog } from '../../utils/helpers';
 
 export default {
   commandType: 'Automation',
@@ -35,11 +34,7 @@ export default {
           return sendStopInteraction({ interaction, nessie: app });
       }
     } catch (error) {
-      const uuid = uuidV4();
-      const type = 'Status Generic';
-      const errorEmbed = await generateErrorEmbed(error, uuid, app);
-      await interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+      sendErrorLog({ error, interaction });
     }
   },
 } as AppCommand;

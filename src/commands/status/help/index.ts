@@ -72,10 +72,6 @@ export const sendHelpInteraction = async ({ interaction, app }: any) => {
       ],
     });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Help';
-    const errorEmbed = await generateErrorEmbed(error, uuid, app);
-    await interaction.editReply({ embeds: errorEmbed });
-    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction });
   }
 };

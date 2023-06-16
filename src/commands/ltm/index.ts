@@ -38,18 +38,14 @@ export default {
   data: new SlashCommandBuilder()
     .setName('ltm')
     .setDescription('Shows current limited time mode map rotation'),
-  async execute({ app, interaction }: AppCommandOptions) {
+  async execute({ interaction }: AppCommandOptions) {
     try {
       await interaction.deferReply();
       const data = await getLimitedTimeEvent();
       const embed = generateLimitedTimeEventEmbed(data);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
-      const uuid = uuidV4();
-      const type = 'Limited Time Event';
-      const errorEmbed = await generateErrorEmbed(error, uuid, app);
-      await interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+      sendErrorLog({ error, interaction });
     }
   },
 } as AppCommand;

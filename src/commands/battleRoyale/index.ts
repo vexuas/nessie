@@ -1,13 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getBattleRoyalePubs, getBattleRoyaleRanked } from '../../services/adapters';
-import {
-  generateErrorEmbed,
-  generatePubsEmbed,
-  generateRankedEmbed,
-  sendErrorLog,
-} from '../../utils/helpers';
+import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
-import { v4 as uuidV4 } from 'uuid';
 
 export default {
   commandType: 'Maps',
@@ -22,7 +16,7 @@ export default {
         .addChoice('pubs', 'br_pubs')
         .addChoice('ranked', 'br_ranked')
     ),
-  async execute({ interaction, app }: AppCommandOptions) {
+  async execute({ interaction }: AppCommandOptions) {
     let data;
     let embed;
     try {
@@ -49,11 +43,7 @@ export default {
       //   true
       // );
     } catch (error) {
-      const uuid = uuidV4();
-      const type = 'Battle Royale';
-      const errorEmbed = await generateErrorEmbed(error, uuid, app);
-      await interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+      sendErrorLog({ error, interaction });
     }
   },
 } as AppCommand;
