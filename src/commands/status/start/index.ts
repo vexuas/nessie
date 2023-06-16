@@ -1,4 +1,10 @@
-import { MessageActionRow, MessageButton, MessageSelectMenu, WebhookClient } from 'discord.js';
+import {
+  CommandInteraction,
+  MessageActionRow,
+  MessageButton,
+  MessageSelectMenu,
+  WebhookClient,
+} from 'discord.js';
 import { deleteStatus, getAllStatus, getStatus, insertNewStatus } from '../../../services/database';
 import {
   generatePubsEmbed,
@@ -18,6 +24,8 @@ import { getRotationData } from '../../../services/adapters';
 import { nessieLogo } from '../../../utils/constants';
 import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
 import Scheduler from '../../../services/scheduler';
+import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
+import { isEmpty } from 'lodash';
 
 const errorNotification = {
   count: 0,
@@ -175,7 +183,13 @@ const generateArenasStatusEmbeds = (data: any) => {
  * We want to show permissions errors only when status do not exist
  * We want to show them existing status details but block them if they want to create one
  */
-export const sendStartInteraction = async ({ interaction, nessie }: any) => {
+export const sendStartInteraction = async ({
+  interaction,
+  subCommand,
+}: {
+  interaction: CommandInteraction;
+  subCommand: string;
+}) => {
   const status = await getStatus(interaction.guildId);
   const { embed, row } = generateGameModeSelectionMessage(status);
   const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
@@ -193,28 +207,20 @@ export const sendStartInteraction = async ({ interaction, nessie }: any) => {
     }
     await interaction.editReply({ embeds: [embed], components: row ? [row] : [] });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Start';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, subCommand });
   }
 };
 /**
  * Handler for when a user selects any of the options in the Game Mode dropdown
  * Will edit and show the second step of the status start wizard: Confirm Status
  */
-export const goToConfirmStatus = async ({ interaction, nessie }: any) => {
+export const goToConfirmStatus = async ({ interaction }: any) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Start Confirm';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -229,17 +235,13 @@ export const goToConfirmStatus = async ({ interaction, nessie }: any) => {
  * Handler for when a user clicks the Back button in Confirm Status Step
  * Will edit and show the first step of the status start wizard: Confirm Status
  */
-export const goBackToGameModeSelection = async ({ interaction, nessie }: any) => {
+export const goBackToGameModeSelection = async ({ interaction }: any) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Start Back';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Back Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -256,7 +258,7 @@ export const goBackToGameModeSelection = async ({ interaction, nessie }: any) =>
  * Prepended an underscore as there's a function in announcement with the same name
  * TODO: Clean up the code there eventually
  */
-export const _cancelStatusStart = async ({ interaction, nessie }: any) => {
+export const _cancelStatusStart = async ({ interaction }: any) => {
   const embed = {
     description: 'Cancelled automatic map status config',
     color: 16711680,
@@ -265,11 +267,7 @@ export const _cancelStatusStart = async ({ interaction, nessie }: any) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [] });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Start Cancel';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Cancel Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -453,11 +451,7 @@ export const createStatus = async ({ interaction, nessie }: any) => {
     };
     await statusLogChannel.send({ embeds: [statusLogEmbed] });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Start Confirm';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -519,7 +513,6 @@ export const scheduleStatus = (nessie: any) => {
        * Only difference is instead of the rotation data, we're showing the information embed + an error message
        */
       const uuid = uuidV4();
-      const type = 'Status Scheduler Config';
       const errorEmbed: any = [
         {
           description:
@@ -543,7 +536,7 @@ export const scheduleStatus = (nessie: any) => {
             index,
           });
         });
-      await sendErrorLog({ nessie, error, type, uuid, ping: true });
+      sendErrorLog({ error, customTitle: 'Status Scheduler Config' });
     }
   });
 };
@@ -645,7 +638,6 @@ const handleStatusCycle = async ({
     const uuid = uuidV4();
     errorNotification.count <= 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
     if (errorNotification.count !== 0 && index === totalCount - 1) {
-      const errorChannel = nessie.channels.cache.get('938441853542465548');
       const errorEmbed = {
         title: 'Error Summary | Status Cycle',
         color: 16711680,
@@ -661,7 +653,14 @@ const handleStatusCycle = async ({
           },
         ],
       };
-      await errorChannel.send({ embeds: [errorEmbed] });
+      if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
+        const notificationWebhook = new WebhookClient({ url: ERROR_NOTIFICATION_WEBHOOK_URL });
+        await notificationWebhook.send({
+          embeds: [errorEmbed],
+          username: 'Nessie Error Notification',
+          avatarURL: nessieLogo,
+        });
+      }
     }
 
     if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {

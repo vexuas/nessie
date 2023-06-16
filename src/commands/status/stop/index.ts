@@ -1,16 +1,14 @@
-import { MessageActionRow, MessageButton } from 'discord.js';
+import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
 import { deleteStatus, getStatus } from '../../../services/database';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
   codeBlock,
-  generateErrorEmbed,
   sendErrorLog,
   sendMissingAllPermissionsError,
   sendMissingBotPermissionsError,
   sendMissingUserPermissionError,
 } from '../../../utils/helpers';
-import { v4 as uuidV4 } from 'uuid';
 
 /**
  * Handler for when a user initiates the /status stop command
@@ -18,7 +16,13 @@ import { v4 as uuidV4 } from 'uuid';
  * Passes a success and error callback with the former sending an information embed with context depending on status existence
  * Also, we want to show permissions errors but only if a status exists as we want to block them from interacting with components
  */
-export const sendStopInteraction = async ({ interaction }: any) => {
+export const sendStopInteraction = async ({
+  interaction,
+  subCommand,
+}: {
+  interaction: CommandInteraction;
+  subCommand: string;
+}) => {
   const status = await getStatus(interaction.guildId);
   const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
   const isManageServerUser = checkIfUserHasManageServer(interaction);
@@ -32,43 +36,47 @@ export const sendStopInteraction = async ({ interaction }: any) => {
         return sendMissingUserPermissionError({ interaction, title: 'Status | Stop' });
     }
   }
-  const embed = {
-    title: 'Status | Stop',
-    color: 3447003,
-    description: status
-      ? `By confirming below, Nessie will stop all existing map status and **delete**:\n• <#${
-          status.category_channel_id
-        }>${status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''}${
-          status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''
-        }\n• Webhooks under each status channel\n\nThis status was created at ${
-          status.created_at
-        } by ${status.created_by}`
-      : `There's currently no active automated map status to stop.\n\nTry starting one with ${codeBlock(
-          '/status start'
-        )}`,
-  };
-  const row = status
-    ? new MessageActionRow()
-        .addComponents(
-          new MessageButton()
-            .setCustomId('statusStop__cancelButton')
-            .setLabel('Cancel')
-            .setStyle('SECONDARY')
-        )
-        .addComponents(
-          new MessageButton()
-            .setCustomId('statusStop__stopButton')
-            .setLabel(`Stop it!`)
-            .setStyle('DANGER')
-        )
-    : null;
-  return await interaction.editReply({ components: row ? [row] : [], embeds: [embed] });
+  try {
+    const embed = {
+      title: 'Status | Stop',
+      color: 3447003,
+      description: status
+        ? `By confirming below, Nessie will stop all existing map status and **delete**:\n• <#${
+            status.category_channel_id
+          }>${status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''}${
+            status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''
+          }\n• Webhooks under each status channel\n\nThis status was created at ${
+            status.created_at
+          } by ${status.created_by}`
+        : `There's currently no active automated map status to stop.\n\nTry starting one with ${codeBlock(
+            '/status start'
+          )}`,
+    };
+    const row = status
+      ? new MessageActionRow()
+          .addComponents(
+            new MessageButton()
+              .setCustomId('statusStop__cancelButton')
+              .setLabel('Cancel')
+              .setStyle('SECONDARY')
+          )
+          .addComponents(
+            new MessageButton()
+              .setCustomId('statusStop__stopButton')
+              .setLabel(`Stop it!`)
+              .setStyle('DANGER')
+          )
+      : null;
+    await interaction.editReply({ components: row ? [row] : [], embeds: [embed] });
+  } catch (error) {
+    sendErrorLog({ error, interaction, subCommand });
+  }
 };
 /**
  * Handler for when a user clicks the cancel button of /status stop
  * Pretty straightforward; we just edit the initial message with a cancel message similar to the cancel start handler
  */
-export const _cancelStatusStop = async ({ interaction, nessie }: any) => {
+export const _cancelStatusStop = async ({ interaction }: any) => {
   const embed = {
     description: 'Cancelled automated map status deletion',
     color: 16711680,
@@ -77,11 +85,7 @@ export const _cancelStatusStop = async ({ interaction, nessie }: any) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [] });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Stop Cancel';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.editReply({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, customTitle: 'Status Stop Cancel Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -145,11 +149,7 @@ export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
       await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Stop Button';
-    const errorEmbed = await generateErrorEmbed(error, uuid, nessie);
-    await interaction.message.edit({ embeds: errorEmbed, components: [] });
-    await sendErrorLog({ nessie, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, customTitle: 'Status Stop Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,

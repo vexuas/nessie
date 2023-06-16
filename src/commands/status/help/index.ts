@@ -1,11 +1,11 @@
+import { CommandInteraction } from 'discord.js';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
   codeBlock,
-  generateErrorEmbed,
+  getEmbedColor,
   sendErrorLog,
 } from '../../../utils/helpers';
-import { v4 as uuidV4 } from 'uuid';
 
 //TODO: Add typing and refactor handlers
 /**
@@ -15,7 +15,13 @@ import { v4 as uuidV4 } from 'uuid';
  * Will either show a tick or mark if the permission is missing
  * Shows a success/warning at the end if any of the permissions are missing
  */
-export const sendHelpInteraction = async ({ interaction, app }: any) => {
+export const sendHelpInteraction = async ({
+  interaction,
+  subCommand,
+}: {
+  interaction: CommandInteraction;
+  subCommand: string;
+}) => {
   const {
     hasAdmin,
     hasManageChannels,
@@ -64,18 +70,14 @@ export const sendHelpInteraction = async ({ interaction, app }: any) => {
       color: 3447003,
     };
 
-    return await interaction.editReply({
+    await interaction.editReply({
       embeds: [
-        { title: 'Status | Help', description: '', color: 3447003 },
+        { title: 'Status | Help', description: '', color: getEmbedColor() },
         embedInformation,
         embedPermissions,
       ],
     });
   } catch (error) {
-    const uuid = uuidV4();
-    const type = 'Status Help';
-    const errorEmbed = await generateErrorEmbed(error, uuid, app);
-    await interaction.editReply({ embeds: errorEmbed });
-    await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+    sendErrorLog({ error, interaction, subCommand });
   }
 };

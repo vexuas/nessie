@@ -3,8 +3,6 @@ import { AppCommand, AppCommandOptions } from '../commands';
 import { sendHelpInteraction } from './help';
 import { sendStartInteraction } from './start';
 import { sendStopInteraction } from './stop';
-import { v4 as uuidV4 } from 'uuid';
-import { generateErrorEmbed, sendErrorLog } from '../../utils/helpers';
 
 export default {
   commandType: 'Automation',
@@ -22,24 +20,16 @@ export default {
     .addSubcommand((subCommand) =>
       subCommand.setName('stop').setDescription('Stops existing automatic map updates')
     ),
-  async execute({ app, interaction }: AppCommandOptions) {
-    const statusOption = interaction.options.getSubcommand();
-    try {
-      await interaction.deferReply();
-      switch (statusOption) {
-        case 'help':
-          return sendHelpInteraction({ interaction, nessie: app });
-        case 'start':
-          return sendStartInteraction({ interaction, nessie: app });
-        case 'stop':
-          return sendStopInteraction({ interaction, nessie: app });
-      }
-    } catch (error) {
-      const uuid = uuidV4();
-      const type = 'Status Generic';
-      const errorEmbed = await generateErrorEmbed(error, uuid, app);
-      await interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+  async execute({ interaction }: AppCommandOptions) {
+    const subCommand = interaction.options.getSubcommand();
+    await interaction.deferReply();
+    switch (subCommand) {
+      case 'help':
+        return sendHelpInteraction({ interaction, subCommand });
+      case 'start':
+        return sendStartInteraction({ interaction, subCommand });
+      case 'stop':
+        return sendStopInteraction({ interaction, subCommand });
     }
   },
 } as AppCommand;

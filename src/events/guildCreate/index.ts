@@ -3,7 +3,7 @@ import { EventModule } from '../events';
 import { isEmpty } from 'lodash';
 import { Guild, WebhookClient } from 'discord.js';
 import { DATABASE_CONFIG, GUILD_NOTIFICATION_WEBHOOK_URL } from '../../config/environment';
-import { serverNotificationEmbed } from '../../utils/helpers';
+import { sendErrorLog, serverNotificationEmbed } from '../../utils/helpers';
 import { nessieLogo } from '../../utils/constants';
 
 export default function ({ nessie }: EventModule) {
@@ -19,8 +19,8 @@ export default function ({ nessie }: EventModule) {
           avatarURL: nessieLogo,
         });
       }
-    } catch (e) {
-      console.log(e); // Add proper handling
+    } catch (error) {
+      sendErrorLog({ error });
     }
   });
 }

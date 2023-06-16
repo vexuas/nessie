@@ -1,13 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getArenasPubs, getArenasRanked } from '../../services/adapters';
-import {
-  generateErrorEmbed,
-  generatePubsEmbed,
-  generateRankedEmbed,
-  sendErrorLog,
-} from '../../utils/helpers';
+import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
-import { v4 as uuidV4 } from 'uuid';
 
 export default {
   commandType: 'Maps',
@@ -22,12 +16,12 @@ export default {
         .addChoice('pubs', 'arenas_pubs')
         .addChoice('ranked', 'arenas_ranked')
     ),
-  async execute({ interaction, app }: AppCommandOptions) {
+  async execute({ interaction }: AppCommandOptions) {
     let data;
     let embed;
+    const optionMode = interaction.options.getString('mode');
     try {
       await interaction.deferReply();
-      const optionMode = interaction.options.getString('mode');
       switch (optionMode) {
         case 'arenas_pubs':
           data = await getArenasPubs();
@@ -49,11 +43,7 @@ export default {
       //   true
       // );
     } catch (error) {
-      const uuid = uuidV4();
-      const type = 'Arenas';
-      const errorEmbed = await generateErrorEmbed(error, uuid, app);
-      await interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie: app, error, type, interaction, uuid });
+      sendErrorLog({ error, interaction, option: optionMode });
     }
   },
 } as AppCommand;

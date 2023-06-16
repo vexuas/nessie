@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getLimitedTimeEvent } from '../../services/adapters';
-import { generateErrorEmbed, getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
+import { getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
-import { v4 as uuidV4 } from 'uuid';
 
 //TODO: Add typing after upgrading to djs v14
 export const generateLimitedTimeEventEmbed = (data: any) => {
@@ -38,18 +37,14 @@ export default {
   data: new SlashCommandBuilder()
     .setName('ltm')
     .setDescription('Shows current limited time mode map rotation'),
-  async execute({ app, interaction }: AppCommandOptions) {
+  async execute({ interaction }: AppCommandOptions) {
     try {
       await interaction.deferReply();
       const data = await getLimitedTimeEvent();
       const embed = generateLimitedTimeEventEmbed(data);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
-      const uuid = uuidV4();
-      const type = 'Limited Time Event';
-      const errorEmbed = await generateErrorEmbed(error, uuid, app);
-      await interaction.editReply({ embeds: errorEmbed });
-      await sendErrorLog({ nessie: app, error, interaction, type, uuid });
+      sendErrorLog({ error, interaction });
     }
   },
 } as AppCommand;

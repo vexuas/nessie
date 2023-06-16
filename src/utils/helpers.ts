@@ -1,8 +1,22 @@
 import { format } from 'date-fns';
-import { Channel, Client, Guild } from 'discord.js';
-import { BOOT_NOTIFICATION_CHANNEL_ID } from '../config/environment';
+import {
+  Channel,
+  Client,
+  CommandInteraction,
+  Guild,
+  GuildChannel,
+  SelectMenuInteraction,
+  WebhookClient,
+} from 'discord.js';
+import {
+  BOOT_NOTIFICATION_CHANNEL_ID,
+  ERROR_NOTIFICATION_WEBHOOK_URL,
+} from '../config/environment';
 import { nessieLogo } from './constants';
 import { isEmpty } from 'lodash';
+import { v4 as uuidV4 } from 'uuid';
+import { inlineCode } from '@discordjs/builders';
+import { capitalize } from 'lodash';
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
@@ -142,79 +156,92 @@ export const generateErrorEmbed = async (error: any, uuid: any, nessie: any) => 
   };
   return [embed];
 };
-//----------
-/**
- * Send error log with relevant information to the error-logs channel in the support server
- * Mainly used for failed promises
- * Probably think of a more efficient way of handling these errors; right now it does the job but looks to be cluttered
- * @param nessie - client
- * @param error - error object
- * @param message - discord message object
- * @param interaction - discord interaction object
- * @param type - which command the error originated from
- * @param uuid - error uuid
- * @param ping - whether to ping me if an error occured; default false
- */
 export const sendErrorLog = async ({
-  nessie,
   error,
-  message,
   interaction,
-  type,
-  uuid,
-  ping = false,
-}: any) => {
-  const errorChannel = nessie.channels.cache.get('938441853542465548');
-  const embed = {
-    title: message ? `Error | ${type} Prefix Command` : `Error | ${type} Application Command`,
-    color: 16711680,
-    description: `uuid: ${uuid}\nError: ${error.message ? error.message : 'Unexpected Error'}`,
-    fields:
-      message || interaction
+  option,
+  subCommand,
+  customTitle,
+}: {
+  error: any;
+  interaction?: CommandInteraction | SelectMenuInteraction;
+  option?: string | null;
+  subCommand?: string;
+  customTitle?: string;
+}) => {
+  console.error(error);
+  const errorID = uuidV4();
+  if (interaction) {
+    const errorEmbed = {
+      description: `Oops something went wrong! D:\n\nError: ${
+        error.message ? inlineCode(error.message) : inlineCode('Unexpected Error')
+      }\nError ID: ${inlineCode(errorID)}`,
+      color: getEmbedColor('#FF0000'),
+    };
+    await interaction.editReply({ embeds: [errorEmbed], components: [] });
+  }
+  if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
+    const interactionChannel = interaction?.channel as GuildChannel | undefined;
+    const notificationEmbed: any = {
+      title: customTitle
+        ? `Error | ${customTitle}`
+        : interaction
+        ? `Error | ${interaction.isCommand() ? capitalize(interaction.commandName) : ''}${
+            subCommand ? ` ${capitalize(subCommand)}` : ''
+          } Command`
+        : 'Error',
+      color: getEmbedColor('#FF0000'),
+      description: `uuid: ${errorID}\nError: ${
+        error.message ? error.message : 'Unexpected Error'
+      }\n${option ? `Option: ${option}` : ''}`,
+      fields: interaction
         ? [
             {
               name: 'User',
-              value: message ? message.author.username : interaction.user.username,
+              value: interaction.user.username,
               inline: true,
             },
             {
               name: 'User ID',
-              value: message ? message.author.id : interaction.user.id,
+              value: interaction.user.id,
               inline: true,
             },
             {
               name: 'Channel',
-              value: message ? message.channel.name : interaction.channel.name,
+              value: interactionChannel ? interactionChannel.name : '-',
               inline: true,
             },
             {
               name: 'Channel ID',
-              value: message ? message.channel.id : interaction.channelId,
+              value: interaction.channelId,
               inline: true,
             },
             {
               name: 'Guild',
-              value: message ? message.guild.name : interaction.guild.name,
+              value: interaction.guild ? interaction.guild.name : '-',
               inline: true,
             },
             {
               name: 'Guild ID',
-              value: message ? message.guild.id : interaction.guildId,
+              value: interaction.guildId ? interaction.guildId : '-',
               inline: true,
             },
           ]
-        : [],
-  };
-  return ping
-    ? await errorChannel.send({ embeds: [embed], content: '<@183444648360935424>' })
-    : await errorChannel.send({ embeds: [embed] });
+        : undefined,
+    };
+    const notificationWebhook = new WebhookClient({ url: ERROR_NOTIFICATION_WEBHOOK_URL });
+    await notificationWebhook.send({
+      embeds: [notificationEmbed],
+      username: 'Nessie Error Notification',
+      avatarURL: nessieLogo,
+    });
+  }
 };
 /**
  * Handler for errors concerning status cycles
  * Same as above, only difference is the embed content
  */
 export const sendStatusErrorLog = async ({ nessie, uuid, error, status }: any) => {
-  const errorChannel = nessie.channels.cache.get('938441853542465548');
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
   const errorEmbed = {
     title: 'Error | Status Scheduler Cycle',
@@ -243,7 +270,15 @@ export const sendStatusErrorLog = async ({ nessie, uuid, error, status }: any) =
       },
     ],
   };
-  await errorChannel.send({ embeds: [errorEmbed], content: '<@183444648360935424>' });
+  if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
+    const notificationWebhook = new WebhookClient({ url: ERROR_NOTIFICATION_WEBHOOK_URL });
+    await notificationWebhook.send({
+      content: '<@183444648360935424>',
+      embeds: [errorEmbed],
+      username: 'Nessie Error Notification',
+      avatarURL: nessieLogo,
+    });
+  }
 };
 export const generateAnnouncementMessage = (prefix: any) => {
   return (
@@ -402,7 +437,7 @@ export const sendMissingBotPermissionsError = async ({ interaction, title }: any
     )}`,
     color: 16711680,
   };
-  return await interaction.editReply({ embeds: [embed], components: [] });
+  await interaction.editReply({ embeds: [embed], components: [] });
 };
 export const sendMissingUserPermissionError = async ({ interaction, title }: any) => {
   const embed = {
@@ -414,7 +449,7 @@ export const sendMissingUserPermissionError = async ({ interaction, title }: any
     )}`,
     color: 16711680,
   };
-  return await interaction.editReply({ embeds: [embed], components: [] });
+  interaction.editReply({ embeds: [embed], components: [] });
 };
 export const sendMissingAllPermissionsError = async ({ interaction, title }: any) => {
   const embed = {
@@ -424,7 +459,7 @@ export const sendMissingAllPermissionsError = async ({ interaction, title }: any
     )}`,
     color: 16711680,
   };
-  return await interaction.editReply({ embeds: [embed], components: [] });
+  await interaction.editReply({ embeds: [embed], components: [] });
 };
 
 export const sendBootNotification = async (app: Client) => {

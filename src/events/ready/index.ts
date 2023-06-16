@@ -80,8 +80,8 @@ export default function ({ nessie, appCommands }: EventModule) {
 
       const statusSchedule = scheduleStatus(nessie);
       statusSchedule.start();
-    } catch (e) {
-      console.log(e); //Add proper error handling
+    } catch (error) {
+      sendErrorLog({ error });
     }
   });
 }
