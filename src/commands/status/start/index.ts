@@ -24,6 +24,8 @@ import { getRotationData } from '../../../services/adapters';
 import { nessieLogo } from '../../../utils/constants';
 import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
 import Scheduler from '../../../services/scheduler';
+import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
+import { isEmpty } from 'lodash';
 
 const errorNotification = {
   count: 0,
@@ -636,7 +638,6 @@ const handleStatusCycle = async ({
     const uuid = uuidV4();
     errorNotification.count <= 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
     if (errorNotification.count !== 0 && index === totalCount - 1) {
-      const errorChannel = nessie.channels.cache.get('938441853542465548');
       const errorEmbed = {
         title: 'Error Summary | Status Cycle',
         color: 16711680,
@@ -652,7 +653,15 @@ const handleStatusCycle = async ({
           },
         ],
       };
-      await errorChannel.send({ embeds: [errorEmbed] });
+      if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
+        const notificationWebhook = new WebhookClient({ url: ERROR_NOTIFICATION_WEBHOOK_URL });
+        await notificationWebhook.send({
+          content: '<@183444648360935424>',
+          embeds: [errorEmbed],
+          username: 'Nessie Error Notification',
+          avatarURL: nessieLogo,
+        });
+      }
     }
 
     if (error.message === 'Unknown Message' || error.message === 'Unknown Webhook') {
