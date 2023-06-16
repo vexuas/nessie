@@ -158,9 +158,11 @@ export const generateErrorEmbed = async (error: any, uuid: any, nessie: any) => 
 export const sendErrorLog = async ({
   error,
   interaction,
+  option,
 }: {
   error: any;
   interaction?: CommandInteraction;
+  option?: string | null;
 }) => {
   console.error(error);
   const errorID = uuidV4();
@@ -178,7 +180,9 @@ export const sendErrorLog = async ({
     const notificationEmbed: any = {
       title: interaction ? `Error | ${capitalize(interaction.commandName)} Command` : 'Error',
       color: getEmbedColor('#FF0000'),
-      description: `uuid: ${errorID}\nError: ${error.message ? error.message : 'Unexpected Error'}`,
+      description: `uuid: ${errorID}\nError: ${
+        error.message ? error.message : 'Unexpected Error'
+      }\n${option ? `Option: ${option}` : ''}`,
       fields: interaction
         ? [
             {
@@ -217,8 +221,8 @@ export const sendErrorLog = async ({
     const notificationWebhook = new WebhookClient({ url: ERROR_NOTIFICATION_WEBHOOK_URL });
     await notificationWebhook.send({
       embeds: [notificationEmbed],
-      username: 'My App Error Notification',
-      avatarURL: '',
+      username: 'Nessie Error Notification',
+      avatarURL: nessieLogo,
     });
   }
 };

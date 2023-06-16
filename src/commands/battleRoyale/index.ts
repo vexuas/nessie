@@ -19,9 +19,9 @@ export default {
   async execute({ interaction }: AppCommandOptions) {
     let data;
     let embed;
+    const optionMode = interaction.options.getString('mode');
     try {
       await interaction.deferReply();
-      const optionMode = interaction.options.getString('mode');
       switch (optionMode) {
         case 'br_pubs':
           data = await getBattleRoyalePubs();
@@ -43,7 +43,7 @@ export default {
       //   true
       // );
     } catch (error) {
-      sendErrorLog({ error, interaction });
+      sendErrorLog({ error, interaction, option: optionMode });
     }
   },
 } as AppCommand;
