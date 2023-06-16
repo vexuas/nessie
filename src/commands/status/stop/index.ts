@@ -85,7 +85,7 @@ export const _cancelStatusStop = async ({ interaction }: any) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [] });
   } catch (error) {
-    sendErrorLog({ error, interaction });
+    sendErrorLog({ error, interaction, customTitle: 'Status Stop Cancel Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -149,7 +149,7 @@ export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
       await statusLogChannel.send({ embeds: [statusLogEmbed] });
     }
   } catch (error) {
-    sendErrorLog({ error, interaction });
+    sendErrorLog({ error, interaction, customTitle: 'Status Stop Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
