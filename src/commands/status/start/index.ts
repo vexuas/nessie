@@ -534,7 +534,7 @@ export const scheduleStatus = (nessie: any) => {
             index,
           });
         });
-      sendErrorLog({ error });
+      sendErrorLog({ error, customTitle: 'Status Scheduler Config' });
     }
   });
 };

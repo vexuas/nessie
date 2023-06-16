@@ -242,7 +242,6 @@ export const sendErrorLog = async ({
  * Same as above, only difference is the embed content
  */
 export const sendStatusErrorLog = async ({ nessie, uuid, error, status }: any) => {
-  const errorChannel = nessie.channels.cache.get('938441853542465548');
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
   const errorEmbed = {
     title: 'Error | Status Scheduler Cycle',
@@ -271,7 +270,15 @@ export const sendStatusErrorLog = async ({ nessie, uuid, error, status }: any) =
       },
     ],
   };
-  await errorChannel.send({ embeds: [errorEmbed], content: '<@183444648360935424>' });
+  if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
+    const notificationWebhook = new WebhookClient({ url: ERROR_NOTIFICATION_WEBHOOK_URL });
+    await notificationWebhook.send({
+      content: '<@183444648360935424>',
+      embeds: [errorEmbed],
+      username: 'Nessie Error Notification',
+      avatarURL: nessieLogo,
+    });
+  }
 };
 export const generateAnnouncementMessage = (prefix: any) => {
   return (
