@@ -5,6 +5,7 @@ import {
   CommandInteraction,
   Guild,
   GuildChannel,
+  SelectMenuInteraction,
   WebhookClient,
 } from 'discord.js';
 import {
@@ -160,11 +161,13 @@ export const sendErrorLog = async ({
   interaction,
   option,
   subCommand,
+  customTitle,
 }: {
   error: any;
-  interaction?: CommandInteraction;
+  interaction?: CommandInteraction | SelectMenuInteraction;
   option?: string | null;
   subCommand?: string;
+  customTitle?: string;
 }) => {
   console.error(error);
   const errorID = uuidV4();
@@ -175,13 +178,15 @@ export const sendErrorLog = async ({
       }\nError ID: ${inlineCode(errorID)}`,
       color: getEmbedColor('#FF0000'),
     };
-    await interaction.editReply({ embeds: [errorEmbed] });
+    await interaction.editReply({ embeds: [errorEmbed], components: [] });
   }
   if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
     const interactionChannel = interaction?.channel as GuildChannel | undefined;
     const notificationEmbed: any = {
-      title: interaction
-        ? `Error | ${capitalize(interaction.commandName)}${
+      title: customTitle
+        ? `Error | ${customTitle}`
+        : interaction
+        ? `Error | ${interaction.isCommand() ? capitalize(interaction.commandName) : ''}${
             subCommand ? ` ${capitalize(subCommand)}` : ''
           } Command`
         : 'Error',

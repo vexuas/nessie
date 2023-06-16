@@ -218,7 +218,7 @@ export const goToConfirmStatus = async ({ interaction }: any) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
-    sendErrorLog({ error, interaction });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -239,7 +239,7 @@ export const goBackToGameModeSelection = async ({ interaction }: any) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
-    sendErrorLog({ error, interaction });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Back Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -265,7 +265,7 @@ export const _cancelStatusStart = async ({ interaction }: any) => {
     await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [] });
   } catch (error) {
-    sendErrorLog({ error, interaction });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Cancel Error' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
@@ -449,7 +449,7 @@ export const createStatus = async ({ interaction, nessie }: any) => {
     };
     await statusLogChannel.send({ embeds: [statusLogEmbed] });
   } catch (error) {
-    sendErrorLog({ error, interaction });
+    sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm' });
   } finally {
     // sendMixpanelEvent({
     //   user: interaction.user,
