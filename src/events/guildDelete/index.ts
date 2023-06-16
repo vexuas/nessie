@@ -2,7 +2,7 @@ import { DATABASE_CONFIG, GUILD_NOTIFICATION_WEBHOOK_URL } from '../../config/en
 import { deleteGuild } from '../../services/database';
 import { EventModule } from '../events';
 import { isEmpty } from 'lodash';
-import { serverNotificationEmbed } from '../../utils/helpers';
+import { sendErrorLog, serverNotificationEmbed } from '../../utils/helpers';
 import { Guild, WebhookClient } from 'discord.js';
 import { nessieLogo } from '../../utils/constants';
 
@@ -19,8 +19,8 @@ export default function ({ nessie }: EventModule) {
           avatarURL: nessieLogo,
         });
       }
-    } catch (e) {
-      console.log(e); // Add proper handling
+    } catch (error) {
+      sendErrorLog({ error });
     }
   });
 }
