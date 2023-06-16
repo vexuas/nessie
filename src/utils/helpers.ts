@@ -159,10 +159,12 @@ export const sendErrorLog = async ({
   error,
   interaction,
   option,
+  subCommand,
 }: {
   error: any;
   interaction?: CommandInteraction;
   option?: string | null;
+  subCommand?: string;
 }) => {
   console.error(error);
   const errorID = uuidV4();
@@ -178,7 +180,11 @@ export const sendErrorLog = async ({
   if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
     const interactionChannel = interaction?.channel as GuildChannel | undefined;
     const notificationEmbed: any = {
-      title: interaction ? `Error | ${capitalize(interaction.commandName)} Command` : 'Error',
+      title: interaction
+        ? `Error | ${capitalize(interaction.commandName)}${
+            subCommand ? ` ${capitalize(subCommand)}` : ''
+          } Command`
+        : 'Error',
       color: getEmbedColor('#FF0000'),
       description: `uuid: ${errorID}\nError: ${
         error.message ? error.message : 'Unexpected Error'
