@@ -9,6 +9,7 @@ import {
   Guild,
   GuildChannel,
   WebhookClient,
+  PermissionFlagsBits,
 } from 'discord.js';
 import {
   BOOT_NOTIFICATION_CHANNEL_ID,
@@ -406,12 +407,29 @@ export const generateRankedEmbed = (data: any, type = 'Battle Royale') => {
   return embedData;
 };
 
-export const checkMissingBotPermissions = (interaction: any) => {
-  const hasAdmin = interaction.guild.me.permissions.has('ADMINISTRATOR');
-  const hasManageChannels = interaction.guild.me.permissions.has('MANAGE_CHANNELS', false);
-  const hasViewChannel = interaction.guild.me.permissions.has('VIEW_CHANNEL', false);
-  const hasManageWebhooks = interaction.guild.me.permissions.has('MANAGE_WEBHOOKS', false);
-  const hasSendMessages = interaction.guild.me.permissions.has('SEND_MESSAGES', false);
+export const checkMissingBotPermissions = (interaction: ChatInputCommandInteraction) => {
+  const { guild } = interaction;
+
+  const hasAdmin =
+    guild &&
+    guild.members.me &&
+    guild.members.me.permissions.has(PermissionFlagsBits.Administrator);
+  const hasManageChannels =
+    guild &&
+    guild.members.me &&
+    guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels, false);
+  const hasViewChannel =
+    guild &&
+    guild.members.me &&
+    guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel, false);
+  const hasManageWebhooks =
+    guild &&
+    guild.members.me &&
+    guild.members.me.permissions.has(PermissionFlagsBits.ManageWebhooks, false);
+  const hasSendMessages =
+    guild &&
+    guild.members.me &&
+    guild.members.me.permissions.has(PermissionFlagsBits.SendMessages, false);
 
   const hasMissingPermissions =
     (!hasManageChannels || !hasViewChannel || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
