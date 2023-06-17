@@ -155,7 +155,7 @@ const generateBattleRoyaleStatusEmbeds = (data: any) => {
     description:
       '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
-    timestamp: Date.now(),
+    timestamp: new Date(Date.now()).toISOString(),
     footer: {
       text: 'Last Update',
     },
@@ -174,7 +174,7 @@ const generateArenasStatusEmbeds = (data: any) => {
     description:
       '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
-    timestamp: Date.now(),
+    timestamp: new Date(Date.now()).toISOString(),
     footer: {
       text: 'Last Update',
     },
@@ -522,7 +522,7 @@ export const scheduleStatus = (nessie: any) => {
           description:
             '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
           color: 3447003,
-          timestamp: Date.now(),
+          timestamp: new Date(Date.now()).toISOString(),
           footer: {
             text: 'Last Update',
           },

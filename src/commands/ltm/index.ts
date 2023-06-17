@@ -13,7 +13,7 @@ export const generateLimitedTimeEventEmbed = (data: any): APIEmbed => {
     image: {
       url: mapURL && mapURL.length > 0 ? mapURL : data.current.asset,
     },
-    timestamp: (Date.now() + data.current.remainingSecs * 1000).toString(),
+    timestamp: new Date(Date.now() + data.current.remainingSecs * 1000).toISOString(),
     footer: {
       text: `Next Map: ${data.next.map}`,
     },

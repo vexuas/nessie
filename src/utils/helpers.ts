@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import {
   AnySelectMenuInteraction,
+  APIEmbed,
   Channel,
   ChannelType,
   ChatInputCommandInteraction,
@@ -346,14 +347,14 @@ export const getCountdown = (timer: any) => {
  * Added a hack to display the time for next map regardless of timezone
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  */
-export const generatePubsEmbed = (data: any, type = 'Battle Royale') => {
-  const embedData = {
+export const generatePubsEmbed = (data: any, type = 'Battle Royale'): APIEmbed => {
+  const embedData: APIEmbed = {
     title: `${type} | Pubs`,
     color: 3066993,
     image: {
       url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
-    timestamp: Date.now() + data.current.remainingSecs * 1000,
+    timestamp: new Date(Date.now() + data.current.remainingSecs * 1000).toISOString(),
     footer: {
       text: `Next Map: ${data.next.map}`,
     },
@@ -397,7 +398,7 @@ export const generateRankedEmbed = (data: any, type = 'Battle Royale') => {
     ],
   };
   if (data.next && data.next.map) {
-    embedData.timestamp = Date.now() + data.current.remainingSecs * 1000;
+    embedData.timestamp = new Date(Date.now() + data.current.remainingSecs * 1000).toISOString();
     embedData.footer = {
       text: `Next Map: ${data.next.map}`,
     };

@@ -13,7 +13,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
     try {
       if (!interaction.inGuild() || !appCommands) return;
 
-      if (interaction.isCommand()) {
+      if (interaction.isChatInputCommand()) {
         const { commandName } = interaction;
         const command = appCommands.find((command) => command.data.name === commandName);
         command && (await command.execute({ interaction, app, appCommands }));
