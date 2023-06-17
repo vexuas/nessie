@@ -1,8 +1,11 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
+  ChannelType,
   ChatInputCommandInteraction,
+  Client,
 } from 'discord.js';
 import { deleteStatus, getStatus } from '../../../services/database';
 import {
@@ -113,8 +116,14 @@ export const _cancelStatusStop = async ({ interaction }: any) => {
  *
  * We don't need to delete the webhooks as they'll be automatically deleted along with its channels
  */
-export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
-  const status = await deleteStatus(interaction.guildId);
+export const deleteGuildStatus = async ({
+  interaction,
+  nessie,
+}: {
+  interaction: ButtonInteraction;
+  nessie: Client;
+}) => {
+  const status = await deleteStatus(interaction.guildId ?? '');
   try {
     await interaction.deferUpdate();
     if (status) {
@@ -147,11 +156,13 @@ export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
         fields: [
           {
             name: 'Guild',
-            value: interaction.guild.name,
+            value: interaction.guild ? interaction.guild.name : '',
           },
         ],
       };
-      await statusLogChannel.send({ embeds: [statusLogEmbed] });
+      statusLogChannel &&
+        statusLogChannel.type === ChannelType.GuildText &&
+        (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
     }
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Stop Error' });

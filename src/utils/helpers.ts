@@ -11,6 +11,7 @@ import {
   WebhookClient,
   PermissionFlagsBits,
   ButtonInteraction,
+  GuildMember,
 } from 'discord.js';
 import {
   BOOT_NOTIFICATION_CHANNEL_ID,
@@ -444,11 +445,12 @@ export const checkMissingBotPermissions = (interaction: ChatInputCommandInteract
     hasMissingPermissions,
   };
 };
-export const checkIfAdminUser = (interaction: any) => {
-  return interaction.member.permissions.has('ADMINISTRATOR'); //Checks if user who initiated command is an Admin
-};
-export const checkIfUserHasManageServer = (interaction: any) => {
-  return interaction.member.permissions.has('MANAGE_GUILD'); //Checks if user who initiated command has the Manage Server/Guild permission
+export const checkIfUserHasManageServer = (interaction: ChatInputCommandInteraction) => {
+  return (
+    interaction.member &&
+    interaction.member instanceof GuildMember &&
+    interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)
+  ); //Checks if user who initiated command has the Manage Server/Guild permission
 };
 export const sendMissingBotPermissionsError = async ({ interaction, title }: any) => {
   const embed = {
