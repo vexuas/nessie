@@ -10,6 +10,7 @@ import {
   GuildChannel,
   WebhookClient,
   PermissionFlagsBits,
+  ButtonInteraction,
 } from 'discord.js';
 import {
   BOOT_NOTIFICATION_CHANNEL_ID,
@@ -167,7 +168,7 @@ export const sendErrorLog = async ({
   customTitle,
 }: {
   error: any;
-  interaction?: ChatInputCommandInteraction | AnySelectMenuInteraction;
+  interaction?: ChatInputCommandInteraction | AnySelectMenuInteraction | ButtonInteraction;
   option?: string | null;
   subCommand?: string;
   customTitle?: string;

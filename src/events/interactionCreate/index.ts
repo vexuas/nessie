@@ -74,7 +74,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             return;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
-              createStatus({ interaction, app, mixpanel });
+              createStatus({ interaction, nessie: app });
               return;
             }
         }

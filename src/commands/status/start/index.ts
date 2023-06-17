@@ -5,6 +5,11 @@ import {
   StringSelectMenuBuilder,
   WebhookClient,
   ButtonStyle,
+  APIEmbed,
+  ButtonInteraction,
+  Client,
+  ChannelType,
+  PermissionsBitField,
 } from 'discord.js';
 import { deleteStatus, getAllStatus, getStatus, insertNewStatus } from '../../../services/database';
 import {
@@ -298,7 +303,13 @@ export const _cancelStatusStart = async ({ interaction }: any) => {
  * TODO: Save status data in our database
  * TODO: Maybe separate ui and wiring up to respective files/folders for better readability
  */
-export const createStatus = async ({ interaction, nessie }: any) => {
+export const createStatus = async ({
+  interaction,
+  nessie,
+}: {
+  interaction: ButtonInteraction;
+  nessie: Client;
+}) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
   const gameModeSelected =
@@ -307,17 +318,18 @@ export const createStatus = async ({ interaction, nessie }: any) => {
       : isBattleRoyaleSelected
       ? 'Battle Royale'
       : 'Arenas';
-  const embedLoadingChannels = {
+  const embedLoadingChannels: APIEmbed = {
     description: `Loading Status Channels...`,
     color: 16776960,
   };
-  const embedLoadingWebhooks = {
+  const embedLoadingWebhooks: APIEmbed = {
     description: `Loading Webhooks...`,
     color: 16776960,
   };
 
   try {
     await interaction.deferUpdate();
+    if (!interaction.guild) return;
     await interaction.message.edit({ embeds: [embedLoadingChannels], components: [] });
 
     const rotationData = await getRotationData();
@@ -331,30 +343,33 @@ export const createStatus = async ({ interaction, nessie }: any) => {
       (role: any) => role.name === '@everyone'
     );
 
-    const statusCategory = await interaction.guild.channels.create('Apex Legends Map Status', {
-      type: 'GUILD_CATEGORY',
+    const statusCategory = await interaction.guild.channels.create({
+      name: 'Apex Legends Map Status',
+      type: ChannelType.GuildCategory,
     });
     const statusBattleRoyaleChannel =
       isBattleRoyaleSelected &&
-      (await interaction.guild.channels.create('apex-battle-royale', {
+      (await interaction.guild.channels.create({
+        name: 'apex-battle-royale',
         parent: statusCategory,
-        type: 'GUILD_TEXT',
+        type: ChannelType.GuildText,
         permissionOverwrites: [
           {
-            id: everyoneRole.id,
-            deny: ['SEND_MESSAGES'],
+            id: everyoneRole ? everyoneRole.id : '',
+            deny: [PermissionsBitField.Flags.SendMessages],
           },
         ],
       }));
     const statusArenasChannel =
       isArenasSelected &&
-      (await interaction.guild.channels.create('apex-arenas', {
+      (await interaction.guild.channels.create({
+        name: 'apex-arenas',
         parent: statusCategory,
-        type: 'GUILD_TEXT',
+        type: ChannelType.GuildText,
         permissionOverwrites: [
           {
-            id: everyoneRole.id,
-            deny: ['SEND_MESSAGES'],
+            id: everyoneRole ? everyoneRole.id : '',
+            deny: [PermissionsBitField.Flags.SendMessages],
           },
         ],
       }));
@@ -364,13 +379,15 @@ export const createStatus = async ({ interaction, nessie }: any) => {
 
     const statusBattleRoyaleWebhook =
       statusBattleRoyaleChannel &&
-      (await statusBattleRoyaleChannel.createWebhook('Nessie Automatic Status', {
+      (await statusBattleRoyaleChannel.createWebhook({
+        name: 'Nessie Automatic Status',
         avatar: nessieLogo,
         reason: 'Webhook to receive automatic map updates for Apex Battle Royale',
       }));
     const statusArenasWebhook =
       statusArenasChannel &&
-      (await statusArenasChannel.createWebhook('Nessie Automatic Status', {
+      (await statusArenasChannel.createWebhook({
+        name: 'Nessie Automatic Status',
         avatar: nessieLogo,
         reason: 'Webhook to receive automatic map updates for Apex Arenas',
       }));
@@ -379,7 +396,7 @@ export const createStatus = async ({ interaction, nessie }: any) => {
       statusBattleRoyaleWebhook &&
       (await new WebhookClient({
         id: statusBattleRoyaleWebhook.id,
-        token: statusBattleRoyaleWebhook.token,
+        token: statusBattleRoyaleWebhook.token ?? '',
       }).send({
         embeds: statusBattleRoyaleEmbed,
       }));
@@ -387,7 +404,7 @@ export const createStatus = async ({ interaction, nessie }: any) => {
       statusArenasWebhook &&
       (await new WebhookClient({
         id: statusArenasWebhook.id,
-        token: statusArenasWebhook.token,
+        token: statusArenasWebhook.token ?? '',
       }).send({
         embeds: statusArenasEmbed,
       }));
@@ -453,7 +470,9 @@ export const createStatus = async ({ interaction, nessie }: any) => {
         },
       ],
     };
-    await statusLogChannel.send({ embeds: [statusLogEmbed] });
+    statusLogChannel &&
+      statusLogChannel.type === ChannelType.GuildText &&
+      (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm' });
   } finally {
