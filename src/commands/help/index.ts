@@ -1,4 +1,4 @@
-import { inlineCode, SlashCommandBuilder } from '@discordjs/builders';
+import { inlineCode, SlashCommandBuilder } from 'discord.js';
 import { isEmpty, reduce, uniq } from 'lodash';
 import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';

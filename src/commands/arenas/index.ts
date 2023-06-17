@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder, SlashCommandStringOption } from 'discord.js';
 import { getArenasPubs, getArenasRanked } from '../../services/adapters';
 import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
@@ -8,13 +8,15 @@ export default {
   data: new SlashCommandBuilder()
     .setName('arenas')
     .setDescription('Shows current map rotation for arenas')
-    .addStringOption((option) =>
+    .addStringOption((option: SlashCommandStringOption) =>
       option
         .setName('mode')
         .setDescription('Game Mode')
         .setRequired(true)
-        .addChoice('pubs', 'arenas_pubs')
-        .addChoice('ranked', 'arenas_ranked')
+        .addChoices(
+          { name: 'pubs', value: 'arenas_pubs' },
+          { name: 'ranked', value: 'arenas_ranked' }
+        )
     ),
   async execute({ interaction }: AppCommandOptions) {
     let data;

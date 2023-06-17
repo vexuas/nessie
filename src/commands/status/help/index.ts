@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
@@ -19,7 +19,7 @@ export const sendHelpInteraction = async ({
   interaction,
   subCommand,
 }: {
-  interaction: CommandInteraction;
+  interaction: ChatInputCommandInteraction;
   subCommand: string;
 }) => {
   const {

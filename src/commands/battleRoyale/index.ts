@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder } from 'discord.js';
 import { getBattleRoyalePubs, getBattleRoyaleRanked } from '../../services/adapters';
 import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
@@ -13,8 +13,7 @@ export default {
         .setName('mode')
         .setDescription('Game Mode')
         .setRequired(true)
-        .addChoice('pubs', 'br_pubs')
-        .addChoice('ranked', 'br_ranked')
+        .addChoices({ name: 'pubs', value: 'br_pubs' }, { name: 'ranked', value: 'br_ranked' })
     ),
   async execute({ interaction }: AppCommandOptions) {
     let data;

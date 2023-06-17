@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder } from 'discord.js';
 import { AppCommand, AppCommandOptions } from '../commands';
 import { sendHelpInteraction } from './help';
 import { sendStartInteraction } from './start';

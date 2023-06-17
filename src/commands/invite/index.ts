@@ -1,6 +1,6 @@
 import { AppCommand, AppCommandOptions } from '../commands';
 import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
-import { hyperlink, SlashCommandBuilder } from '@discordjs/builders';
+import { hyperlink, SlashCommandBuilder } from 'discord.js';
 
 //TODO: Add typing after upgrading to djs v14
 export const generateInviteEmbed = () => {

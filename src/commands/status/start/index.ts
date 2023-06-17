@@ -1,9 +1,10 @@
 import {
-  CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-  MessageSelectMenu,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ChatInputCommandInteraction,
+  StringSelectMenuBuilder,
   WebhookClient,
+  ButtonStyle,
 } from 'discord.js';
 import { deleteStatus, getAllStatus, getStatus, insertNewStatus } from '../../../services/database';
 import {
@@ -45,8 +46,8 @@ const errorNotification = {
 const generateGameModeSelectionMessage = (status?: any) => {
   let embed, row;
   if (!status) {
-    row = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
+    row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
         .setCustomId('statusStart__gameModeDropdown')
         .setPlaceholder('Requires at least one game mode')
         .setMinValues(1)
@@ -108,21 +109,24 @@ const generateConfirmStatusMessage = ({ interaction }: any) => {
     modeLength > 1 ? 'and' : ''
   } ${isArenasSelected ? '*Arenas*' : ''}`;
 
-  const row = new MessageActionRow()
+  const row = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
-      new MessageButton()
+      new ButtonBuilder()
         .setLabel('Back')
-        .setStyle('SECONDARY')
+        .setStyle(ButtonStyle.Secondary)
         .setCustomId('statusStart__backButton')
     )
     .addComponents(
-      new MessageButton()
+      new ButtonBuilder()
         .setLabel('Cancel')
-        .setStyle('DANGER')
+        .setStyle(ButtonStyle.Danger)
         .setCustomId('statusStart__cancelButton')
     )
     .addComponents(
-      new MessageButton().setLabel("Let's go!").setStyle('SUCCESS').setCustomId(confirmButtonId)
+      new ButtonBuilder()
+        .setLabel("Let's go!")
+        .setStyle(ButtonStyle.Success)
+        .setCustomId(confirmButtonId)
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
@@ -187,10 +191,10 @@ export const sendStartInteraction = async ({
   interaction,
   subCommand,
 }: {
-  interaction: CommandInteraction;
+  interaction: ChatInputCommandInteraction;
   subCommand: string;
 }) => {
-  const status = await getStatus(interaction.guildId);
+  const status = await getStatus(interaction.guildId ?? '');
   const { embed, row } = generateGameModeSelectionMessage(status);
   const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
   const isManageServerUser = checkIfUserHasManageServer(interaction);

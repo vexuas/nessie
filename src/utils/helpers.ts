@@ -1,11 +1,12 @@
 import { format } from 'date-fns';
 import {
+  AnySelectMenuInteraction,
   Channel,
+  ChannelType,
+  ChatInputCommandInteraction,
   Client,
-  CommandInteraction,
   Guild,
   GuildChannel,
-  SelectMenuInteraction,
   WebhookClient,
 } from 'discord.js';
 import {
@@ -164,7 +165,7 @@ export const sendErrorLog = async ({
   customTitle,
 }: {
   error: any;
-  interaction?: CommandInteraction | SelectMenuInteraction;
+  interaction?: ChatInputCommandInteraction | AnySelectMenuInteraction;
   option?: string | null;
   subCommand?: string;
   customTitle?: string;
@@ -469,7 +470,7 @@ export const sendBootNotification = async (app: Client) => {
       ? app.channels.cache.get(BOOT_NOTIFICATION_CHANNEL_ID)
       : undefined;
   bootNotificationChannel &&
-    bootNotificationChannel.isText() &&
+    bootNotificationChannel.type === ChannelType.GuildText &&
     (await bootNotificationChannel.send("I'm booting up! (◕ᴗ◕✿)"));
 };
 

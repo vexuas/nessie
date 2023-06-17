@@ -1,4 +1,9 @@
-import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+} from 'discord.js';
 import { deleteStatus, getStatus } from '../../../services/database';
 import {
   checkIfUserHasManageServer,
@@ -20,10 +25,10 @@ export const sendStopInteraction = async ({
   interaction,
   subCommand,
 }: {
-  interaction: CommandInteraction;
+  interaction: ChatInputCommandInteraction;
   subCommand: string;
 }) => {
-  const status = await getStatus(interaction.guildId);
+  const status = await getStatus(interaction.guildId ?? '');
   const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
   const isManageServerUser = checkIfUserHasManageServer(interaction);
   if (status) {
@@ -53,18 +58,18 @@ export const sendStopInteraction = async ({
           )}`,
     };
     const row = status
-      ? new MessageActionRow()
+      ? new ActionRowBuilder<ButtonBuilder>()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId('statusStop__cancelButton')
               .setLabel('Cancel')
-              .setStyle('SECONDARY')
+              .setStyle(ButtonStyle.Secondary)
           )
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId('statusStop__stopButton')
               .setLabel(`Stop it!`)
-              .setStyle('DANGER')
+              .setStyle(ButtonStyle.Danger)
           )
       : null;
     await interaction.editReply({ components: row ? [row] : [], embeds: [embed] });
