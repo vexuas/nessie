@@ -11,6 +11,7 @@ import {
   ChannelType,
   PermissionsBitField,
   AnySelectMenuInteraction,
+  inlineCode,
 } from 'discord.js';
 import {
   deleteStatus,
@@ -21,7 +22,6 @@ import {
 } from '../../../services/database';
 import {
   generatePubsEmbed,
-  codeBlock,
   generateRankedEmbed,
   checkMissingBotPermissions,
   checkIfUserHasManageServer,
@@ -146,10 +146,10 @@ const generateConfirmStatusMessage = ({
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
-    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${modeLength} text-channels and ${modeLength} webhooks for the automatic map updates:\n• ${codeBlock(
+    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${modeLength} text-channels and ${modeLength} webhooks for the automatic map updates:\n• ${inlineCode(
       'Apex Legends Map Status'
-    )}\n${isBattleRoyaleSelected ? `• ${codeBlock('#apex-battle-royale')}\n` : ''}${
-      isArenasSelected ? `• ${codeBlock('#apex-arenas')}\n` : ''
+    )}\n${isBattleRoyaleSelected ? `• ${inlineCode('#apex-battle-royale')}\n` : ''}${
+      isArenasSelected ? `• ${inlineCode('#apex-arenas')}\n` : ''
     }• Webhook for each text channel\n\nUpdates get sent to these channels **every 15 minutes**`,
     color: 3447003,
   };
@@ -360,9 +360,7 @@ export const createStatus = async ({
      * Gets the @everyone role of the guild
      * Important so w can't prevent non-admin users from sending any messages in status channels
      */
-    const everyoneRole = interaction.guild.roles.cache.find(
-      (role: any) => role.name === '@everyone'
-    );
+    const everyoneRole = interaction.guild.roles.cache.find((role) => role.name === '@everyone');
 
     const statusCategory = await interaction.guild.channels.create({
       name: 'Apex Legends Map Status',
@@ -525,7 +523,7 @@ export const createStatus = async ({
  * Might have to revisit this in the near future when we're supporting a lot of guilds
  * More detailed explanation here: https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658
  */
-export const scheduleStatus = (nessie: any) => {
+export const scheduleStatus = (nessie: Client) => {
   return new Scheduler('5 */15 * * * *', async () => {
     errorNotification.count = 0;
     errorNotification.message = '';
@@ -557,7 +555,7 @@ export const scheduleStatus = (nessie: any) => {
        * Only difference is instead of the rotation data, we're showing the information embed + an error message
        */
       const uuid = uuidV4();
-      const errorEmbed: any = [
+      const errorEmbed: APIEmbed[] = [
         {
           description:
             '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
@@ -643,20 +641,20 @@ const handleStatusCycle = async ({
         fields: [
           {
             name: 'Status Count',
-            value: codeBlock(totalCount),
+            value: inlineCode(totalCount),
             inline: true,
           },
           {
             name: 'Start Time',
-            value: codeBlock(format(startTime, 'dd MMM yyyy, h:mm:ss a')),
+            value: inlineCode(format(startTime, 'dd MMM yyyy, h:mm:ss a')),
           },
           {
             name: 'End Time',
-            value: codeBlock(format(endTime, 'dd MMM yyyy, h:mm:ss a')),
+            value: inlineCode(format(endTime, 'dd MMM yyyy, h:mm:ss a')),
           },
           {
             name: 'Time Taken',
-            value: codeBlock(
+            value: inlineCode(
               `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
                 endTime,
                 startTime
@@ -685,7 +683,7 @@ const handleStatusCycle = async ({
       const errorEmbed = {
         title: 'Error Summary | Status Cycle',
         color: 16711680,
-        description: `Error: ${codeBlock(errorNotification.message)}`,
+        description: `Error: ${inlineCode(errorNotification.message)}`,
         fields: [
           {
             name: 'Number of guilds affected',
@@ -727,7 +725,7 @@ const handleStatusCycle = async ({
           embeds: [
             {
               title: 'Automatic Map Status Error',
-              description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${codeBlock(
+              description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${inlineCode(
                 '/status start'
               )}`,
               color: 16711680,

@@ -1,8 +1,7 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, inlineCode } from 'discord.js';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
-  codeBlock,
   getEmbedColor,
   sendErrorLog,
 } from '../../../utils/helpers';
@@ -35,9 +34,9 @@ export const sendHelpInteraction = async ({
   try {
     const embedInformation = {
       title: 'Information',
-      description: `This command will send automatic updates of Apex Legends Map Rotations. You will be able to choose which game modes, *Battle Royale or/and Arenas*, to get updates for both pubs and ranked.\n\nDepending on what you choose, Nessie will create a set of:\n• ${codeBlock(
+      description: `This command will send automatic updates of Apex Legends Map Rotations. You will be able to choose which game modes, *Battle Royale or/and Arenas*, to get updates for both pubs and ranked.\n\nDepending on what you choose, Nessie will create a set of:\n• ${inlineCode(
         'Category Channel'
-      )}\n• ${codeBlock('Text Channel(s)')}\n• ${codeBlock(
+      )}\n• ${inlineCode('Text Channel(s)')}\n• ${inlineCode(
         'Webhook(s)'
       )}\nUpdates will then be sent in these channels **every 15 minutes**\n\n`,
       color: 3447003,

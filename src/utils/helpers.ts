@@ -29,6 +29,8 @@ import { StatusRecord } from '../services/database';
  * @data - br data object
  * @channel - log channel in Nessie's Canyon (#health: 899620845436141609)
  * @isAccurate - whether the data received is up-to-date
+ * TODO: Add typing for ALS Data
+ * TODO: Check if this is even necessary
  */
 export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
   const utcStart = new Date(data.current.readableDate_start);
@@ -46,19 +48,19 @@ export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
     fields: [
       {
         name: 'Current Map',
-        value: `${codeBlock(data.current.map)} - ${codeBlock(format(sgtStart, 'hh:mm:ss aa'))}`,
+        value: `${inlineCode(data.current.map)} - ${inlineCode(format(sgtStart, 'hh:mm:ss aa'))}`,
       },
       {
         name: 'Next Map',
-        value: `${codeBlock(data.next.map)} - ${codeBlock(format(sgtEnd, 'hh:mm:ss aa'))}`,
+        value: `${inlineCode(data.next.map)} - ${inlineCode(format(sgtEnd, 'hh:mm:ss aa'))}`,
       },
       {
         name: 'Time left',
-        value: codeBlock(`${data.current.remainingTimer} | ${data.current.remainingSecs} secs`),
+        value: inlineCode(`${data.current.remainingTimer} | ${data.current.remainingSecs} secs`),
       },
       {
         name: 'Requested At',
-        value: codeBlock(format(new Date(), 'hh:mm:ss aa, dd MMM yyyy')),
+        value: inlineCode(format(new Date(), 'hh:mm:ss aa, dd MMM yyyy')),
       },
       {
         name: 'Accurate',
@@ -69,14 +71,6 @@ export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
   isAccurate
     ? channel.send({ embeds: [embed] })
     : channel.send({ content: '<@183444648360935424>', embeds: [embed] });
-};
-//----------
-/**
- * Function to create a text into a discord code block
- * @param text - text to transform
- */
-export const codeBlock = (text: any) => {
-  return '`' + text + '`';
 };
 //----------
 export const serverNotificationEmbed = async ({
@@ -159,8 +153,8 @@ export const generateErrorEmbed = async (
     description: `${
       error.message.includes('Missing Access') ? missingAccessAlert : errorAlert
     }\n\nError: ${
-      error.message ? codeBlock(error.message) : codeBlock('Unexpected Error')
-    }\nError ID: ${codeBlock(
+      error.message ? inlineCode(error.message) : inlineCode('Unexpected Error')
+    }\nError ID: ${inlineCode(
       uuid
     )}\nAlternatively, you can also report issue through the [support server](https://discord.gg/FyxVrAbRAd)`,
     color: 16711680,
@@ -267,7 +261,7 @@ export const sendStatusErrorLog = async ({
   const errorEmbed = {
     title: 'Error | Status Scheduler Cycle',
     color: 16711680,
-    description: `uuid: ${uuid}\nError: ${codeBlock(error.message)}`,
+    description: `uuid: ${uuid}\nError: ${inlineCode(error.message)}`,
     fields: [
       {
         name: 'Status ID',
@@ -479,7 +473,7 @@ export const sendMissingBotPermissionsError = async ({
 }) => {
   const embed = {
     title,
-    description: `Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create/stop automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nFor more details, use ${codeBlock(
+    description: `Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create/stop automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nFor more details, use ${inlineCode(
       '/status help'
     )}`,
     color: 16711680,
@@ -495,9 +489,9 @@ export const sendMissingUserPermissionError = async ({
 }) => {
   const embed = {
     title,
-    description: `Oops only users with the ${codeBlock(
+    description: `Oops only users with the ${inlineCode(
       'Manage Server'
-    )} permission can create/stop automatic map updates D:\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${codeBlock(
+    )} permission can create/stop automatic map updates D:\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${inlineCode(
       '/status help'
     )}`,
     color: 16711680,
@@ -513,7 +507,7 @@ export const sendMissingAllPermissionsError = async ({
 }) => {
   const embed = {
     title,
-    description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${codeBlock(
+    description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${inlineCode(
       '/status help'
     )}`,
     color: 16711680,

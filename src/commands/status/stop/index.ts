@@ -6,12 +6,12 @@ import {
   ChannelType,
   ChatInputCommandInteraction,
   Client,
+  inlineCode,
 } from 'discord.js';
 import { deleteStatus, getStatus } from '../../../services/database';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
-  codeBlock,
   sendErrorLog,
   sendMissingAllPermissionsError,
   sendMissingBotPermissionsError,
@@ -56,7 +56,7 @@ export const sendStopInteraction = async ({
           }\n• Webhooks under each status channel\n\nThis status was created at ${
             status.created_at
           } by ${status.created_by}`
-        : `There's currently no active automated map status to stop.\n\nTry starting one with ${codeBlock(
+        : `There's currently no active automated map status to stop.\n\nTry starting one with ${inlineCode(
             '/status start'
           )}`,
     };

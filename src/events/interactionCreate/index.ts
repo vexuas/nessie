@@ -1,3 +1,4 @@
+import { inlineCode } from 'discord.js';
 import {
   createStatus,
   goBackToGameModeSelection,
@@ -5,7 +6,7 @@ import {
   goToConfirmStatus,
 } from '../../commands/status/start';
 import { deleteGuildStatus, _cancelStatusStop } from '../../commands/status/stop';
-import { codeBlock, sendErrorLog } from '../../utils/helpers';
+import { sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
 export default function ({ app, mixpanel, appCommands }: EventModule) {
@@ -43,7 +44,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
           interaction.user.id !== interaction.message.interaction.user.id
         ) {
           const wrongUserEmbed = {
-            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
+            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
               '/help'
             )}!`,
             color: 16711680,
@@ -85,7 +86,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
           interaction.user.id !== interaction.message.interaction.user.id
         ) {
           const wrongUserEmbed = {
-            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
+            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
               '/help'
             )}!`,
             color: 16711680,
