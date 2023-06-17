@@ -22,6 +22,7 @@ import { isEmpty } from 'lodash';
 import { v4 as uuidV4 } from 'uuid';
 import { inlineCode } from '@discordjs/builders';
 import { capitalize } from 'lodash';
+import { StatusRecord } from '../services/database';
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
@@ -134,8 +135,13 @@ export const serverNotificationEmbed = async ({
  * @param message - error description/message
  * @param uuid - error uuid
  * @param nessie = client
+ * TODO: Refactor this
  */
-export const generateErrorEmbed = async (error: any, uuid: any, nessie: any) => {
+export const generateErrorEmbed = async (
+  error: any,
+  uuid: any,
+  nessie: any
+): Promise<APIEmbed[]> => {
   //To get a specific message, we need to get the channel it's in before fetching it
   const alertChannel = nessie.channels.cache.get('973977422699573258');
   const messageObject = await alertChannel.messages.fetch('973981539731922946');
@@ -187,7 +193,7 @@ export const sendErrorLog = async ({
   }
   if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
     const interactionChannel = interaction?.channel as GuildChannel | undefined;
-    const notificationEmbed: any = {
+    const notificationEmbed: APIEmbed = {
       title: customTitle
         ? `Error | ${customTitle}`
         : interaction
@@ -246,7 +252,17 @@ export const sendErrorLog = async ({
  * Handler for errors concerning status cycles
  * Same as above, only difference is the embed content
  */
-export const sendStatusErrorLog = async ({ nessie, uuid, error, status }: any) => {
+export const sendStatusErrorLog = async ({
+  nessie,
+  uuid,
+  error,
+  status,
+}: {
+  nessie: Client;
+  uuid: string;
+  error: any;
+  status: StatusRecord;
+}) => {
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
   const errorEmbed = {
     title: 'Error | Status Scheduler Cycle',
@@ -285,7 +301,7 @@ export const sendStatusErrorLog = async ({ nessie, uuid, error, status }: any) =
     });
   }
 };
-export const generateAnnouncementMessage = (prefix: any) => {
+export const generateAnnouncementMessage = (prefix: string) => {
   return (
     '```diff\n' +
     `- Prefix commands will no longer be supported\n- Full information: ${prefix}announcement` +
@@ -302,7 +318,7 @@ export const generateAnnouncementMessage = (prefix: any) => {
  * Manually wiring them up to our images isn't scalable either
  * I'll just leave this comment so I get reminded about it in the future
  */
-export const getMapUrl = (map: any) => {
+export const getMapUrl = (map: string) => {
   switch (map) {
     case 'kings_canyon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
@@ -332,7 +348,7 @@ export const getMapUrl = (map: any) => {
  * Function returns hr hrs min mins sec secs (01 hrs 02 mins 03 secs);
  * Might want to think of using the number of remaining seconds instead of splitting the timer string in the future
  */
-export const getCountdown = (timer: any) => {
+export const getCountdown = (timer: string) => {
   const countdown = timer.split(':');
   const isOverAnHour = countdown[0] && countdown[0] !== '00';
   const isOverADay = countdown[0] && parseInt(countdown[0]) >= 24;
@@ -349,6 +365,7 @@ export const getCountdown = (timer: any) => {
  * Embed design for any pubs map
  * Added a hack to display the time for next map regardless of timezone
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
+ * TODO: Add typing for ALS Data
  */
 export const generatePubsEmbed = (data: any, type = 'Battle Royale'): APIEmbed => {
   const embedData: APIEmbed = {
@@ -379,6 +396,7 @@ export const generatePubsEmbed = (data: any, type = 'Battle Royale'): APIEmbed =
 /**
  * Embed design for any ranked map
  * Fairly simple, don't need any fancy timers and footers
+ * TODO: Add typing for ALS Data
  */
 export const generateRankedEmbed = (data: any, type = 'Battle Royale') => {
   const embedData: any = {
@@ -452,7 +470,13 @@ export const checkIfUserHasManageServer = (interaction: ChatInputCommandInteract
     interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)
   ); //Checks if user who initiated command has the Manage Server/Guild permission
 };
-export const sendMissingBotPermissionsError = async ({ interaction, title }: any) => {
+export const sendMissingBotPermissionsError = async ({
+  interaction,
+  title,
+}: {
+  interaction: ChatInputCommandInteraction;
+  title: string;
+}) => {
   const embed = {
     title,
     description: `Oops looks like Nessie is missing some permissions D:\n\nThese bot permissions are required to create/stop automatic map updates:\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nFor more details, use ${codeBlock(
@@ -462,7 +486,13 @@ export const sendMissingBotPermissionsError = async ({ interaction, title }: any
   };
   await interaction.editReply({ embeds: [embed], components: [] });
 };
-export const sendMissingUserPermissionError = async ({ interaction, title }: any) => {
+export const sendMissingUserPermissionError = async ({
+  interaction,
+  title,
+}: {
+  interaction: ChatInputCommandInteraction;
+  title: string;
+}) => {
   const embed = {
     title,
     description: `Oops only users with the ${codeBlock(
@@ -474,7 +504,13 @@ export const sendMissingUserPermissionError = async ({ interaction, title }: any
   };
   interaction.editReply({ embeds: [embed], components: [] });
 };
-export const sendMissingAllPermissionsError = async ({ interaction, title }: any) => {
+export const sendMissingAllPermissionsError = async ({
+  interaction,
+  title,
+}: {
+  interaction: ChatInputCommandInteraction;
+  title: string;
+}) => {
   const embed = {
     title,
     description: `Oops looks there are some issues to resolve before you're able to create automatic map updates D:\n\nRequired Bot Permissions\n• Manage Channels\n• Manage Webhooks\n• View Channels\n• Send Messages\n\nRequired User Permissions:\n• Manage Server\n\nFor more details, use ${codeBlock(

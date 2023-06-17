@@ -10,8 +10,15 @@ import {
   Client,
   ChannelType,
   PermissionsBitField,
+  AnySelectMenuInteraction,
 } from 'discord.js';
-import { deleteStatus, getAllStatus, getStatus, insertNewStatus } from '../../../services/database';
+import {
+  deleteStatus,
+  getAllStatus,
+  getStatus,
+  insertNewStatus,
+  StatusRecord,
+} from '../../../services/database';
 import {
   generatePubsEmbed,
   codeBlock,
@@ -48,7 +55,7 @@ const errorNotification = {
  * - TODO: Don't forget to add copy for the explanation of webhooks/channels creation + status update cycles
  * - Has 3 buttons: Back goes to Step 1, Cancel stops the wizard entirely, Confirm creates a status for the guild
  */
-const generateGameModeSelectionMessage = (status?: any) => {
+const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
   let embed, row;
   if (!status) {
     row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -92,7 +99,11 @@ const generateGameModeSelectionMessage = (status?: any) => {
     row,
   };
 };
-const generateConfirmStatusMessage = ({ interaction }: any) => {
+const generateConfirmStatusMessage = ({
+  interaction,
+}: {
+  interaction: AnySelectMenuInteraction;
+}) => {
   /**
    * The game mode selections are passed down from the dropdown interaction in step 1
    * However, there's no direct way of passing them down along with the confirm button interaction
@@ -100,10 +111,10 @@ const generateConfirmStatusMessage = ({ interaction }: any) => {
    * Going to treat them like query params (?x&y)
    */
   const isBattleRoyaleSelected = interaction.values.find(
-    (value: any) => value === 'gameModeDropdown__battleRoyaleValue'
+    (value) => value === 'gameModeDropdown__battleRoyaleValue'
   );
   const isArenasSelected = interaction.values.find(
-    (value: any) => value === 'gameModeDropdown__arenasValue'
+    (value) => value === 'gameModeDropdown__arenasValue'
   );
   const modeLength = interaction.values.length;
 
@@ -152,6 +163,7 @@ const generateConfirmStatusMessage = ({ interaction }: any) => {
  * Generates relevant embeds for the status battle royale channel
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
+ * TODO: Add typing for ALS Data
  */
 const generateBattleRoyaleStatusEmbeds = (data: any) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
@@ -171,6 +183,7 @@ const generateBattleRoyaleStatusEmbeds = (data: any) => {
  * Generates relevant embeds for the status arenas channel
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
+ * TODO: Add typing for ALS Data
  */
 const generateArenasStatusEmbeds = (data: any) => {
   const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
@@ -223,7 +236,11 @@ export const sendStartInteraction = async ({
  * Handler for when a user selects any of the options in the Game Mode dropdown
  * Will edit and show the second step of the status start wizard: Confirm Status
  */
-export const goToConfirmStatus = async ({ interaction }: any) => {
+export const goToConfirmStatus = async ({
+  interaction,
+}: {
+  interaction: AnySelectMenuInteraction;
+}) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
     await interaction.deferUpdate();
@@ -244,11 +261,15 @@ export const goToConfirmStatus = async ({ interaction }: any) => {
  * Handler for when a user clicks the Back button in Confirm Status Step
  * Will edit and show the first step of the status start wizard: Confirm Status
  */
-export const goBackToGameModeSelection = async ({ interaction }: any) => {
+export const goBackToGameModeSelection = async ({
+  interaction,
+}: {
+  interaction: ButtonInteraction;
+}) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
     await interaction.deferUpdate();
-    await interaction.message.edit({ embeds: [embed], components: [row] });
+    await interaction.message.edit({ embeds: [embed], components: row ? [row] : [] });
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Back Error' });
   } finally {
@@ -267,7 +288,7 @@ export const goBackToGameModeSelection = async ({ interaction }: any) => {
  * Prepended an underscore as there's a function in announcement with the same name
  * TODO: Clean up the code there eventually
  */
-export const _cancelStatusStart = async ({ interaction }: any) => {
+export const _cancelStatusStart = async ({ interaction }: { interaction: ButtonInteraction }) => {
   const embed = {
     description: 'Cancelled automatic map status config',
     color: 16711680,

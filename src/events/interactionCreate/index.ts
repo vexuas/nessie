@@ -61,10 +61,10 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__backButton':
-            goBackToGameModeSelection({ interaction, app, mixpanel });
+            goBackToGameModeSelection({ interaction });
             return;
           case 'statusStart__cancelButton':
-            _cancelStatusStart({ interaction, app, mixpanel });
+            _cancelStatusStart({ interaction });
             return;
           case 'statusStop__cancelButton':
             _cancelStatusStop({ interaction, app, mixpanel });
@@ -103,7 +103,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
-            goToConfirmStatus({ interaction, app, mixpanel });
+            goToConfirmStatus({ interaction });
             return;
         }
       }

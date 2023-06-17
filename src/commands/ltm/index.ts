@@ -3,7 +3,7 @@ import { getLimitedTimeEvent } from '../../services/adapters';
 import { getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
-//TODO: Add typing after upgrading to djs v14
+//TODO: Add typing for ALS Data
 export const generateLimitedTimeEventEmbed = (data: any): APIEmbed => {
   const mapURL = getMapUrl(data.current.code);
   const embedData: APIEmbed = {
