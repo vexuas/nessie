@@ -65,13 +65,17 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             return;
           case 'statusStart__cancelButton':
             _cancelStatusStart({ interaction, app, mixpanel });
+            return;
           case 'statusStop__cancelButton':
             _cancelStatusStop({ interaction, app, mixpanel });
+            return;
           case 'statusStop__stopButton':
             deleteGuildStatus({ interaction, app, mixpanel });
+            return;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
               createStatus({ interaction, app, mixpanel });
+              return;
             }
         }
       }
@@ -100,6 +104,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
             goToConfirmStatus({ interaction, app, mixpanel });
+            return;
         }
       }
     } catch (error) {
