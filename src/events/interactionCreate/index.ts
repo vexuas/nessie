@@ -8,15 +8,15 @@ import { deleteGuildStatus, _cancelStatusStop } from '../../commands/status/stop
 import { codeBlock, sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
-export default function ({ nessie, mixpanel, appCommands }: EventModule) {
-  nessie.on('interactionCreate', async (interaction) => {
+export default function ({ app, mixpanel, appCommands }: EventModule) {
+  app.on('interactionCreate', async (interaction) => {
     try {
       if (!interaction.inGuild() || !appCommands) return;
 
       if (interaction.isCommand()) {
         const { commandName } = interaction;
         const command = appCommands.find((command) => command.data.name === commandName);
-        command && (await command.execute({ interaction, app: nessie, appCommands }));
+        command && (await command.execute({ interaction, app, appCommands }));
         // mixpanel &&
         // 	sendCommandEvent({
         // 		user: interaction.user,
@@ -61,17 +61,17 @@ export default function ({ nessie, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__backButton':
-            goBackToGameModeSelection({ interaction, nessie, mixpanel });
+            goBackToGameModeSelection({ interaction, app, mixpanel });
             return;
           case 'statusStart__cancelButton':
-            _cancelStatusStart({ interaction, nessie, mixpanel });
+            _cancelStatusStart({ interaction, app, mixpanel });
           case 'statusStop__cancelButton':
-            _cancelStatusStop({ interaction, nessie, mixpanel });
+            _cancelStatusStop({ interaction, app, mixpanel });
           case 'statusStop__stopButton':
-            deleteGuildStatus({ interaction, nessie, mixpanel });
+            deleteGuildStatus({ interaction, app, mixpanel });
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
-              createStatus({ interaction, nessie, mixpanel });
+              createStatus({ interaction, app, mixpanel });
             }
         }
       }
@@ -99,7 +99,7 @@ export default function ({ nessie, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
-            goToConfirmStatus({ interaction, nessie, mixpanel });
+            goToConfirmStatus({ interaction, app, mixpanel });
         }
       }
     } catch (error) {
