@@ -2,13 +2,14 @@ import { Guild, GuildTextBasedChannel, User } from 'discord.js';
 import { Mixpanel } from 'mixpanel';
 
 //TODO: Check if sub commands are being tracked correctly
-type CommandEvent = {
+type AnalyticsEvent = {
   client: Mixpanel;
   user: User;
   channel: GuildTextBasedChannel | null;
   guild: Guild | null;
-  command: string;
-  subCommand: string | null;
+  eventName: string;
+  command?: string;
+  subCommand?: string | null;
   options?: string;
   properties?: object;
 };
@@ -35,20 +36,21 @@ function setUserProfile({ client, user, channel, guild, command }: UserProfile) 
     first_used_in_channel: channel ? channel.name : 'N/A',
   });
 }
-export function sendCommandEvent({
+export function sendAnalyticsEvent({
   user,
   channel,
   guild,
+  eventName,
   command,
   subCommand,
   client,
   options,
   properties,
-}: CommandEvent) {
+}: AnalyticsEvent) {
   setUserProfile({ client, user, guild, channel, command });
-  const eventName = `Use ${command}${subCommand ? ` ${subCommand}` : ''} command`;
 
   client.track(eventName, {
+    command,
     distinct_id: user.id,
     user: user.tag,
     user_name: user.username,
@@ -56,8 +58,8 @@ export function sendCommandEvent({
     channel_id: channel ? channel.id : 'N/A',
     guild: guild ? guild.name : 'N/A',
     guild_id: guild ? guild.id : 'N/A',
-    command: command,
     arguments: options ? options : 'none',
+    sub_command: subCommand,
     ...properties,
   });
 }
