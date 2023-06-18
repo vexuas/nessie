@@ -58,14 +58,15 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             color: 16711680,
           };
           await interaction.deferReply({ ephemeral: true });
-          // sendMixpanelEvent({
-          //   user: interaction.user,
-          //   channel: interaction.channel,
-          //   guild: interaction.guild,
-          //   client: mixpanel,
-          //   arguments: interaction.customId,
-          //   customEventName: 'Click wrong user button',
-          // });
+          mixpanel &&
+            sendAnalyticsEvent({
+              user: interaction.user,
+              channel: interaction.channel,
+              guild: interaction.guild,
+              client: mixpanel,
+              options: interaction.customId,
+              eventName: 'Click wrong user button',
+            });
           interaction.editReply({ embeds: [wrongUserEmbed] });
         }
         switch (interaction.customId) {
@@ -100,14 +101,15 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             color: 16711680,
           };
           await interaction.deferReply({ ephemeral: true });
-          // sendMixpanelEvent({
-          //   user: interaction.user,
-          //   channel: interaction.channel,
-          //   guild: interaction.guild,
-          //   client: mixpanel,
-          //   arguments: interaction.customId,
-          //   customEventName: 'Click wrong user select menu',
-          // });
+          mixpanel &&
+            sendAnalyticsEvent({
+              user: interaction.user,
+              channel: interaction.channel,
+              guild: interaction.guild,
+              client: mixpanel,
+              options: interaction.customId,
+              eventName: 'Click wrong user button',
+            });
           interaction.editReply({ embeds: [wrongUserEmbed] });
         }
         switch (interaction.customId) {
