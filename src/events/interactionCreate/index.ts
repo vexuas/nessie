@@ -20,7 +20,8 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         const subCommand = interaction.options.getSubcommand(false);
         const command = appCommands.find((command) => command.data.name === commandName);
         command && (await command.execute({ interaction, app, appCommands }));
-        const eventName = `Use ${command}${subCommand ? ` ${subCommand}` : ''} command`;
+
+        const eventName = `Use ${commandName}${subCommand ? ` ${subCommand}` : ''} command`;
         mixpanel &&
           sendAnalyticsEvent({
             user: interaction.user,
@@ -67,10 +68,10 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__backButton':
-            goBackToGameModeSelection({ interaction });
+            goBackToGameModeSelection({ interaction, mixpanel });
             return;
           case 'statusStart__cancelButton':
-            _cancelStatusStart({ interaction });
+            _cancelStatusStart({ interaction, mixpanel });
             return;
           case 'statusStop__cancelButton':
             _cancelStatusStop({ interaction, app, mixpanel });
@@ -80,7 +81,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             return;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
-              createStatus({ interaction, nessie: app });
+              createStatus({ interaction, nessie: app, mixpanel });
               return;
             }
         }
@@ -109,7 +110,10 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
-            goToConfirmStatus({ interaction: interaction as StringSelectMenuInteraction });
+            goToConfirmStatus({
+              interaction: interaction as StringSelectMenuInteraction,
+              mixpanel,
+            });
             return;
         }
       }
