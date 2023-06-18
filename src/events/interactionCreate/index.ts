@@ -1,4 +1,4 @@
-import { inlineCode, StringSelectMenuInteraction } from 'discord.js';
+import { inlineCode, StringSelectMenuInteraction, ApplicationCommandOptionType } from 'discord.js';
 import {
   createStatus,
   goBackToGameModeSelection,
@@ -16,7 +16,8 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
       if (!interaction.inGuild() || !appCommands) return;
 
       if (interaction.isChatInputCommand()) {
-        const { commandName } = interaction;
+        const { commandName, options } = interaction;
+        const hasArgument = options.data[0].type === ApplicationCommandOptionType.String;
         const subCommand = interaction.options.getSubcommand(false);
         const command = appCommands.find((command) => command.data.name === commandName);
         command && (await command.execute({ interaction, app, appCommands }));
@@ -29,6 +30,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             guild: interaction.guild,
             command: commandName,
             client: mixpanel,
+            options: hasArgument ? options.data[0].value : null,
             eventName,
             subCommand,
           });

@@ -10,7 +10,7 @@ type AnalyticsEvent = {
   eventName: string;
   command?: string;
   subCommand?: string | null;
-  options?: string;
+  options?: string | number | boolean | null;
   properties?: object;
 };
 type UserProfile = {
