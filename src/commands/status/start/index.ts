@@ -39,6 +39,8 @@ import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns'
 import Scheduler from '../../../services/scheduler';
 import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
 import { isEmpty } from 'lodash';
+import { Mixpanel } from 'mixpanel';
+import { sendAnalyticsEvent } from '../../../services/analytics';
 
 const errorNotification = {
   count: 0,
@@ -238,8 +240,10 @@ export const sendStartInteraction = async ({
  */
 export const goToConfirmStatus = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
@@ -248,13 +252,14 @@ export const goToConfirmStatus = async ({
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm Error' });
   } finally {
-    // sendMixpanelEvent({
-    //   user: interaction.user,
-    //   channel: interaction.channel,
-    //   guild: interaction.guild,
-    //   client: mixpanel,
-    //   customEventName: 'Click status start gamemode select menu',
-    // });
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status start gamemode select menu',
+      });
   }
 };
 /**
@@ -263,8 +268,10 @@ export const goToConfirmStatus = async ({
  */
 export const goBackToGameModeSelection = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: ButtonInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const { embed, row } = generateGameModeSelectionMessage();
   try {
@@ -273,13 +280,14 @@ export const goBackToGameModeSelection = async ({
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Back Error' });
   } finally {
-    // sendMixpanelEvent({
-    //   user: interaction.user,
-    //   channel: interaction.channel,
-    //   guild: interaction.guild,
-    //   client: mixpanel,
-    //   customEventName: 'Click status start back button',
-    // });
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status start back button',
+      });
   }
 };
 /**
@@ -288,7 +296,13 @@ export const goBackToGameModeSelection = async ({
  * Prepended an underscore as there's a function in announcement with the same name
  * TODO: Clean up the code there eventually
  */
-export const _cancelStatusStart = async ({ interaction }: { interaction: ButtonInteraction }) => {
+export const _cancelStatusStart = async ({
+  interaction,
+  mixpanel,
+}: {
+  interaction: ButtonInteraction;
+  mixpanel?: Mixpanel | null;
+}) => {
   const embed = {
     description: 'Cancelled automatic map status config',
     color: 16711680,
@@ -299,13 +313,14 @@ export const _cancelStatusStart = async ({ interaction }: { interaction: ButtonI
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Cancel Error' });
   } finally {
-    // sendMixpanelEvent({
-    //   user: interaction.user,
-    //   channel: interaction.channel,
-    //   guild: interaction.guild,
-    //   client: mixpanel,
-    //   customEventName: 'Click status start cancel button',
-    // });
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status start cancel button',
+      });
   }
 };
 /**
@@ -327,9 +342,11 @@ export const _cancelStatusStart = async ({ interaction }: { interaction: ButtonI
 export const createStatus = async ({
   interaction,
   nessie,
+  mixpanel,
 }: {
   interaction: ButtonInteraction;
   nessie: Client;
+  mixpanel?: Mixpanel | null;
 }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
   const isArenasSelected = interaction.customId.includes('arenas');
@@ -495,16 +512,17 @@ export const createStatus = async ({
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm' });
   } finally {
-    // sendMixpanelEvent({
-    //   user: interaction.user,
-    //   channel: interaction.channel,
-    //   guild: interaction.guild,
-    //   client: mixpanel,
-    //   customEventName: 'Click status start confirm button',
-    //   properties: {
-    //     game_mode_selected: gameModeSelected,
-    //   },
-    // });
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status start confirm button',
+        properties: {
+          game_mode_selected: gameModeSelected,
+        },
+      });
   }
 };
 /**

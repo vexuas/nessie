@@ -1,4 +1,4 @@
-import { inlineCode, StringSelectMenuInteraction } from 'discord.js';
+import { inlineCode, StringSelectMenuInteraction, ApplicationCommandOptionType } from 'discord.js';
 import {
   createStatus,
   goBackToGameModeSelection,
@@ -6,6 +6,7 @@ import {
   goToConfirmStatus,
 } from '../../commands/status/start';
 import { deleteGuildStatus, _cancelStatusStop } from '../../commands/status/stop';
+import { sendAnalyticsEvent } from '../../services/analytics';
 import { sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
@@ -15,17 +16,24 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
       if (!interaction.inGuild() || !appCommands) return;
 
       if (interaction.isChatInputCommand()) {
-        const { commandName } = interaction;
+        const { commandName, options } = interaction;
+        const hasArgument = options.data[0].type === ApplicationCommandOptionType.String;
+        const subCommand = interaction.options.getSubcommand(false);
         const command = appCommands.find((command) => command.data.name === commandName);
         command && (await command.execute({ interaction, app, appCommands }));
-        // mixpanel &&
-        // 	sendCommandEvent({
-        // 		user: interaction.user,
-        // 		channel: interaction.channel,
-        // 		guild: interaction.guild,
-        // 		command: commandName,
-        // 		client: mixpanel,
-        // 	});
+
+        const eventName = `Use ${commandName}${subCommand ? ` ${subCommand}` : ''} command`;
+        mixpanel &&
+          sendAnalyticsEvent({
+            user: interaction.user,
+            channel: interaction.channel,
+            guild: interaction.guild,
+            command: commandName,
+            client: mixpanel,
+            options: hasArgument ? options.data[0].value : null,
+            eventName,
+            subCommand,
+          });
       }
       /**
        * Since components are also interactions, any user inputs from it go through this listener too
@@ -50,32 +58,33 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             color: 16711680,
           };
           await interaction.deferReply({ ephemeral: true });
-          // sendMixpanelEvent({
-          //   user: interaction.user,
-          //   channel: interaction.channel,
-          //   guild: interaction.guild,
-          //   client: mixpanel,
-          //   arguments: interaction.customId,
-          //   customEventName: 'Click wrong user button',
-          // });
+          mixpanel &&
+            sendAnalyticsEvent({
+              user: interaction.user,
+              channel: interaction.channel,
+              guild: interaction.guild,
+              client: mixpanel,
+              options: interaction.customId,
+              eventName: 'Click wrong user button',
+            });
           interaction.editReply({ embeds: [wrongUserEmbed] });
         }
         switch (interaction.customId) {
           case 'statusStart__backButton':
-            goBackToGameModeSelection({ interaction });
+            goBackToGameModeSelection({ interaction, mixpanel });
             return;
           case 'statusStart__cancelButton':
-            _cancelStatusStart({ interaction });
+            _cancelStatusStart({ interaction, mixpanel });
             return;
           case 'statusStop__cancelButton':
-            _cancelStatusStop({ interaction, app, mixpanel });
+            _cancelStatusStop({ interaction, mixpanel });
             return;
           case 'statusStop__stopButton':
-            deleteGuildStatus({ interaction, nessie: app });
+            deleteGuildStatus({ interaction, nessie: app, mixpanel });
             return;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
-              createStatus({ interaction, nessie: app });
+              createStatus({ interaction, nessie: app, mixpanel });
               return;
             }
         }
@@ -92,19 +101,23 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             color: 16711680,
           };
           await interaction.deferReply({ ephemeral: true });
-          // sendMixpanelEvent({
-          //   user: interaction.user,
-          //   channel: interaction.channel,
-          //   guild: interaction.guild,
-          //   client: mixpanel,
-          //   arguments: interaction.customId,
-          //   customEventName: 'Click wrong user select menu',
-          // });
+          mixpanel &&
+            sendAnalyticsEvent({
+              user: interaction.user,
+              channel: interaction.channel,
+              guild: interaction.guild,
+              client: mixpanel,
+              options: interaction.customId,
+              eventName: 'Click wrong user button',
+            });
           interaction.editReply({ embeds: [wrongUserEmbed] });
         }
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
-            goToConfirmStatus({ interaction: interaction as StringSelectMenuInteraction });
+            goToConfirmStatus({
+              interaction: interaction as StringSelectMenuInteraction,
+              mixpanel,
+            });
             return;
         }
       }

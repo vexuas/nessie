@@ -32,15 +32,6 @@ export default {
           break;
       }
       await interaction.editReply({ embeds: [embed] });
-      // sendMixpanelEvent(
-      //   interaction.user,
-      //   interaction.channel,
-      //   interaction.guild,
-      //   'br',
-      //   mixpanel,
-      //   optionMode,
-      //   true
-      // );
     } catch (error) {
       sendErrorLog({ error, interaction, option: optionMode });
     }
