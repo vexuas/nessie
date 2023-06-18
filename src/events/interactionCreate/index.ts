@@ -17,7 +17,8 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
 
       if (interaction.isChatInputCommand()) {
         const { commandName, options } = interaction;
-        const hasArgument = options.data[0].type === ApplicationCommandOptionType.String;
+        const hasArgument =
+          options.data[0] && options.data[0].type === ApplicationCommandOptionType.String;
         const subCommand = interaction.options.getSubcommand(false);
         const command = appCommands.find((command) => command.data.name === commandName);
         command && (await command.execute({ interaction, app, appCommands }));

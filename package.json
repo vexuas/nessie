@@ -24,10 +24,10 @@
     "release": "git fetch --tags --force && git checkout -b release/$(date +'%Y-%m-%d') && yarn auto:release && yarn update:version && git add . && git commit -m 'Update version' && git push -u origin head"
   },
   "dependencies": {
-    "axios": "^0.22.0",
     "cron": "^1.8.2",
     "date-fns": "^2.24.0",
     "discord.js": "^14.11.0",
+    "got": "11.8.6",
     "lodash": "^4.17.21",
     "mixpanel": "^0.13.0",
     "pg": "^8.7.3",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@types/cron": "^2.0.1",
+    "@types/got": "^9.6.12",
     "@types/lodash": "^4.14.195",
     "@types/pg": "^8.10.2",
     "@types/uuid": "^9.0.2",
