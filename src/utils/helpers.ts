@@ -23,6 +23,12 @@ import { v4 as uuidV4 } from 'uuid';
 import { inlineCode } from '@discordjs/builders';
 import { capitalize } from 'lodash';
 import { StatusRecord } from '../services/database';
+import {
+  MapRotationArenasRankedSchema,
+  MapRotationArenasSchema,
+  MapRotationBattleRoyaleSchema,
+  MapRotationRankedSchema,
+} from '../schemas/mapRotation';
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
@@ -333,7 +339,7 @@ export const getMapUrl = (map: string) => {
     case 'broken_moon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/1064934640739164240/broken_moon.jpg';
     default:
-      return null;
+      return '';
   }
 };
 /**
@@ -361,7 +367,10 @@ export const getCountdown = (timer: string) => {
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  * TODO: Add typing for ALS Data
  */
-export const generatePubsEmbed = (data: any, type = 'Battle Royale'): APIEmbed => {
+export const generatePubsEmbed = (
+  data: MapRotationBattleRoyaleSchema | MapRotationArenasSchema,
+  type = 'Battle Royale'
+): APIEmbed => {
   const embedData: APIEmbed = {
     title: `${type} | Pubs`,
     color: 3066993,
@@ -392,7 +401,10 @@ export const generatePubsEmbed = (data: any, type = 'Battle Royale'): APIEmbed =
  * Fairly simple, don't need any fancy timers and footers
  * TODO: Add typing for ALS Data
  */
-export const generateRankedEmbed = (data: any, type = 'Battle Royale') => {
+export const generateRankedEmbed = (
+  data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
+  type = 'Battle Royale'
+) => {
   const embedData: any = {
     title: `${type} | Ranked`,
     color: 7419530,

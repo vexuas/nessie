@@ -41,6 +41,7 @@ import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
 import { isEmpty } from 'lodash';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../../../services/analytics';
+import { MapRotationAPIObject } from '../../../schemas/mapRotation';
 
 const errorNotification = {
   count: 0,
@@ -167,7 +168,7 @@ const generateConfirmStatusMessage = ({
  * Had to split it between br and arenas after seeing that
  * TODO: Add typing for ALS Data
  */
-const generateBattleRoyaleStatusEmbeds = (data: any) => {
+const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
   const informationEmbed = {
@@ -187,7 +188,7 @@ const generateBattleRoyaleStatusEmbeds = (data: any) => {
  * Had to split it between br and arenas after seeing that
  * TODO: Add typing for ALS Data
  */
-const generateArenasStatusEmbeds = (data: any) => {
+const generateArenasStatusEmbeds = (data: MapRotationAPIObject) => {
   const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
   const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {

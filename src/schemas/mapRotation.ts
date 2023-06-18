@@ -48,11 +48,11 @@ export interface MapRotationArenasSchema {
 }
 export interface MapRotationRankedSchema {
   current: MapRotationCurrentSchema;
-  next: MapRotationNextSchema;
+  next?: MapRotationNextSchema;
 }
 export interface MapRotationArenasRankedSchema {
   current: MapRotationCurrentSchema;
-  next: MapRotationNextSchema;
+  next?: MapRotationNextSchema;
 }
 export interface MapRotationLimitedTimeMapSchema {
   current: MapRotationLimitedTimeMapCurrentSchema;
