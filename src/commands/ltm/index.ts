@@ -1,19 +1,19 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { APIEmbed, SlashCommandBuilder } from 'discord.js';
 import { getLimitedTimeEvent } from '../../services/adapters';
 import { getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
-//TODO: Add typing after upgrading to djs v14
-export const generateLimitedTimeEventEmbed = (data: any) => {
+//TODO: Add typing for ALS Data
+export const generateLimitedTimeEventEmbed = (data: any): APIEmbed => {
   const mapURL = getMapUrl(data.current.code);
-  const embedData = {
+  const embedData: APIEmbed = {
     title: data.current.eventName,
     description: '',
     color: 15105570,
     image: {
       url: mapURL && mapURL.length > 0 ? mapURL : data.current.asset,
     },
-    timestamp: Date.now() + data.current.remainingSecs * 1000,
+    timestamp: new Date(Date.now() + data.current.remainingSecs * 1000).toISOString(),
     footer: {
       text: `Next Map: ${data.next.map}`,
     },

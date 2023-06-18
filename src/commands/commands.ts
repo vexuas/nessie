@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Client, CommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, Client } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -9,7 +9,7 @@ export type AppCommand = {
   execute: (data: AppCommandOptions) => Promise<void>;
 };
 export type AppCommandOptions = {
-  interaction: CommandInteraction;
+  interaction: ChatInputCommandInteraction;
   app: Client;
   appCommands?: AppCommand[];
 };

@@ -12,7 +12,7 @@ type GuildRecord = {
   prefix: string;
   use_prefix: boolean;
 };
-type StatusRecord = {
+export type StatusRecord = {
   uuid: string;
   guild_id: string;
   category_channel_id: string;

@@ -6,12 +6,12 @@ import { sendErrorLog, serverNotificationEmbed } from '../../utils/helpers';
 import { Guild, WebhookClient } from 'discord.js';
 import { nessieLogo } from '../../utils/constants';
 
-export default function ({ nessie }: EventModule) {
-  nessie.on('guildDelete', async (guild: Guild) => {
+export default function ({ app }: EventModule) {
+  app.on('guildDelete', async (guild: Guild) => {
     try {
       DATABASE_CONFIG && (await deleteGuild(guild));
       if (GUILD_NOTIFICATION_WEBHOOK_URL && !isEmpty(GUILD_NOTIFICATION_WEBHOOK_URL)) {
-        const embed = await serverNotificationEmbed({ app: nessie, guild, type: 'leave' });
+        const embed = await serverNotificationEmbed({ app, guild, type: 'leave' });
         const notificationWebhook = new WebhookClient({ url: GUILD_NOTIFICATION_WEBHOOK_URL });
         await notificationWebhook.send({
           embeds: [embed],

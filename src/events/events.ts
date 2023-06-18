@@ -8,18 +8,18 @@ import { sendErrorLog } from '../utils/helpers';
 const appCommands = getApplicationCommands();
 
 interface Props {
-  nessie: Client;
+  app: Client;
   mixpanel: Mixpanel | null;
 }
 type ExportedEventModule = {
   default: (data: EventModule) => void;
 };
 export type EventModule = {
-  nessie: Client;
+  app: Client;
   appCommands?: AppCommand[];
   mixpanel?: Mixpanel | null;
 };
-export function registerEventHandlers({ nessie, mixpanel }: Props): void {
+export function registerEventHandlers({ app, mixpanel }: Props): void {
   const loadModules = (directoryPath: string) => {
     fs.readdir(directoryPath, { withFileTypes: true }, (error, files) => {
       if (error) {
@@ -34,7 +34,7 @@ export function registerEventHandlers({ nessie, mixpanel }: Props): void {
           if (file.name === 'index.js') {
             const modulePath = `.${filePath.replace('dist/events', '')}`;
             const currentModule = require(modulePath) as ExportedEventModule;
-            currentModule.default({ nessie, appCommands, mixpanel });
+            currentModule.default({ app, appCommands, mixpanel });
           }
         });
     });

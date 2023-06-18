@@ -1,8 +1,8 @@
 import { sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
-export default function ({ nessie }: EventModule) {
-  nessie.on('rateLimit', async (data) => {
+export default function ({ app }: EventModule) {
+  app.on('rateLimit', async (data) => {
     try {
       const error = {
         message: data

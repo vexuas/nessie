@@ -1,9 +1,17 @@
-import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  ChannelType,
+  ChatInputCommandInteraction,
+  Client,
+  inlineCode,
+} from 'discord.js';
 import { deleteStatus, getStatus } from '../../../services/database';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
-  codeBlock,
   sendErrorLog,
   sendMissingAllPermissionsError,
   sendMissingBotPermissionsError,
@@ -20,10 +28,10 @@ export const sendStopInteraction = async ({
   interaction,
   subCommand,
 }: {
-  interaction: CommandInteraction;
+  interaction: ChatInputCommandInteraction;
   subCommand: string;
 }) => {
-  const status = await getStatus(interaction.guildId);
+  const status = await getStatus(interaction.guildId ?? '');
   const { hasMissingPermissions } = checkMissingBotPermissions(interaction);
   const isManageServerUser = checkIfUserHasManageServer(interaction);
   if (status) {
@@ -48,23 +56,23 @@ export const sendStopInteraction = async ({
           }\n• Webhooks under each status channel\n\nThis status was created at ${
             status.created_at
           } by ${status.created_by}`
-        : `There's currently no active automated map status to stop.\n\nTry starting one with ${codeBlock(
+        : `There's currently no active automated map status to stop.\n\nTry starting one with ${inlineCode(
             '/status start'
           )}`,
     };
     const row = status
-      ? new MessageActionRow()
+      ? new ActionRowBuilder<ButtonBuilder>()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId('statusStop__cancelButton')
               .setLabel('Cancel')
-              .setStyle('SECONDARY')
+              .setStyle(ButtonStyle.Secondary)
           )
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId('statusStop__stopButton')
               .setLabel(`Stop it!`)
-              .setStyle('DANGER')
+              .setStyle(ButtonStyle.Danger)
           )
       : null;
     await interaction.editReply({ components: row ? [row] : [], embeds: [embed] });
@@ -108,8 +116,14 @@ export const _cancelStatusStop = async ({ interaction }: any) => {
  *
  * We don't need to delete the webhooks as they'll be automatically deleted along with its channels
  */
-export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
-  const status = await deleteStatus(interaction.guildId);
+export const deleteGuildStatus = async ({
+  interaction,
+  nessie,
+}: {
+  interaction: ButtonInteraction;
+  nessie: Client;
+}) => {
+  const status = await deleteStatus(interaction.guildId ?? '');
   try {
     await interaction.deferUpdate();
     if (status) {
@@ -142,11 +156,13 @@ export const deleteGuildStatus = async ({ interaction, nessie }: any) => {
         fields: [
           {
             name: 'Guild',
-            value: interaction.guild.name,
+            value: interaction.guild ? interaction.guild.name : '',
           },
         ],
       };
-      await statusLogChannel.send({ embeds: [statusLogEmbed] });
+      statusLogChannel &&
+        statusLogChannel.type === ChannelType.GuildText &&
+        (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
     }
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Stop Error' });

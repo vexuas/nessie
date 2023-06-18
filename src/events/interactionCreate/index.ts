@@ -1,3 +1,4 @@
+import { inlineCode, StringSelectMenuInteraction } from 'discord.js';
 import {
   createStatus,
   goBackToGameModeSelection,
@@ -5,18 +6,18 @@ import {
   goToConfirmStatus,
 } from '../../commands/status/start';
 import { deleteGuildStatus, _cancelStatusStop } from '../../commands/status/stop';
-import { codeBlock, sendErrorLog } from '../../utils/helpers';
+import { sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
-export default function ({ nessie, mixpanel, appCommands }: EventModule) {
-  nessie.on('interactionCreate', async (interaction) => {
+export default function ({ app, mixpanel, appCommands }: EventModule) {
+  app.on('interactionCreate', async (interaction) => {
     try {
       if (!interaction.inGuild() || !appCommands) return;
 
-      if (interaction.isCommand()) {
+      if (interaction.isChatInputCommand()) {
         const { commandName } = interaction;
         const command = appCommands.find((command) => command.data.name === commandName);
-        command && (await command.execute({ interaction, app: nessie, appCommands }));
+        command && (await command.execute({ interaction, app, appCommands }));
         // mixpanel &&
         // 	sendCommandEvent({
         // 		user: interaction.user,
@@ -43,7 +44,7 @@ export default function ({ nessie, mixpanel, appCommands }: EventModule) {
           interaction.user.id !== interaction.message.interaction.user.id
         ) {
           const wrongUserEmbed = {
-            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
+            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
               '/help'
             )}!`,
             color: 16711680,
@@ -61,27 +62,31 @@ export default function ({ nessie, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__backButton':
-            goBackToGameModeSelection({ interaction, nessie, mixpanel });
+            goBackToGameModeSelection({ interaction });
             return;
           case 'statusStart__cancelButton':
-            _cancelStatusStart({ interaction, nessie, mixpanel });
+            _cancelStatusStart({ interaction });
+            return;
           case 'statusStop__cancelButton':
-            _cancelStatusStop({ interaction, nessie, mixpanel });
+            _cancelStatusStop({ interaction, app, mixpanel });
+            return;
           case 'statusStop__stopButton':
-            deleteGuildStatus({ interaction, nessie, mixpanel });
+            deleteGuildStatus({ interaction, nessie: app });
+            return;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
-              createStatus({ interaction, nessie, mixpanel });
+              createStatus({ interaction, nessie: app });
+              return;
             }
         }
       }
-      if (interaction.isSelectMenu()) {
+      if (interaction.isAnySelectMenu()) {
         if (
           interaction.message.interaction &&
           interaction.user.id !== interaction.message.interaction.user.id
         ) {
           const wrongUserEmbed = {
-            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${codeBlock(
+            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
               '/help'
             )}!`,
             color: 16711680,
@@ -99,7 +104,8 @@ export default function ({ nessie, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
-            goToConfirmStatus({ interaction, nessie, mixpanel });
+            goToConfirmStatus({ interaction: interaction as StringSelectMenuInteraction });
+            return;
         }
       }
     } catch (error) {

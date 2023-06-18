@@ -1,5 +1,4 @@
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v10';
+import { REST, Routes } from 'discord.js';
 import { AppCommand } from '../../commands/commands';
 import { scheduleStatus } from '../../commands/status/start';
 import { BOT_ID, BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
@@ -52,33 +51,32 @@ const setCurrentMapStatus = (data: any, channel: any, nessie: any) => {
       nessie.user.setActivity(updatedBrPubsData.current.map);
       sendHealthLog(updatedBrPubsData, channel, isAccurate);
       setTimeout(intervalRequest, currentTimer);
-    } catch (e) {
-      console.log(e);
-      channel.send('<@183444648360935424> WHOOPS SOMETHING WENT WRONG');
+    } catch (error) {
+      sendErrorLog({ error });
     }
   };
   setTimeout(intervalRequest, currentTimer); //Start initial timer
 };
 
-export default function ({ nessie, appCommands }: EventModule) {
-  nessie.once('ready', async () => {
+export default function ({ app, appCommands }: EventModule) {
+  app.once('ready', async () => {
     try {
       await registerApplicationCommands(appCommands);
       if (DATABASE_CONFIG) {
         await createGuildTable();
-        await populateGuilds(nessie.guilds.cache);
+        await populateGuilds(app.guilds.cache);
         await createStatusTable();
       }
-      await sendBootNotification(nessie);
+      await sendBootNotification(app);
 
       //TODO: See if we even need the health log
-      const logChannel = nessie.channels.cache.get('899620845436141609');
+      const logChannel = app.channels.cache.get('899620845436141609');
       const brPubsData = await getBattleRoyalePubs();
-      nessie.user && nessie.user.setActivity(brPubsData.current.map);
+      app.user && app.user.setActivity(brPubsData.current.map);
       sendHealthLog(brPubsData, logChannel, true);
-      setCurrentMapStatus(brPubsData, logChannel, nessie);
+      setCurrentMapStatus(brPubsData, logChannel, app);
 
-      const statusSchedule = scheduleStatus(nessie);
+      const statusSchedule = scheduleStatus(app);
       statusSchedule.start();
     } catch (error) {
       sendErrorLog({ error });
