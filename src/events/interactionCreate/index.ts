@@ -6,6 +6,7 @@ import {
   goToConfirmStatus,
 } from '../../commands/status/start';
 import { deleteGuildStatus, _cancelStatusStop } from '../../commands/status/stop';
+import { sendCommandEvent } from '../../services/analytics';
 import { sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
@@ -16,16 +17,18 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
 
       if (interaction.isChatInputCommand()) {
         const { commandName } = interaction;
+        const subCommand = interaction.options.getSubcommand(false);
         const command = appCommands.find((command) => command.data.name === commandName);
         command && (await command.execute({ interaction, app, appCommands }));
-        // mixpanel &&
-        // 	sendCommandEvent({
-        // 		user: interaction.user,
-        // 		channel: interaction.channel,
-        // 		guild: interaction.guild,
-        // 		command: commandName,
-        // 		client: mixpanel,
-        // 	});
+        mixpanel &&
+          sendCommandEvent({
+            user: interaction.user,
+            channel: interaction.channel,
+            guild: interaction.guild,
+            command: commandName,
+            client: mixpanel,
+            subCommand,
+          });
       }
       /**
        * Since components are also interactions, any user inputs from it go through this listener too

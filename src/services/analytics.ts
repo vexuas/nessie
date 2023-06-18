@@ -1,6 +1,5 @@
 import { Guild, GuildTextBasedChannel, User } from 'discord.js';
 import { Mixpanel } from 'mixpanel';
-import { capitalize } from 'lodash';
 
 //TODO: Check if sub commands are being tracked correctly
 type CommandEvent = {
@@ -9,6 +8,7 @@ type CommandEvent = {
   channel: GuildTextBasedChannel | null;
   guild: Guild | null;
   command: string;
+  subCommand: string | null;
   options?: string;
   properties?: object;
 };
@@ -40,12 +40,13 @@ export function sendCommandEvent({
   channel,
   guild,
   command,
+  subCommand,
   client,
   options,
   properties,
 }: CommandEvent) {
   setUserProfile({ client, user, guild, channel, command });
-  const eventName = `Use ${capitalize(command)} Command`;
+  const eventName = `Use ${command}${subCommand ? ` ${subCommand}` : ''} command`;
 
   client.track(eventName, {
     distinct_id: user.id,
