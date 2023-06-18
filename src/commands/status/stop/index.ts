@@ -8,6 +8,8 @@ import {
   Client,
   inlineCode,
 } from 'discord.js';
+import { Mixpanel } from 'mixpanel';
+import { sendAnalyticsEvent } from '../../../services/analytics';
 import { deleteStatus, getStatus } from '../../../services/database';
 import {
   checkIfUserHasManageServer,
@@ -84,7 +86,13 @@ export const sendStopInteraction = async ({
  * Handler for when a user clicks the cancel button of /status stop
  * Pretty straightforward; we just edit the initial message with a cancel message similar to the cancel start handler
  */
-export const _cancelStatusStop = async ({ interaction }: any) => {
+export const _cancelStatusStop = async ({
+  interaction,
+  mixpanel,
+}: {
+  interaction: ButtonInteraction;
+  mixpanel?: Mixpanel | null;
+}) => {
   const embed = {
     description: 'Cancelled automated map status deletion',
     color: 16711680,
@@ -95,13 +103,14 @@ export const _cancelStatusStop = async ({ interaction }: any) => {
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Stop Cancel Error' });
   } finally {
-    // sendMixpanelEvent({
-    //   user: interaction.user,
-    //   channel: interaction.channel,
-    //   guild: interaction.guild,
-    //   client: mixpanel,
-    //   customEventName: 'Click status stop cancel button',
-    // });
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status stop cancel button',
+      });
   }
 };
 /**
@@ -119,9 +128,11 @@ export const _cancelStatusStop = async ({ interaction }: any) => {
 export const deleteGuildStatus = async ({
   interaction,
   nessie,
+  mixpanel,
 }: {
   interaction: ButtonInteraction;
   nessie: Client;
+  mixpanel?: Mixpanel | null;
 }) => {
   const status = await deleteStatus(interaction.guildId ?? '');
   try {
@@ -167,12 +178,13 @@ export const deleteGuildStatus = async ({
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Stop Error' });
   } finally {
-    // sendMixpanelEvent({
-    //   user: interaction.user,
-    //   channel: interaction.channel,
-    //   guild: interaction.guild,
-    //   client: mixpanel,
-    //   customEventName: 'Click status stop delete button',
-    // });
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status stop delete button',
+      });
   }
 };

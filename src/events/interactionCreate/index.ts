@@ -74,10 +74,10 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             _cancelStatusStart({ interaction, mixpanel });
             return;
           case 'statusStop__cancelButton':
-            _cancelStatusStop({ interaction, app, mixpanel });
+            _cancelStatusStop({ interaction, mixpanel });
             return;
           case 'statusStop__stopButton':
-            deleteGuildStatus({ interaction, nessie: app });
+            deleteGuildStatus({ interaction, nessie: app, mixpanel });
             return;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
