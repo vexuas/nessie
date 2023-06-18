@@ -1,51 +1,38 @@
-import axios from 'axios';
 import got from 'got';
 import { ALS_API_KEY } from '../config/environment';
+import {
+  MapRotationAPIObject,
+  MapRotationArenasRankedSchema,
+  MapRotationArenasSchema,
+  MapRotationBattleRoyaleSchema,
+  MapRotationLimitedTimeMapSchema,
+  MapRotationRankedSchema,
+} from '../schemas/mapRotation';
 
 //Documentation on API: https://apexlegendsapi.com/documentation.php
 const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
 
-//TODO: Add schema for ALS responses
-export async function getRotationData(): Promise<any> {
+export async function getRotationData(): Promise<MapRotationAPIObject> {
   const response: string = (await got.get(url)).body;
   return JSON.parse(response);
 }
-export const getBattleRoyalePubs = async () => {
+export async function getBattleRoyalePubs(): Promise<MapRotationBattleRoyaleSchema> {
   const response = await getRotationData();
   return response.battle_royale;
-};
-export const getBattleRoyaleRanked = async () => {
-  const data = await axios.get(url).then((response: any) => {
-    return response.data.ranked;
-  });
-  console.log(data);
-  return data;
-};
-export const getArenasPubs = async () => {
-  const data = await axios.get(url).then((response: any) => {
-    return response.data.arenas;
-  });
-  console.log(data);
-  return data;
-};
-export const getArenasRanked = async () => {
-  const data = await axios.get(url).then((response: any) => {
-    return response.data.arenasRanked;
-  });
-  console.log(data);
-  return data;
-};
-export const getControlPubs = async () => {
-  const data = await axios.get(url).then((response: any) => {
-    return response.data.control;
-  });
-  console.log(data);
-  return data;
-};
-export const getLimitedTimeEvent = async () => {
-  const data = await axios.get(url).then((response: any) => {
-    return response.data.ltm;
-  });
-  console.log(data);
-  return data;
-};
+}
+export async function getBattleRoyaleRanked(): Promise<MapRotationRankedSchema> {
+  const response = await getRotationData();
+  return response.ranked;
+}
+export async function getArenasPubs(): Promise<MapRotationArenasSchema> {
+  const response = await getRotationData();
+  return response.arenas;
+}
+export async function getArenasRanked(): Promise<MapRotationArenasRankedSchema> {
+  const response = await getRotationData();
+  return response.arenasRanked;
+}
+export async function getLimitedTimeEvent(): Promise<MapRotationLimitedTimeMapSchema> {
+  const response = await getRotationData();
+  return response.ltm;
+}
