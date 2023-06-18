@@ -10,8 +10,8 @@ import {
   Client,
   ChannelType,
   PermissionsBitField,
-  AnySelectMenuInteraction,
   inlineCode,
+  StringSelectMenuInteraction,
 } from 'discord.js';
 import {
   deleteStatus,
@@ -102,7 +102,7 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
 const generateConfirmStatusMessage = ({
   interaction,
 }: {
-  interaction: AnySelectMenuInteraction;
+  interaction: StringSelectMenuInteraction;
 }) => {
   /**
    * The game mode selections are passed down from the dropdown interaction in step 1
@@ -239,7 +239,7 @@ export const sendStartInteraction = async ({
 export const goToConfirmStatus = async ({
   interaction,
 }: {
-  interaction: AnySelectMenuInteraction;
+  interaction: StringSelectMenuInteraction;
 }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {

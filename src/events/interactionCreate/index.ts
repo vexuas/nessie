@@ -1,4 +1,4 @@
-import { inlineCode } from 'discord.js';
+import { inlineCode, StringSelectMenuInteraction } from 'discord.js';
 import {
   createStatus,
   goBackToGameModeSelection,
@@ -80,7 +80,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             }
         }
       }
-      if (interaction.isSelectMenu()) {
+      if (interaction.isAnySelectMenu()) {
         if (
           interaction.message.interaction &&
           interaction.user.id !== interaction.message.interaction.user.id
@@ -104,7 +104,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         }
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
-            goToConfirmStatus({ interaction });
+            goToConfirmStatus({ interaction: interaction as StringSelectMenuInteraction });
             return;
         }
       }
