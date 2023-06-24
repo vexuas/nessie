@@ -1,4 +1,4 @@
-import { REST, Routes } from 'discord.js';
+import { REST, Routes, TextChannel } from 'discord.js';
 import { AppCommand } from '../../commands/commands';
 import { scheduleStatus } from '../../commands/status/start';
 import { BOT_ID, BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
@@ -70,7 +70,7 @@ export default function ({ app, appCommands }: EventModule) {
       await sendBootNotification(app);
 
       //TODO: See if we even need the health log
-      const logChannel = app.channels.cache.get('899620845436141609');
+      const logChannel = app.channels.cache.get('899620845436141609') as TextChannel | undefined;
       const brPubsData = await getBattleRoyalePubs();
       app.user && app.user.setActivity(brPubsData.current.map);
       sendHealthLog(brPubsData, logChannel, true);

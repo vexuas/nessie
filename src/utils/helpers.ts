@@ -12,6 +12,7 @@ import {
   PermissionFlagsBits,
   ButtonInteraction,
   GuildMember,
+  TextChannel,
 } from 'discord.js';
 import {
   BOOT_NOTIFICATION_CHANNEL_ID,
@@ -37,10 +38,13 @@ import { sendAnalyticsEvent } from '../services/analytics';
  * @data - br data object
  * @channel - log channel in Nessie's Canyon (#health: 899620845436141609)
  * @isAccurate - whether the data received is up-to-date
- * TODO: Add typing for ALS Data
- * TODO: Check if this is even necessary
+ * TODO: Revisit if this is necessary
  */
-export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
+export const sendHealthLog = (
+  data: MapRotationBattleRoyaleSchema,
+  channel: TextChannel | undefined,
+  isAccurate: boolean
+) => {
   const utcStart = new Date(data.current.readableDate_start);
   const sgtStart = new Date(utcStart.getTime() + 28800000);
   const utcEnd = new Date(data.current.readableDate_end);
@@ -76,6 +80,7 @@ export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
       },
     ],
   };
+  if (!channel) return;
   isAccurate
     ? channel.send({ embeds: [embed] })
     : channel.send({ content: '<@183444648360935424>', embeds: [embed] });
@@ -89,7 +94,7 @@ export const serverNotificationEmbed = async ({
   app: Client;
   guild: Guild;
   type: 'join' | 'leave';
-}): Promise<any> => {
+}): Promise<APIEmbed> => {
   const defaultIcon =
     'https://cdn.discordapp.com/attachments/248430185463021569/614789995596742656/Wallpaper2.png';
   const guildIcon = guild.icon && guild.iconURL();
@@ -137,7 +142,7 @@ export const serverNotificationEmbed = async ({
  * @param message - error description/message
  * @param uuid - error uuid
  * @param nessie = client
- * TODO: Refactor this
+ * TODO: Revisit if this is necessary
  */
 export const generateErrorEmbed = async (
   error: any,
@@ -253,6 +258,7 @@ export const sendErrorLog = async ({
 /**
  * Handler for errors concerning status cycles
  * Same as above, only difference is the embed content
+ * TODO: Revisit if this is necessary
  */
 export const sendStatusErrorLog = async ({
   nessie,
@@ -319,6 +325,7 @@ export const generateAnnouncementMessage = (prefix: string) => {
  * These assets don't look good however I've decided to use them for now as it's direct
  * Manually wiring them up to our images isn't scalable either
  * I'll just leave this comment so I get reminded about it in the future
+ * TODO: Revisit if this is necessary
  */
 export const getMapUrl = (map: string) => {
   switch (map) {
@@ -367,7 +374,6 @@ export const getCountdown = (timer: string) => {
  * Embed design for any pubs map
  * Added a hack to display the time for next map regardless of timezone
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
- * TODO: Add typing for ALS Data
  */
 export const generatePubsEmbed = (
   data: MapRotationBattleRoyaleSchema | MapRotationArenasSchema,
@@ -401,7 +407,6 @@ export const generatePubsEmbed = (
 /**
  * Embed design for any ranked map
  * Fairly simple, don't need any fancy timers and footers
- * TODO: Add typing for ALS Data
  */
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
@@ -434,7 +439,7 @@ export const generateRankedEmbed = (
   }
   return embedData;
 };
-
+//TODO: Refactor this someday
 export const checkMissingBotPermissions = (interaction: ChatInputCommandInteraction) => {
   const { guild } = interaction;
 
