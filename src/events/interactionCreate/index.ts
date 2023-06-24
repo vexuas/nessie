@@ -59,9 +59,11 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
           case 'statusStop__stopButton':
             deleteGuildStatus({ interaction, nessie: app, mixpanel });
             break;
-          case 'statusStart__confirmButton':
-            createStatus({ interaction, nessie: app, mixpanel });
-            break;
+          default:
+            if (interaction.customId.includes('statusStart__confirmButton')) {
+              createStatus({ interaction, nessie: app, mixpanel });
+              return;
+            }
         }
       }
       if (interaction.isAnySelectMenu()) {

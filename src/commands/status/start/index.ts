@@ -544,7 +544,7 @@ export const createStatus = async ({
  * More detailed explanation here: https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658
  */
 export const scheduleStatus = (nessie: Client) => {
-  return new Scheduler('5 */15 * * * *', async () => {
+  return new Scheduler('5 */1 * * * *', async () => {
     errorNotification.count = 0;
     errorNotification.message = '';
     const startTime = Date.now();
