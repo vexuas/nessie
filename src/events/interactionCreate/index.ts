@@ -36,47 +36,42 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             subCommand,
           });
       }
-      if (interaction.isButton()) {
-        if (
-          interaction.message.interaction &&
-          interaction.user.id !== interaction.message.interaction.user.id
-        ) {
-          await sendWrongUserWarning({ interaction, mixpanel });
-        } else {
-          switch (interaction.customId) {
-            case 'statusStart__backButton':
-              goBackToGameModeSelection({ interaction, mixpanel });
-              break;
-            case 'statusStart__cancelButton':
-              _cancelStatusStart({ interaction, mixpanel });
-              break;
-            case 'statusStop__cancelButton':
-              _cancelStatusStop({ interaction, mixpanel });
-              break;
-            case 'statusStop__stopButton':
-              deleteGuildStatus({ interaction, nessie: app, mixpanel });
-              break;
-            case 'statusStart__confirmButton':
-              createStatus({ interaction, nessie: app, mixpanel });
-              break;
-          }
-        }
-      }
-      if (interaction.isAnySelectMenu()) {
+      if (interaction.isButton() || interaction.isAnySelectMenu()) {
         if (
           interaction.message.interaction &&
           interaction.user.id !== interaction.message.interaction.user.id
         ) {
           sendWrongUserWarning({ interaction, mixpanel });
-        } else {
-          switch (interaction.customId) {
-            case 'statusStart__gameModeDropdown':
-              goToConfirmStatus({
-                interaction: interaction as StringSelectMenuInteraction,
-                mixpanel,
-              });
-              break;
-          }
+          return;
+        }
+      }
+      if (interaction.isButton()) {
+        switch (interaction.customId) {
+          case 'statusStart__backButton':
+            goBackToGameModeSelection({ interaction, mixpanel });
+            break;
+          case 'statusStart__cancelButton':
+            _cancelStatusStart({ interaction, mixpanel });
+            break;
+          case 'statusStop__cancelButton':
+            _cancelStatusStop({ interaction, mixpanel });
+            break;
+          case 'statusStop__stopButton':
+            deleteGuildStatus({ interaction, nessie: app, mixpanel });
+            break;
+          case 'statusStart__confirmButton':
+            createStatus({ interaction, nessie: app, mixpanel });
+            break;
+        }
+      }
+      if (interaction.isAnySelectMenu()) {
+        switch (interaction.customId) {
+          case 'statusStart__gameModeDropdown':
+            goToConfirmStatus({
+              interaction: interaction as StringSelectMenuInteraction,
+              mixpanel,
+            });
+            break;
         }
       }
     } catch (error) {
