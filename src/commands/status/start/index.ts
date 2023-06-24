@@ -12,6 +12,7 @@ import {
   PermissionsBitField,
   inlineCode,
   StringSelectMenuInteraction,
+  TextChannel,
 } from 'discord.js';
 import {
   deleteStatus,
@@ -621,7 +622,15 @@ const handleStatusCycle = async ({
   totalCount,
   brStatusEmbeds,
   arenasStatusEmbeds,
-}: any) => {
+}: {
+  nessie: Client;
+  status: StatusRecord;
+  index?: number;
+  startTime?: number;
+  totalCount?: number;
+  brStatusEmbeds: APIEmbed[];
+  arenasStatusEmbeds: APIEmbed[];
+}) => {
   try {
     const brWebhook =
       status.br_webhook_id &&
@@ -650,9 +659,11 @@ const handleStatusCycle = async ({
      * This is placed here instead of finally as somehow the latter gets fired even before the loop ends
      * Added time fields so we can monitor how long a cycle finishes
      */
-    if (index === totalCount - 1) {
+    if (totalCount && index === totalCount - 1) {
       const endTime = Date.now();
-      const statusLogChannel = nessie.channels.cache.get('976863441526595644');
+      const statusLogChannel = nessie.channels.cache.get('976863441526595644') as
+        | TextChannel
+        | undefined;
       const statusLogEmbed = {
         title: 'Nessie | Auto Map Status Log',
         description: 'Successfully finished status cycle',
@@ -660,12 +671,12 @@ const handleStatusCycle = async ({
         fields: [
           {
             name: 'Status Count',
-            value: inlineCode(totalCount),
+            value: inlineCode(totalCount.toString()),
             inline: true,
           },
           {
             name: 'Start Time',
-            value: inlineCode(format(startTime, 'dd MMM yyyy, h:mm:ss a')),
+            value: startTime ? inlineCode(format(startTime, 'dd MMM yyyy, h:mm:ss a')) : '-',
           },
           {
             name: 'End Time',
@@ -673,16 +684,18 @@ const handleStatusCycle = async ({
           },
           {
             name: 'Time Taken',
-            value: inlineCode(
-              `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
-                endTime,
-                startTime
-              )} milliseconds`
-            ),
+            value: startTime
+              ? inlineCode(
+                  `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
+                    endTime,
+                    startTime
+                  )} milliseconds`
+                )
+              : '-',
           },
         ],
       };
-      await statusLogChannel.send({ embeds: [statusLogEmbed] });
+      statusLogChannel && (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
     }
   } catch (error: any) {
     /**
@@ -698,7 +711,7 @@ const handleStatusCycle = async ({
     errorNotification.message = error.message;
     const uuid = uuidV4();
     errorNotification.count <= 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
-    if (errorNotification.count !== 0 && index === totalCount - 1) {
+    if (errorNotification.count !== 0 && totalCount && index === totalCount - 1) {
       const errorEmbed = {
         title: 'Error Summary | Status Cycle',
         color: 16711680,
@@ -730,27 +743,29 @@ const handleStatusCycle = async ({
         //Uses cache on status channels so it doesn't fail when they dont exist
         //Might have to revamp these when we have to do sharding
         const battleRoyaleStatusChannel =
-          status.br_channel_id && (await nessie.channels.cache.get(status.br_channel_id));
+          status.br_channel_id && nessie.channels.cache.get(status.br_channel_id);
         const arenasStatusChannel =
-          status.arenas_channel_id && (await nessie.channels.cache.get(status.arenas_channel_id));
+          status.arenas_channel_id && nessie.channels.cache.get(status.arenas_channel_id);
         const categoryStatusChannel =
-          status.category_channel_id &&
-          (await nessie.channels.cache.get(status.category_channel_id));
+          status.category_channel_id && nessie.channels.cache.get(status.category_channel_id);
         battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
         arenasStatusChannel && (await arenasStatusChannel.delete());
         categoryStatusChannel && (await categoryStatusChannel.delete());
-        const originalChannel = await nessie.channels.fetch(status.original_channel_id);
-        await originalChannel.send({
-          embeds: [
-            {
-              title: 'Automatic Map Status Error',
-              description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${inlineCode(
-                '/status start'
-              )}`,
-              color: 16711680,
-            },
-          ],
-        });
+        const originalChannel = (await nessie.channels.fetch(
+          status.original_channel_id
+        )) as TextChannel | null;
+        originalChannel &&
+          (await originalChannel.send({
+            embeds: [
+              {
+                title: 'Automatic Map Status Error',
+                description: `Oops looks like one of the channels/webhooks/messages for map status got deleted!\nNessie needs these to properly send map updates so please refrain from manually deleting them.\n\nMap status has been temporarily stopped. To start it again, use ${inlineCode(
+                  '/status start'
+                )}`,
+                color: 16711680,
+              },
+            ],
+          }));
       } catch (error) {
         const uuid = uuidV4();
         await sendStatusErrorLog({ nessie, uuid, error, status });

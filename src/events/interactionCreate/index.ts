@@ -1,4 +1,4 @@
-import { inlineCode, StringSelectMenuInteraction, ApplicationCommandOptionType } from 'discord.js';
+import { StringSelectMenuInteraction, ApplicationCommandOptionType } from 'discord.js';
 import {
   createStatus,
   goBackToGameModeSelection,
@@ -7,7 +7,7 @@ import {
 } from '../../commands/status/start';
 import { deleteGuildStatus, _cancelStatusStop } from '../../commands/status/stop';
 import { sendAnalyticsEvent } from '../../services/analytics';
-import { sendErrorLog } from '../../utils/helpers';
+import { sendErrorLog, sendWrongUserWarning } from '../../utils/helpers';
 import { EventModule } from '../events';
 
 export default function ({ app, mixpanel, appCommands }: EventModule) {
@@ -36,53 +36,29 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             subCommand,
           });
       }
-      /**
-       * Since components are also interactions, any user inputs from it go through this listener too
-       * This does prove to be a hassle code readability wise as the handlers for these interactions are now detached from their own files
-       * Tried to make it less ugly tho and house the implementations inside functions and call them here
-       * Will still have to check the customId for each of the buttons here though
-       */
-      if (interaction.isButton()) {
-        /**
-         * Fancy handling of when the wrong user tries to use someone else's interactions
-         * Fortunately discord has the original interaction attached to the current one's payload which makes this straightforward
-         * We'll send the wrong user an ephemeral reply indicating that they can only use their own commands
-         */
+      if (interaction.isButton() || interaction.isAnySelectMenu()) {
         if (
           interaction.message.interaction &&
           interaction.user.id !== interaction.message.interaction.user.id
         ) {
-          const wrongUserEmbed = {
-            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
-              '/help'
-            )}!`,
-            color: 16711680,
-          };
-          await interaction.deferReply({ ephemeral: true });
-          mixpanel &&
-            sendAnalyticsEvent({
-              user: interaction.user,
-              channel: interaction.channel,
-              guild: interaction.guild,
-              client: mixpanel,
-              options: interaction.customId,
-              eventName: 'Click wrong user button',
-            });
-          interaction.editReply({ embeds: [wrongUserEmbed] });
+          sendWrongUserWarning({ interaction, mixpanel });
+          return;
         }
+      }
+      if (interaction.isButton()) {
         switch (interaction.customId) {
           case 'statusStart__backButton':
             goBackToGameModeSelection({ interaction, mixpanel });
-            return;
+            break;
           case 'statusStart__cancelButton':
             _cancelStatusStart({ interaction, mixpanel });
-            return;
+            break;
           case 'statusStop__cancelButton':
             _cancelStatusStop({ interaction, mixpanel });
-            return;
+            break;
           case 'statusStop__stopButton':
             deleteGuildStatus({ interaction, nessie: app, mixpanel });
-            return;
+            break;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
               createStatus({ interaction, nessie: app, mixpanel });
@@ -91,35 +67,13 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         }
       }
       if (interaction.isAnySelectMenu()) {
-        if (
-          interaction.message.interaction &&
-          interaction.user.id !== interaction.message.interaction.user.id
-        ) {
-          const wrongUserEmbed = {
-            description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
-              '/help'
-            )}!`,
-            color: 16711680,
-          };
-          await interaction.deferReply({ ephemeral: true });
-          mixpanel &&
-            sendAnalyticsEvent({
-              user: interaction.user,
-              channel: interaction.channel,
-              guild: interaction.guild,
-              client: mixpanel,
-              options: interaction.customId,
-              eventName: 'Click wrong user button',
-            });
-          interaction.editReply({ embeds: [wrongUserEmbed] });
-        }
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
             goToConfirmStatus({
               interaction: interaction as StringSelectMenuInteraction,
               mixpanel,
             });
-            return;
+            break;
         }
       }
     } catch (error) {

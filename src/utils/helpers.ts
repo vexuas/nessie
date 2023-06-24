@@ -12,6 +12,7 @@ import {
   PermissionFlagsBits,
   ButtonInteraction,
   GuildMember,
+  TextChannel,
 } from 'discord.js';
 import {
   BOOT_NOTIFICATION_CHANNEL_ID,
@@ -29,16 +30,21 @@ import {
   MapRotationBattleRoyaleSchema,
   MapRotationRankedSchema,
 } from '../schemas/mapRotation';
+import { Mixpanel } from 'mixpanel';
+import { sendAnalyticsEvent } from '../services/analytics';
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
  * @data - br data object
  * @channel - log channel in Nessie's Canyon (#health: 899620845436141609)
  * @isAccurate - whether the data received is up-to-date
- * TODO: Add typing for ALS Data
- * TODO: Check if this is even necessary
+ * TODO: Revisit if this is necessary
  */
-export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
+export const sendHealthLog = (
+  data: MapRotationBattleRoyaleSchema,
+  channel: TextChannel | undefined,
+  isAccurate: boolean
+) => {
   const utcStart = new Date(data.current.readableDate_start);
   const sgtStart = new Date(utcStart.getTime() + 28800000);
   const utcEnd = new Date(data.current.readableDate_end);
@@ -74,6 +80,7 @@ export const sendHealthLog = (data: any, channel: any, isAccurate: any) => {
       },
     ],
   };
+  if (!channel) return;
   isAccurate
     ? channel.send({ embeds: [embed] })
     : channel.send({ content: '<@183444648360935424>', embeds: [embed] });
@@ -87,7 +94,7 @@ export const serverNotificationEmbed = async ({
   app: Client;
   guild: Guild;
   type: 'join' | 'leave';
-}): Promise<any> => {
+}): Promise<APIEmbed> => {
   const defaultIcon =
     'https://cdn.discordapp.com/attachments/248430185463021569/614789995596742656/Wallpaper2.png';
   const guildIcon = guild.icon && guild.iconURL();
@@ -135,7 +142,7 @@ export const serverNotificationEmbed = async ({
  * @param message - error description/message
  * @param uuid - error uuid
  * @param nessie = client
- * TODO: Refactor this
+ * TODO: Revisit if this is necessary
  */
 export const generateErrorEmbed = async (
   error: any,
@@ -251,6 +258,7 @@ export const sendErrorLog = async ({
 /**
  * Handler for errors concerning status cycles
  * Same as above, only difference is the embed content
+ * TODO: Revisit if this is necessary
  */
 export const sendStatusErrorLog = async ({
   nessie,
@@ -317,6 +325,7 @@ export const generateAnnouncementMessage = (prefix: string) => {
  * These assets don't look good however I've decided to use them for now as it's direct
  * Manually wiring them up to our images isn't scalable either
  * I'll just leave this comment so I get reminded about it in the future
+ * TODO: Revisit if this is necessary
  */
 export const getMapUrl = (map: string) => {
   switch (map) {
@@ -365,7 +374,6 @@ export const getCountdown = (timer: string) => {
  * Embed design for any pubs map
  * Added a hack to display the time for next map regardless of timezone
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
- * TODO: Add typing for ALS Data
  */
 export const generatePubsEmbed = (
   data: MapRotationBattleRoyaleSchema | MapRotationArenasSchema,
@@ -399,7 +407,6 @@ export const generatePubsEmbed = (
 /**
  * Embed design for any ranked map
  * Fairly simple, don't need any fancy timers and footers
- * TODO: Add typing for ALS Data
  */
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
@@ -432,7 +439,7 @@ export const generateRankedEmbed = (
   }
   return embedData;
 };
-
+//TODO: Refactor this someday
 export const checkMissingBotPermissions = (interaction: ChatInputCommandInteraction) => {
   const { guild } = interaction;
 
@@ -542,4 +549,30 @@ export const sendBootNotification = async (app: Client) => {
 //Returns a default color if no argument is passed
 export const getEmbedColor = (color?: string): number => {
   return parseInt(color ? color.replace('#', '0x') : '#3399FF'.replace('#', '0x'));
+};
+
+export const sendWrongUserWarning = async ({
+  interaction,
+  mixpanel,
+}: {
+  interaction: ButtonInteraction | AnySelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
+}) => {
+  const wrongUserEmbed = {
+    description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
+      '/help'
+    )}!`,
+    color: getEmbedColor('#FF0000'),
+  };
+  await interaction.deferReply({ ephemeral: true });
+  mixpanel &&
+    sendAnalyticsEvent({
+      user: interaction.user,
+      channel: interaction.inGuild() ? interaction.channel : null,
+      guild: interaction.guild,
+      client: mixpanel,
+      options: interaction.customId,
+      eventName: 'Click wrong user button',
+    });
+  interaction.editReply({ embeds: [wrongUserEmbed] });
 };
