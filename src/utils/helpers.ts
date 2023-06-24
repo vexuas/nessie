@@ -29,6 +29,8 @@ import {
   MapRotationBattleRoyaleSchema,
   MapRotationRankedSchema,
 } from '../schemas/mapRotation';
+import { Mixpanel } from 'mixpanel';
+import { sendAnalyticsEvent } from '../services/analytics';
 //----------
 /**
  * Function to send health status so that I can monitor how the status update for br pub maps is doing
@@ -542,4 +544,30 @@ export const sendBootNotification = async (app: Client) => {
 //Returns a default color if no argument is passed
 export const getEmbedColor = (color?: string): number => {
   return parseInt(color ? color.replace('#', '0x') : '#3399FF'.replace('#', '0x'));
+};
+
+export const sendWrongUserWarning = async ({
+  interaction,
+  mixpanel,
+}: {
+  interaction: ButtonInteraction | AnySelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
+}) => {
+  const wrongUserEmbed = {
+    description: `Oops looks like that interaction wasn't meant for you! Nessie can only properly interact with your own commands.\n\nTo check what Nessie can do, type ${inlineCode(
+      '/help'
+    )}!`,
+    color: getEmbedColor('#FF0000'),
+  };
+  await interaction.deferReply({ ephemeral: true });
+  mixpanel &&
+    sendAnalyticsEvent({
+      user: interaction.user,
+      channel: interaction.inGuild() ? interaction.channel : null,
+      guild: interaction.guild,
+      client: mixpanel,
+      options: interaction.customId,
+      eventName: 'Click wrong user button',
+    });
+  interaction.editReply({ embeds: [wrongUserEmbed] });
 };
