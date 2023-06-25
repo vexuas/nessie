@@ -1,0 +1,48 @@
+name: deploy/prod
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Logs in to DigitalOcean droplet and deploy changes
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          password: ${{ secrets.DO_PASSWORD }}
+          script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            nvm install 16.13.0
+            pm2 stop nessie
+            pm2 delete nessie
+            cd nessie
+            git restore .
+            git clean -f
+            git checkout develop
+            git pull
+            git fetch --tags
+            git branch | grep -v "develop" | xargs git branch -D            
+            git checkout tags/${{ github.ref_name }} -b prod/${{ github.ref_name }}
+            echo "${{ secrets.ENVIRONMENT_PROD }}" > src/config/environment.ts
+            yarn update:version
+            yarn install
+            yarn build
+            pm2 start deploy.config.js --env prod
+
+      - name: Send notification to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
+          DISCORD_USERNAME: 'Nessie Release Notification'
+          DISCORD_AVATAR: 'https://cdn.discordapp.com/attachments/248430185463021569/955497690735738900/Nessie_Logo_v2.png'
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: 'Successfully deployed `${{ github.ref_name }}` to production'
