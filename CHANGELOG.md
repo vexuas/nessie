@@ -1,3 +1,40 @@
+# v2.0.0 (Sun Jun 25 2023)
+
+#### 💥 Breaking Change
+
+- Upgrade to djs v14 [#145](https://github.com/vexuas/nessie/pull/145) ([@vexuas](https://github.com/vexuas))
+- Migrate commands to typescript [#139](https://github.com/vexuas/nessie/pull/139) ([@vexuas](https://github.com/vexuas))
+- Migrate database to typescript [#138](https://github.com/vexuas/nessie/pull/138) ([@vexuas](https://github.com/vexuas))
+- Migrate to typescript for events [#137](https://github.com/vexuas/nessie/pull/137) ([@vexuas](https://github.com/vexuas))
+- Migrate to typescript for non-core files [#136](https://github.com/vexuas/nessie/pull/136) ([@vexuas](https://github.com/vexuas))
+
+#### 🚀 Enhancement
+
+- Add test workflows [#141](https://github.com/vexuas/nessie/pull/141) ([@vexuas](https://github.com/vexuas))
+- Add scripts and cleanup dependencies [#140](https://github.com/vexuas/nessie/pull/140) ([@vexuas](https://github.com/vexuas))
+- Refactor environment variables [#135](https://github.com/vexuas/nessie/pull/135) ([@vexuas](https://github.com/vexuas))
+- Restructure app [#134](https://github.com/vexuas/nessie/pull/134) ([@vexuas](https://github.com/vexuas))
+
+#### 🔧 Tweaks
+
+- Add deployment config [#149](https://github.com/vexuas/nessie/pull/149) ([@vexuas](https://github.com/vexuas))
+- Add typing to helper functions [#148](https://github.com/vexuas/nessie/pull/148) ([@vexuas](https://github.com/vexuas))
+- Refactor adapters [#147](https://github.com/vexuas/nessie/pull/147) ([@vexuas](https://github.com/vexuas))
+- Refactor analytics service [#146](https://github.com/vexuas/nessie/pull/146) ([@vexuas](https://github.com/vexuas))
+- Refactor error handling [#144](https://github.com/vexuas/nessie/pull/144) ([@vexuas](https://github.com/vexuas))
+- Refactor guild notifications [#143](https://github.com/vexuas/nessie/pull/143) ([@vexuas](https://github.com/vexuas))
+- Refactor boot notifications [#142](https://github.com/vexuas/nessie/pull/142) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 04 18 [#133](https://github.com/vexuas/nessie/pull/133) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v1.10.5 (Tue Apr 18 2023)
 
 #### 🐛 Bug Fix
