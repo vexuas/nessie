@@ -2,14 +2,17 @@ import { BOT_UPDATED_AT, BOT_VERSION } from '../../version';
 import { AppCommand, AppCommandOptions } from '../commands';
 import { format } from 'date-fns';
 import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
-import { APIEmbed, Client, SlashCommandBuilder } from 'discord.js';
+import { APIEmbed, Client, hyperlink, SlashCommandBuilder } from 'discord.js';
 import { nessieLogo } from '../../utils/constants';
 
 //TODO: Update description
 export const generateAboutEmbed = (app?: Client): APIEmbed => {
   const embed = {
     title: 'Info',
-    description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nTry out my new beta feature: **Automatic Map Updates**! To check out what it is, use \`/status help\`!\n\nAll my data is extracted from the great works of [https://apexlegendsapi.com/](https://apexlegendsapi.com/). Go support them too, it’s a cool project!\n\nFor the latest news, check out \`/updates\`!`,
+    description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nTry out my new beta feature: **Automatic Map Updates**! To check out what it is, use \`/status help\`!\n\nAll my data is extracted from the great works of ${hyperlink(
+      'Apex Legends API',
+      'https://apexlegendsapi.com'
+    )}. Go support them too, it’s a cool project!`,
     color: getEmbedColor(),
     thumbnail: {
       url: nessieLogo,
@@ -17,7 +20,7 @@ export const generateAboutEmbed = (app?: Client): APIEmbed => {
     fields: [
       {
         name: 'Creator',
-        value: '-',
+        value: 'vexuas',
         inline: true,
       },
       {
@@ -43,7 +46,7 @@ export const generateAboutEmbed = (app?: Client): APIEmbed => {
       },
       {
         name: 'Support Server',
-        value: '-',
+        value: hyperlink('Link', 'https://discord.gg/FyxVrAbRAd'),
         inline: true,
       },
     ],
