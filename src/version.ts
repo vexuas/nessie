@@ -1,1 +1,1 @@
-export const BOT_VERSION = "1.10.5";export const BOT_UPDATED_AT = "14-Jun-2023"
+export const BOT_VERSION = "2.0.0";export const BOT_UPDATED_AT = "25-Jun-2023"
