@@ -1,3 +1,19 @@
+# v2.0.1 (Mon Jun 26 2023)
+
+#### 🔧 Tweaks
+
+- Update about command content [#151](https://github.com/vexuas/nessie/pull/151) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 06 25 [#150](https://github.com/vexuas/nessie/pull/150) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.0 (Sun Jun 25 2023)
 
 #### 💥 Breaking Change
