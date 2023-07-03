@@ -470,7 +470,7 @@ export const createStatus = async ({
 };
 /**
  * Handler in charge in updating map data in the relevant status channels
- * Uses the Scheduler class to create a cron job that fires every 10th second of every 15 minutes (0:5:10, 0:10:10, 0:15:10, etc)
+ * Uses the Scheduler class to create a cron job that fires every 10th second of every 5 minutes (0:5:10, 0:10:10, 0:15:10, etc)
  * When the cron job is executed, we then:
  * - Call the getAllStatus handler to get every existing status in our database
  * - Upon finishing the query, we then call the API for the current rotation data
@@ -485,7 +485,7 @@ export const createStatus = async ({
  * More detailed explanation here: https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658
  */
 export const scheduleStatus = (nessie: Client) => {
-  return new Scheduler('5 */15 * * * *', async () => {
+  return new Scheduler('5 */5 * * * *', async () => {
     errorNotification.count = 0;
     errorNotification.message = '';
     const startTime = Date.now();
