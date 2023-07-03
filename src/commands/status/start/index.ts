@@ -163,8 +163,7 @@ const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
   const informationEmbed = {
-    description:
-      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+    description: '**Updates occur every 5 minutes**',
     color: 3447003,
     timestamp: new Date(Date.now()).toISOString(),
     footer: {
@@ -183,8 +182,7 @@ const generateArenasStatusEmbeds = (data: MapRotationAPIObject) => {
   const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
   const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
-    description:
-      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+    description: '**Updates occur every 5 minutes**',
     color: 3447003,
     timestamp: new Date(Date.now()).toISOString(),
     footer: {
@@ -518,8 +516,7 @@ export const scheduleStatus = (nessie: Client) => {
       const uuid = uuidV4();
       const errorEmbed: APIEmbed[] = [
         {
-          description:
-            '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+          description: '**Updates occur every 5 minutes**',
           color: 3447003,
           timestamp: new Date(Date.now()).toISOString(),
           footer: {
