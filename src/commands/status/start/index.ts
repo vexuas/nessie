@@ -86,7 +86,9 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
       title: 'Status | Start',
       description: `There's currently an existing automated map status active in:${
         status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''
-      }\n\nCreated at ${status.created_at} by ${status.created_by}`,
+      }${status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''}\n\nCreated at ${
+        status.created_at
+      } by ${status.created_by}`,
       color: 3447003,
     };
   }
