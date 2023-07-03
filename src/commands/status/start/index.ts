@@ -67,13 +67,8 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
         .setCustomId('statusStart__gameModeDropdown')
         .setPlaceholder('Requires at least one game mode')
         .setMinValues(1)
-        .setMaxValues(2)
+        .setMaxValues(1)
         .addOptions([
-          {
-            label: 'Arenas',
-            description: 'Pubs and Ranked Map Rotation for Arenas',
-            value: 'gameModeDropdown__arenasValue',
-          },
           {
             label: 'Battle Royale',
             description: 'Pubs and Ranked Map Rotation for Battle Royale',
@@ -91,9 +86,7 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
       title: 'Status | Start',
       description: `There's currently an existing automated map status active in:${
         status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''
-      }${status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''}\n\nCreated at ${
-        status.created_at
-      } by ${status.created_by}`,
+      }\n\nCreated at ${status.created_at} by ${status.created_by}`,
       color: 3447003,
     };
   }
@@ -117,17 +110,12 @@ const generateConfirmStatusMessage = ({
   const isBattleRoyaleSelected = interaction.values.find(
     (value) => value === 'gameModeDropdown__battleRoyaleValue'
   );
-  const isArenasSelected = interaction.values.find(
-    (value) => value === 'gameModeDropdown__arenasValue'
-  );
   const modeLength = interaction.values.length;
 
   const confirmButtonId = `statusStart__confirmButton${modeLength > 0 ? '?' : ''}${
     isBattleRoyaleSelected ? 'battle_royale' : ''
-  }${modeLength > 1 ? '&' : ''}${isArenasSelected ? 'arenas' : ''}`; //Full selection: statusStart__confirmButton?battle_royale&arenas;
-  const selectionText = `${isBattleRoyaleSelected ? '*Battle Royale*' : ''} ${
-    modeLength > 1 ? 'and' : ''
-  } ${isArenasSelected ? '*Arenas*' : ''}`;
+  }`; //Full selection: statusStart__confirmButton?battle_royale&arenas;
+  const selectionText = `${isBattleRoyaleSelected ? '*Battle Royale*' : ''}`;
 
   const row = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
@@ -150,10 +138,10 @@ const generateConfirmStatusMessage = ({
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
-    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${modeLength} text-channels and ${modeLength} webhooks for the automatic map updates:\n• ${inlineCode(
+    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${modeLength} text-channel and ${modeLength} webhook for the automatic map updates:\n• ${inlineCode(
       'Apex Legends Map Status'
-    )}\n${isBattleRoyaleSelected ? `• ${inlineCode('#apex-battle-royale')}\n` : ''}${
-      isArenasSelected ? `• ${inlineCode('#apex-arenas')}\n` : ''
+    )}\n${
+      isBattleRoyaleSelected ? `• ${inlineCode('#apex-battle-royale')}\n` : ''
     }• Webhook for each text channel\n\nUpdates get sent to these channels **every 15 minutes**`,
     color: 3447003,
   };
@@ -351,13 +339,7 @@ export const createStatus = async ({
   mixpanel?: Mixpanel | null;
 }) => {
   const isBattleRoyaleSelected = interaction.customId.includes('battle_royale');
-  const isArenasSelected = interaction.customId.includes('arenas');
-  const gameModeSelected =
-    isBattleRoyaleSelected && isArenasSelected
-      ? 'All'
-      : isBattleRoyaleSelected
-      ? 'Battle Royale'
-      : 'Arenas';
+  const gameModeSelected = isBattleRoyaleSelected ? 'Battle Royale' : '-';
   const embedLoadingChannels: APIEmbed = {
     description: `Loading Status Channels...`,
     color: 16776960,
@@ -374,7 +356,6 @@ export const createStatus = async ({
 
     const rotationData = await getRotationData();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
-    const statusArenasEmbed = generateArenasStatusEmbeds(rotationData);
     /**
      * Gets the @everyone role of the guild
      * Important so w can't prevent non-admin users from sending any messages in status channels
@@ -398,19 +379,6 @@ export const createStatus = async ({
           },
         ],
       }));
-    const statusArenasChannel =
-      isArenasSelected &&
-      (await interaction.guild.channels.create({
-        name: 'apex-arenas',
-        parent: statusCategory,
-        type: ChannelType.GuildText,
-        permissionOverwrites: [
-          {
-            id: everyoneRole ? everyoneRole.id : '',
-            deny: [PermissionsBitField.Flags.SendMessages],
-          },
-        ],
-      }));
 
     //Since webhooks take way longer to create than channels, adding another loading state here
     await interaction.message.edit({ embeds: [embedLoadingWebhooks], components: [] });
@@ -422,13 +390,6 @@ export const createStatus = async ({
         avatar: nessieLogo,
         reason: 'Webhook to receive automatic map updates for Apex Battle Royale',
       }));
-    const statusArenasWebhook =
-      statusArenasChannel &&
-      (await statusArenasChannel.createWebhook({
-        name: 'Nessie Automatic Status',
-        avatar: nessieLogo,
-        reason: 'Webhook to receive automatic map updates for Apex Arenas',
-      }));
 
     const statusBattleRoyaleMessage =
       statusBattleRoyaleWebhook &&
@@ -438,32 +399,25 @@ export const createStatus = async ({
       }).send({
         embeds: statusBattleRoyaleEmbed,
       }));
-    const statusArenasMessage =
-      statusArenasWebhook &&
-      (await new WebhookClient({
-        id: statusArenasWebhook.id,
-        token: statusArenasWebhook.token ?? '',
-      }).send({
-        embeds: statusArenasEmbed,
-      }));
 
     /**
      * Create new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
      * * Passes a success and error callback with the former editing the original message with a success embed
+     * TODO: Remove temporary arenas null values when cleaning up database rows
      */
     const newStatus = {
       uuid: uuidV4(),
       guildId: interaction.guildId,
       categoryChannelId: statusCategory.id,
       battleRoyaleChannelId: statusBattleRoyaleChannel ? statusBattleRoyaleChannel.id : null,
-      arenasChannelId: statusArenasChannel ? statusArenasChannel.id : null,
+      arenasChannelId: null,
       battleRoyaleMessageId: statusBattleRoyaleMessage ? statusBattleRoyaleMessage.id : null,
-      arenasMessageId: statusArenasMessage ? statusArenasMessage.id : null,
+      arenasMessageId: null,
       battleRoyaleWebhookId: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.id : null,
-      arenasWebhookId: statusArenasWebhook ? statusArenasWebhook.id : null,
+      arenasWebhookId: null,
       battleRoyaleWebhookToken: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.token : null,
-      arenasWebhookToken: statusArenasWebhook ? statusArenasWebhook.token : null,
+      arenasWebhookToken: null,
       originalChannelId: interaction.channelId,
       gameModeSelected,
       createdBy: interaction.user.tag,
@@ -472,19 +426,9 @@ export const createStatus = async ({
 
     await insertNewStatus(newStatus); //TODO: Add typing
     const embedSuccess = {
-      description: '',
+      description: `Created map status at ${statusBattleRoyaleChannel}`,
       color: 3066993,
     };
-    //TODO: Probably figure out a better way of handling string manipulation
-    isBattleRoyaleSelected && isArenasSelected
-      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel} and ${statusArenasChannel}`)
-      : null;
-    isBattleRoyaleSelected && !isArenasSelected
-      ? (embedSuccess.description = `Created map status at ${statusBattleRoyaleChannel}`)
-      : null;
-    !isBattleRoyaleSelected && isArenasSelected
-      ? (embedSuccess.description = `Created map status at ${statusArenasChannel}`)
-      : null;
 
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
     //Sends status creation log after everything is done
@@ -499,12 +443,7 @@ export const createStatus = async ({
         },
         {
           name: 'Game Modes',
-          value:
-            isBattleRoyaleSelected && isArenasSelected
-              ? 'All'
-              : isBattleRoyaleSelected
-              ? 'Battle Royale'
-              : 'Arenas',
+          value: isBattleRoyaleSelected ? 'Battle Royale' : '-',
         },
       ],
     };
