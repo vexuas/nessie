@@ -124,6 +124,7 @@ export const _cancelStatusStop = async ({
  * - Edits initial message with a success message
  *
  * We don't need to delete the webhooks as they'll be automatically deleted along with its channels
+ * TODO: Remove arenas code once we cleanup arenas in our database
  */
 export const deleteGuildStatus = async ({
   interaction,
