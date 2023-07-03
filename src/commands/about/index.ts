@@ -9,7 +9,7 @@ import { nessieLogo } from '../../utils/constants';
 export const generateAboutEmbed = (app?: Client): APIEmbed => {
   const embed = {
     title: 'Info',
-    description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nTry out my new beta feature: **Automatic Map Updates**! To check out what it is, use \`/status help\`!\n\nAll my data is extracted from the great works of ${hyperlink(
+    description: `Hi there! I’m Nessie and I provide an easy way to get status updates of Map Rotations in Apex Legends! Hope that you can find me useful (◕ᴗ◕✿)\n\nTry out my cool feature: **Automatic Map Updates**! To check out what it is, use \`/status help\`!\n\nAll my data is extracted from the great works of ${hyperlink(
       'Apex Legends API',
       'https://apexlegendsapi.com'
     )}. Go support them too, it’s a cool project!`,
