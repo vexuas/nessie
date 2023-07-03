@@ -34,10 +34,10 @@ export const sendHelpInteraction = async ({
   try {
     const embedInformation = {
       title: 'Information',
-      description: `This command will send automatic updates of Apex Legends Map Rotations. You will be able to choose which game modes, *Battle Royale or/and Arenas*, to get updates for both pubs and ranked.\n\nDepending on what you choose, Nessie will create a set of:\n• ${inlineCode(
+      description: `This command will send automatic updates of Apex Legends Map Rotations. Since Arenas are no longer in the game, you will only be able to choose the *Battle Royale* game mode to get updates for both pubs and ranked.\n\nAfter choosing, Nessie will create a set of:\n• ${inlineCode(
         'Category Channel'
-      )}\n• ${inlineCode('Text Channel(s)')}\n• ${inlineCode(
-        'Webhook(s)'
+      )}\n• ${inlineCode('Text Channel')}\n• ${inlineCode(
+        'Webhook'
       )}\nUpdates will then be sent in these channels **every 15 minutes**\n\n`,
       color: 3447003,
     };
