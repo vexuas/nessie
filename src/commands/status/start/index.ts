@@ -144,7 +144,7 @@ const generateConfirmStatusMessage = ({
       'Apex Legends Map Status'
     )}\n${
       isBattleRoyaleSelected ? `• ${inlineCode('#apex-battle-royale')}\n` : ''
-    }• Webhook for each text channel\n\nUpdates get sent to these channels **every 15 minutes**`,
+    }• Webhook for each text channel\n\nUpdates get sent to these channels **every 5 minutes**`,
     color: 3447003,
   };
   return {
@@ -164,7 +164,7 @@ const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject) => {
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
     timestamp: new Date(Date.now()).toISOString(),
     footer: {
@@ -184,7 +184,7 @@ const generateArenasStatusEmbeds = (data: MapRotationAPIObject) => {
   const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
   const informationEmbed = {
     description:
-      '**Updates occur every 15 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
+      '**Updates occur every 5 minutes**. This feature is currently in beta! For feedback, bug reports or news updates, feel free to visit the [support server](https://discord.gg/FyxVrAbRAd)!',
     color: 3447003,
     timestamp: new Date(Date.now()).toISOString(),
     footer: {

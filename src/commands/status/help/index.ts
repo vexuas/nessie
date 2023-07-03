@@ -38,7 +38,7 @@ export const sendHelpInteraction = async ({
         'Category Channel'
       )}\n• ${inlineCode('Text Channel')}\n• ${inlineCode(
         'Webhook'
-      )}\nUpdates will then be sent in these channels **every 15 minutes**\n\n`,
+      )}\nUpdates will then be sent in these channels **every 5 minutes**\n\n`,
       color: 3447003,
     };
     const embedPermissions = {
