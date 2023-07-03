@@ -1,3 +1,21 @@
+# v2.0.2 (Tue Jul 04 2023)
+
+#### 🔧 Tweaks
+
+- Lower status interval to 5 minutes [#155](https://github.com/vexuas/nessie/pull/155) ([@vexuas](https://github.com/vexuas))
+- Remove arenas from status setup [#154](https://github.com/vexuas/nessie/pull/154) ([@vexuas](https://github.com/vexuas))
+- Remove arenas command [#153](https://github.com/vexuas/nessie/pull/153) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 06 26 [#152](https://github.com/vexuas/nessie/pull/152) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.1 (Mon Jun 26 2023)
 
 #### 🔧 Tweaks
