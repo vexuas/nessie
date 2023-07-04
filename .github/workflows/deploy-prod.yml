@@ -35,6 +35,7 @@ jobs:
             echo "${{ secrets.ENVIRONMENT_PROD }}" > src/config/environment.ts
             yarn update:version
             yarn install
+            rm -R dist
             yarn build
             pm2 start deploy.config.js --env prod
 
