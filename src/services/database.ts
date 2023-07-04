@@ -1,5 +1,6 @@
 import { Collection, Guild } from 'discord.js';
 import { Pool, QueryResult } from 'pg';
+import { sendErrorLog } from '../utils/helpers';
 const { DATABASE_CONFIG } = require('../config/environment');
 
 const pool = DATABASE_CONFIG ? new Pool(DATABASE_CONFIG) : null;
@@ -42,7 +43,7 @@ export async function createGuildTable() {
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -59,7 +60,7 @@ export async function getGuilds(): Promise<QueryResult<GuildRecord> | undefined>
       return allGuilds;
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -76,7 +77,7 @@ export async function populateGuilds(existingGuilds: Collection<string, Guild>) 
       }
     });
   } catch (error) {
-    console.log(error); //TODO: Add error handling
+    sendErrorLog({ error });
   }
 }
 export async function insertNewGuild(newGuild: Guild) {
@@ -98,7 +99,7 @@ export async function insertNewGuild(newGuild: Guild) {
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -115,7 +116,7 @@ export async function deleteGuild(existingGuild: Guild) {
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -133,7 +134,7 @@ export async function createStatusTable() {
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -168,7 +169,7 @@ export async function insertNewStatus(status: any) {
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -185,7 +186,7 @@ export async function getStatus(guildId: string): Promise<StatusRecord | undefin
       return status.rows.length > 0 ? status.rows[0] : null;
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -202,7 +203,7 @@ export async function getAllStatus(): Promise<StatusRecord[] | undefined> {
       return allStatus.rows;
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
@@ -217,12 +218,12 @@ export async function deleteStatus(guildId: string): Promise<StatusRecord | unde
       const getStatusQuery = 'SELECT * FROM Status WHERE guild_id = ($1)';
       const status: QueryResult<StatusRecord> = await client.query(getStatusQuery, [guildId]);
       const deleteStatusQuery = 'DELETE FROM Status WHERE guild_id = ($1)';
-      await client.query(deleteStatusQuery, [guildId]);
+      status.rows.length > 0 && (await client.query(deleteStatusQuery, [guildId]));
       await client.query('COMMIT');
       return status.rows.length > 0 ? status.rows[0] : null;
     } catch (error) {
       await client.query('ROLLBACK');
-      console.log(error); //TODO: Add error handling
+      sendErrorLog({ error });
     } finally {
       client.release();
     }
