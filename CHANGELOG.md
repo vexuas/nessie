@@ -1,3 +1,20 @@
+# v2.0.3 (Wed Jul 05 2023)
+
+#### 🔧 Tweaks
+
+- Delete status when bot leaves guild [#158](https://github.com/vexuas/nessie/pull/158) ([@vexuas](https://github.com/vexuas))
+- Delete compiled files before production build [#157](https://github.com/vexuas/nessie/pull/157) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 07 04 [#156](https://github.com/vexuas/nessie/pull/156) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.2 (Tue Jul 04 2023)
 
 #### 🔧 Tweaks
