@@ -217,7 +217,7 @@ export async function deleteStatus(guildId: string): Promise<StatusRecord | unde
       const getStatusQuery = 'SELECT * FROM Status WHERE guild_id = ($1)';
       const status: QueryResult<StatusRecord> = await client.query(getStatusQuery, [guildId]);
       const deleteStatusQuery = 'DELETE FROM Status WHERE guild_id = ($1)';
-      await client.query(deleteStatusQuery, [guildId]);
+      status.rows.length > 0 && (await client.query(deleteStatusQuery, [guildId]));
       await client.query('COMMIT');
       return status.rows.length > 0 ? status.rows[0] : null;
     } catch (error) {
