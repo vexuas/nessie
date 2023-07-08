@@ -5,7 +5,6 @@ import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
 import { APIEmbed, Client, hyperlink, SlashCommandBuilder } from 'discord.js';
 import { nessieLogo } from '../../utils/constants';
 
-//TODO: Update description
 export const generateAboutEmbed = (app?: Client): APIEmbed => {
   const embed = {
     title: 'Info',

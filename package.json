@@ -16,6 +16,7 @@
     "start": "yarn build && yarn build:watch",
     "build": "tsc",
     "build:watch": "yarn tsc-watch --onSuccess 'node dist/App.js'",
+    "test": "jest --watch",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "update:version": "node -p \"'export const BOT_VERSION = ' + JSON.stringify(require('./package.json').version) + ';' + 'export const BOT_UPDATED_AT = ' + JSON.stringify('$(date +'%d-%b-%Y')')\" > src/version.ts",
     "auto:changelog": "yarn auto changelog",
