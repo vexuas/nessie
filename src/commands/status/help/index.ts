@@ -6,7 +6,6 @@ import {
   sendErrorLog,
 } from '../../../utils/helpers';
 
-//TODO: Add typing and refactor handlers
 /**
  * Handler for when a user initiates the /status help command
  * Displays information of status command, explains what it does and permissions it needs
