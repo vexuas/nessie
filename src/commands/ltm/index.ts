@@ -8,7 +8,6 @@ export const generateLimitedTimeEventEmbed = (data: MapRotationLimitedTimeMapSch
   const mapURL = getMapUrl(data.current.code);
   const embedData: APIEmbed = {
     title: data.current.eventName,
-    description: '',
     color: 15105570,
     image: {
       url: mapURL && mapURL.length > 0 ? mapURL : data.current.asset,
