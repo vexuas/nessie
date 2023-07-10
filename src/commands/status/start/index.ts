@@ -157,7 +157,6 @@ const generateConfirmStatusMessage = ({
  * Generates relevant embeds for the status battle royale channel
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
- * TODO: Add typing for ALS Data
  */
 const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
@@ -176,7 +175,6 @@ const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject) => {
  * Generates relevant embeds for the status arenas channel
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
- * TODO: Add typing for ALS Data
  */
 const generateArenasStatusEmbeds = (data: MapRotationAPIObject) => {
   const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');

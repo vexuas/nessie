@@ -4,12 +4,10 @@ import { getLimitedTimeEvent } from '../../services/adapters';
 import { getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
-//TODO: Add typing for ALS Data
 export const generateLimitedTimeEventEmbed = (data: MapRotationLimitedTimeMapSchema): APIEmbed => {
   const mapURL = getMapUrl(data.current.code);
   const embedData: APIEmbed = {
     title: data.current.eventName,
-    description: '',
     color: 15105570,
     image: {
       url: mapURL && mapURL.length > 0 ? mapURL : data.current.asset,

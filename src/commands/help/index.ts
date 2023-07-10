@@ -3,7 +3,6 @@ import { isEmpty, reduce, uniq } from 'lodash';
 import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
-//TODO: Add typing after upgrading to djs v14
 export const generateHelpEmbed = (appCommands?: AppCommand[]) => {
   const commandTypes = uniq(
     appCommands?.map((command) => (command.commandType ? command.commandType : 'Others'))
