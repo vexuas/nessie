@@ -1,3 +1,30 @@
+# v2.0.4 (Thu Jul 13 2023)
+
+#### 🧪 Tests
+
+- Add workflow for jests [#161](https://github.com/vexuas/nessie/pull/161) ([@vexuas](https://github.com/vexuas))
+- Add jest tests [#160](https://github.com/vexuas/nessie/pull/160) ([@vexuas](https://github.com/vexuas))
+
+#### 🔧 Tweaks
+
+- Only have game status for prod [#164](https://github.com/vexuas/nessie/pull/164) ([@vexuas](https://github.com/vexuas))
+- Add current map remaining time to game status [#163](https://github.com/vexuas/nessie/pull/163) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 07 05 [#159](https://github.com/vexuas/nessie/pull/159) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump semver from 6.3.0 to 6.3.1 [#162](https://github.com/vexuas/nessie/pull/162) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.3 (Wed Jul 05 2023)
 
 #### 🔧 Tweaks
