@@ -69,6 +69,8 @@ export default function ({ app, appCommands }: EventModule) {
       if (ENV === 'prod') {
         const mapGameStatusSchedule = scheduleSetCurrentMapGameStatus(app);
         mapGameStatusSchedule.start();
+      } else {
+        app.user && app.user.setActivity('Nessie Development');
       }
     } catch (error) {
       sendErrorLog({ error });
