@@ -66,8 +66,10 @@ export default function ({ app, appCommands }: EventModule) {
       const statusSchedule = scheduleStatus(app);
       statusSchedule.start();
 
-      const mapGameStatusSchedule = scheduleSetCurrentMapGameStatus(app);
-      mapGameStatusSchedule.start();
+      if (ENV === 'prod') {
+        const mapGameStatusSchedule = scheduleSetCurrentMapGameStatus(app);
+        mapGameStatusSchedule.start();
+      }
     } catch (error) {
       sendErrorLog({ error });
     }
