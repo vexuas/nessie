@@ -12,7 +12,6 @@ import {
   PermissionFlagsBits,
   ButtonInteraction,
   GuildMember,
-  TextChannel,
 } from 'discord.js';
 import {
   BOOT_NOTIFICATION_CHANNEL_ID,
@@ -32,60 +31,7 @@ import {
 } from '../schemas/mapRotation';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../services/analytics';
-//----------
-/**
- * Function to send health status so that I can monitor how the status update for br pub maps is doing
- * @data - br data object
- * @channel - log channel in Nessie's Canyon (#health: 899620845436141609)
- * @isAccurate - whether the data received is up-to-date
- * TODO: Revisit if this is necessary
- */
-export const sendHealthLog = (
-  data: MapRotationBattleRoyaleSchema,
-  channel: TextChannel | undefined,
-  isAccurate: boolean
-) => {
-  const utcStart = new Date(data.current.readableDate_start);
-  const sgtStart = new Date(utcStart.getTime() + 28800000);
-  const utcEnd = new Date(data.current.readableDate_end);
-  const sgtEnd = new Date(utcEnd.getTime() + 28800000);
 
-  const embed = {
-    title: 'Nessie | Status Health Log',
-    description: 'Requested data from API',
-    color: isAccurate ? 3066993 : 16776960,
-    thumbnail: {
-      url: nessieLogo,
-    },
-    fields: [
-      {
-        name: 'Current Map',
-        value: `${inlineCode(data.current.map)} - ${inlineCode(format(sgtStart, 'hh:mm:ss aa'))}`,
-      },
-      {
-        name: 'Next Map',
-        value: `${inlineCode(data.next.map)} - ${inlineCode(format(sgtEnd, 'hh:mm:ss aa'))}`,
-      },
-      {
-        name: 'Time left',
-        value: inlineCode(`${data.current.remainingTimer} | ${data.current.remainingSecs} secs`),
-      },
-      {
-        name: 'Requested At',
-        value: inlineCode(format(new Date(), 'hh:mm:ss aa, dd MMM yyyy')),
-      },
-      {
-        name: 'Accurate',
-        value: isAccurate ? 'Yes' : 'No',
-      },
-    ],
-  };
-  if (!channel) return;
-  isAccurate
-    ? channel.send({ embeds: [embed] })
-    : channel.send({ content: '<@183444648360935424>', embeds: [embed] });
-};
-//----------
 export const serverNotificationEmbed = async ({
   app,
   guild,
