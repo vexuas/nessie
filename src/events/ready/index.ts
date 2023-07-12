@@ -1,9 +1,10 @@
-import { REST, Routes } from 'discord.js';
+import { Client, REST, Routes } from 'discord.js';
 import { AppCommand } from '../../commands/commands';
 import { scheduleStatus } from '../../commands/status/start';
 import { BOT_ID, BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
 import { getBattleRoyalePubs } from '../../services/adapters';
 import { createGuildTable, createStatusTable, populateGuilds } from '../../services/database';
+import Scheduler from '../../services/scheduler';
 import { sendBootNotification, sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
@@ -31,27 +32,18 @@ const registerApplicationCommands = async (commands?: AppCommand[]) => {
     sendErrorLog({ error });
   }
 };
-
-const setCurrentMapStatus = (data: any, nessie: any) => {
-  const fiveSecondsBuffer = 5000;
-  let currentTimer = data.current.remainingSecs * 1000 + fiveSecondsBuffer;
-  const intervalRequest = async () => {
+const scheduleSetCurrentMapGameStatus = (app: Client) => {
+  return new Scheduler('10 */1 * * * *', async () => {
     try {
-      const updatedBrPubsData = await getBattleRoyalePubs();
-      /**
-       * Checks to see if the data taken from API is accurate
-       * Was brought to my attention that the status was displaying the wrong map at one point
-       * Not sure why this is happening so just adding a notification when this happens again
-       * Don't really want to add extra code for now, if it happens again then i'll fix it
-       */
-      currentTimer = updatedBrPubsData.current.remainingSecs * 1000 + fiveSecondsBuffer;
-      nessie.user.setActivity(updatedBrPubsData.current.map);
-      setTimeout(intervalRequest, currentTimer);
+      if (!app.user) return;
+      const data = await getBattleRoyalePubs();
+      const currentMap = data.current.map;
+      const timeLeft = `${data.current.remainingMins.toString()} mins`;
+      app.user.setActivity(`${currentMap} | ${timeLeft}`);
     } catch (error) {
       sendErrorLog({ error });
     }
-  };
-  setTimeout(intervalRequest, currentTimer); //Start initial timer
+  });
 };
 
 export default function ({ app, appCommands }: EventModule) {
@@ -65,12 +57,11 @@ export default function ({ app, appCommands }: EventModule) {
       }
       await sendBootNotification(app);
 
-      const brPubsData = await getBattleRoyalePubs();
-      app.user && app.user.setActivity(brPubsData.current.map);
-      setCurrentMapStatus(brPubsData, app);
-
       const statusSchedule = scheduleStatus(app);
       statusSchedule.start();
+
+      const mapGameStatusSchedule = scheduleSetCurrentMapGameStatus(app);
+      mapGameStatusSchedule.start();
     } catch (error) {
       sendErrorLog({ error });
     }
