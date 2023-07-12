@@ -32,6 +32,12 @@ const registerApplicationCommands = async (commands?: AppCommand[]) => {
     sendErrorLog({ error });
   }
 };
+/**
+ * Uses a cron job to set the current map and its remaining time as a game status for Nessie
+ * Thought of caching the current data but opted to just request for the data everytime the job triggers
+ * The API is free(for now) and rate limits are at 1req/s so this should be fine
+ * That being said since status already has a cron job at the 5th sec of the hour, I'm setting this up at the 10th sec
+ */
 const scheduleSetCurrentMapGameStatus = (app: Client) => {
   return new Scheduler('10 */1 * * * *', async () => {
     try {
