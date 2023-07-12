@@ -1,10 +1,11 @@
-import { REST, Routes, TextChannel } from 'discord.js';
+import { Client, REST, Routes } from 'discord.js';
 import { AppCommand } from '../../commands/commands';
 import { scheduleStatus } from '../../commands/status/start';
 import { BOT_ID, BOT_TOKEN, DATABASE_CONFIG, ENV, GUILD_ID } from '../../config/environment';
 import { getBattleRoyalePubs } from '../../services/adapters';
 import { createGuildTable, createStatusTable, populateGuilds } from '../../services/database';
-import { sendBootNotification, sendErrorLog, sendHealthLog } from '../../utils/helpers';
+import Scheduler from '../../services/scheduler';
+import { sendBootNotification, sendErrorLog } from '../../utils/helpers';
 import { EventModule } from '../events';
 
 const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
@@ -31,31 +32,24 @@ const registerApplicationCommands = async (commands?: AppCommand[]) => {
     sendErrorLog({ error });
   }
 };
-
-const setCurrentMapStatus = (data: any, channel: any, nessie: any) => {
-  const fiveSecondsBuffer = 5000;
-  let currentBrPubsData = data;
-  let currentTimer = data.current.remainingSecs * 1000 + fiveSecondsBuffer;
-  const intervalRequest = async () => {
+/**
+ * Uses a cron job to set the current map and its remaining time as a game status for Nessie
+ * Thought of caching the current data but opted to just request for the data everytime the job triggers
+ * The API is free(for now) and rate limits are at 1req/s so this should be fine
+ * That being said since status already has a cron job at the 5th sec of the hour, I'm setting this up at the 10th sec
+ */
+const scheduleSetCurrentMapGameStatus = (app: Client) => {
+  return new Scheduler('10 */1 * * * *', async () => {
     try {
-      const updatedBrPubsData = await getBattleRoyalePubs();
-      /**
-       * Checks to see if the data taken from API is accurate
-       * Was brought to my attention that the status was displaying the wrong map at one point
-       * Not sure why this is happening so just adding a notification when this happens again
-       * Don't really want to add extra code for now, if it happens again then i'll fix it
-       */
-      const isAccurate = currentBrPubsData.next.code === updatedBrPubsData.current.code;
-      currentBrPubsData = updatedBrPubsData;
-      currentTimer = updatedBrPubsData.current.remainingSecs * 1000 + fiveSecondsBuffer;
-      nessie.user.setActivity(updatedBrPubsData.current.map);
-      sendHealthLog(updatedBrPubsData, channel, isAccurate);
-      setTimeout(intervalRequest, currentTimer);
+      if (!app.user) return;
+      const data = await getBattleRoyalePubs();
+      const currentMap = data.current.map;
+      const timeLeft = `${data.current.remainingMins.toString()} mins`;
+      app.user.setActivity(`${currentMap} | ${timeLeft}`);
     } catch (error) {
       sendErrorLog({ error });
     }
-  };
-  setTimeout(intervalRequest, currentTimer); //Start initial timer
+  });
 };
 
 export default function ({ app, appCommands }: EventModule) {
@@ -69,15 +63,11 @@ export default function ({ app, appCommands }: EventModule) {
       }
       await sendBootNotification(app);
 
-      //TODO: See if we even need the health log
-      const logChannel = app.channels.cache.get('899620845436141609') as TextChannel | undefined;
-      const brPubsData = await getBattleRoyalePubs();
-      app.user && app.user.setActivity(brPubsData.current.map);
-      sendHealthLog(brPubsData, logChannel, true);
-      setCurrentMapStatus(brPubsData, logChannel, app);
-
       const statusSchedule = scheduleStatus(app);
       statusSchedule.start();
+
+      const mapGameStatusSchedule = scheduleSetCurrentMapGameStatus(app);
+      mapGameStatusSchedule.start();
     } catch (error) {
       sendErrorLog({ error });
     }
