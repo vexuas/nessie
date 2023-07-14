@@ -12,6 +12,13 @@ Simple discord bot that provides an easy way to get status updates of map rotati
   <img align="top" width="450" alt="image" src="https://github.com/vexuas/nessie/assets/42207245/c1018e89-1a66-4364-967a-b26a29e9355f">
 </div>
 
+## Prerequisites
+If you want to use Nessie for your own projects, you would need the following before getting started:
+
+- Have a Discord Application created from the [Discord Dev Portal](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
+- Have the Discord Application [invited to a Discord Server](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
+- [Node](https://heynode.com/tutorial/install-nodejs-locally-nvm/) with a version of at least v16.13.0
+- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
 
 ## Command list
 
