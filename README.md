@@ -75,24 +75,18 @@ Cool links regarding the status command:
 
 ## TODO
 Full list [here](https://shizuka.notion.site/To-dos-and-Nice-to-Have-s-4946e00c731d44839ad76bb1c72c0328). Kinda exhausted myself working on Nessie so most of these would probably only get picked up after October 2022; gonna be working on other projects in the meantime
-- Add installation guide to this readme
-- Create alternative branch to make Nessie easily self hosted
-- Create contribution guide
-- Restructure non-command files
+- ~~Add installation guide to this readme~~
+- ~~Create alternative branch to make Nessie easily self hosted~~ [Not Doing]
+- ~~Create contribution guide~~
+- ~~Restructure non-command files~~
 - Make command files object-oriented
-- Migrate to Typescript
-- Make error handling a reusable component
-- Use webhooks instead of manually sending logs through messages
+- ~~Migrate to Typescript~~
+- ~~Make error handling a reusable component~~
+- ~~Use webhooks instead of manually sending logs through messages~~
 - Research multithreading
 - CircleCi Integration
-- Metabase Integration
+- ~~Metabase Integration~~ [Using Trevor instead]
 - Datadog Integration
-
-## Tech Stack
-
-- [Discord.js](https://discord.js.org/#/) - Node.js module to interact easier with Discord's API
-- [PostgreSQL](https://www.postgresql.org/) | [DigitalOcean](https://www.digitalocean.com/products/managed-databases)  - Managed database to store server data
-- [Mixpanel](https://mixpanel.com/) - user analytics tracker
 
 ## Contributing
 Any contributions are greatly appreciated! If you have any suggestions that would make Nessie better, you can either create a pull request or simply open an issue!
