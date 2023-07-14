@@ -15,17 +15,15 @@ Simple discord bot that provides an easy way to get status updates of map rotati
 
 ## Command list
 
-Instead of prefixes, Nessie uses Discord's new [Slash Commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ) `/`
+Nessie uses Discord's Slash Commands `/`:
 - `br`: map rotation for battle royale
-- `arenas`: map rotation for arenas
-- `control`: map rotation for control
+- `ltm`: map rotation for limited time events
 - `status help`: information on how to set up automatic map updates 
 - `status start`: display configuration steps to start automatic map updates
 - `status stop`: display configuration steps to stop existing automatic map updates
 - `about`: information hub of Nessie
-- `help`: list of commands and how to use them
+- `help`: list of commands
 - `invite`: generates Nessie's invite link
-- `updates`: shows the latest news and current update of Nessie
 
 ## Setting Up Automatic Map Status
 Gonna add a detailed guide here someday but use `status help` for now! It's probably straightforward enough. Probably.
