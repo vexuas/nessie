@@ -19,6 +19,38 @@ If you want to use Nessie for your own projects, you would need the following be
 - Have the Discord Application [invited to a Discord Server](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
 - [Node](https://heynode.com/tutorial/install-nodejs-locally-nvm/) with a version of at least v16.13.0
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
+- An API key generated from https://apexlegendsapi.com/
+
+## Installation
+1. Clone this repository and then change directly into it
+    - `git clone [your new repo]`
+    - `cd [your new repo file]`
+2. Install dependencies
+    - `yarn install`
+3. Add required environment variables
+    - You would need the following core environment variables in order to start your Discord bot:
+        - `BOT_TOKEN`
+        - `BOT_ID`
+        - `GUILD_ID`
+        - `ALS_API_KEY`
+    - Generate these configurations using:
+        ```
+        yarn config:init
+        ```
+    - Finally, fill in the required variables above with your data
+        ```ts
+        src/config/environment.ts
+        //Bot Configuration; Required
+        export const BOT_TOKEN = 'Your Discord Bot Token';
+        export const BOT_ID = 'Your Discord Bot ID';
+        export const GUILD_ID = 'The Discord Server ID you want the bot to register Slash Commands in';
+        
+        //API key to retrieve apex data
+        export const ALS_API_KEY = 'Your API key from apexlegendsapi';
+        ```
+    - Note: You may have noticed at this point there are other environment variables generated as well. These are optional to use and is not necessary for the bot to run but they are defined to avoid typescript errors. More information on these [variables in this discord bot template here](https://github.com/vexuas/djs-typescript-template#advanced-features)
+ 4. Start your App
+     - `yarn start`
 
 ## Command list
 
