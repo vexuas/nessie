@@ -1,3 +1,19 @@
+# v2.0.5 (Fri Jul 14 2023)
+
+#### 🔧 Tweaks
+
+- Dont ping if internal error [#166](https://github.com/vexuas/nessie/pull/166) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 07 13 [#165](https://github.com/vexuas/nessie/pull/165) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.4 (Thu Jul 13 2023)
 
 #### 🧪 Tests
