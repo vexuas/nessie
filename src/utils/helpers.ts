@@ -248,7 +248,7 @@ export const sendStatusErrorLog = async ({
   if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
     const notificationWebhook = new WebhookClient({ url: ERROR_NOTIFICATION_WEBHOOK_URL });
     await notificationWebhook.send({
-      content: '<@183444648360935424>',
+      content: error.message === 'Internal Server Error' ? '' : '<@183444648360935424>',
       embeds: [errorEmbed],
       username: 'Nessie Error Notification',
       avatarURL: nessieLogo,
