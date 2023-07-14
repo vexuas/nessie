@@ -23,7 +23,7 @@ If you want to use Nessie for your own projects, you would need the following be
 
 ## Installation
 1. Clone this repository and then change directly into it
-    - `git clone [your new repo]`
+    - `git clone [this repo]`
     - `cd [your new repo file]`
 2. Install dependencies
     - `yarn install`
@@ -93,3 +93,16 @@ Full list [here](https://shizuka.notion.site/To-dos-and-Nice-to-Have-s-4946e00c7
 - [Discord.js](https://discord.js.org/#/) - Node.js module to interact easier with Discord's API
 - [PostgreSQL](https://www.postgresql.org/) | [DigitalOcean](https://www.digitalocean.com/products/managed-databases)  - Managed database to store server data
 - [Mixpanel](https://mixpanel.com/) - user analytics tracker
+
+## Contributing
+Any contributions are greatly appreciated! If you have any suggestions that would make Nessie better, you can either create a pull request or simply open an issue!
+1. Create a new branch
+    - `git checkout -b your-new-branch`
+2. Commit your changes
+    - `git commit -a -m 'Description of the changes'`
+3. Push your branch
+    - `git push origin your-new-branch`
+4. Open a pull request
+
+## License
+Distributed under the [MIT License](https://github.com/vexuas/djs-typescript-template/blob/feature/add-detailed-readme/LICENSE)
