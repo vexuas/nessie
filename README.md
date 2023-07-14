@@ -2,11 +2,15 @@
   <img src="https://cdn.discordapp.com/attachments/248430185463021569/955497690735738900/Nessie_Logo_v2.png" width=120px/>
 </div>
 
-# nessie | v1.10.4 <br>Apex Legends Discord Bot | Map Status
+# nessie <br>Apex Legends Map Status Discord Bot
 
 Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/
 
 <img width="900" alt="image" src="https://user-images.githubusercontent.com/42207245/163541135-2cd5f86e-8a63-4982-9557-7eceb6164f7c.png">
+<div>
+  <img width="450" alt="image" src="https://github.com/vexuas/nessie/assets/42207245/5b366cba-2362-4a87-af08-1a2a2fea5b99">
+  <img align="top" width="450" alt="image" src="https://github.com/vexuas/nessie/assets/42207245/c1018e89-1a66-4364-967a-b26a29e9355f">
+</div>
 
 
 ## Command list
