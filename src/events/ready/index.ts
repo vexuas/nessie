@@ -39,6 +39,7 @@ const registerApplicationCommands = async (commands?: AppCommand[]) => {
  * That being said since status already has a cron job at the 5th sec of the hour, I'm setting this up at the 10th sec
  */
 const scheduleSetCurrentMapGameStatus = (app: Client) => {
+  //Making this a different schedule for dev/prod instances. Just a couple of seconds off each other to not get rate limited by the API
   const gameStatusSchedule = ENV === 'dev' ? '7 */1 * * * *' : '10 */1 * * * *';
   return new Scheduler(gameStatusSchedule, async () => {
     try {
