@@ -39,7 +39,9 @@ const registerApplicationCommands = async (commands?: AppCommand[]) => {
  * That being said since status already has a cron job at the 5th sec of the hour, I'm setting this up at the 10th sec
  */
 const scheduleSetCurrentMapGameStatus = (app: Client) => {
-  return new Scheduler('10 */1 * * * *', async () => {
+  //Making this a different schedule for dev/prod instances. Just a couple of seconds off each other to not get rate limited by the API
+  const gameStatusSchedule = ENV === 'dev' ? '7 */1 * * * *' : '10 */1 * * * *';
+  return new Scheduler(gameStatusSchedule, async () => {
     try {
       if (!app.user) return;
       const data = await getBattleRoyalePubs();
@@ -66,12 +68,8 @@ export default function ({ app, appCommands }: EventModule) {
       const statusSchedule = scheduleStatus(app);
       statusSchedule.start();
 
-      if (ENV === 'dev') {
-        app.user && app.user.setActivity('Nessie Development');
-      } else {
-        const mapGameStatusSchedule = scheduleSetCurrentMapGameStatus(app);
-        mapGameStatusSchedule.start();
-      }
+      const mapGameStatusSchedule = scheduleSetCurrentMapGameStatus(app);
+      mapGameStatusSchedule.start();
     } catch (error) {
       sendErrorLog({ error });
     }
