@@ -1,8 +1,8 @@
 {
   "name": "nessie",
   "version": "2.0.5",
-  "description": "Apex Legends Map Rotation Discord Bot",
   "license": "MIT",
+  "description": "Apex Legends Map Rotation Discord Bot",
   "scripts": {
     "config:init": "yarn config:file && yarn config:bot && yarn config:als && yarn config:env && yarn config:notification && yarn config:database && yarn config:product && yarn config:topgg",
     "config:file": "mkdir src/config && touch src/config/environment.ts",
