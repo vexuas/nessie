@@ -1,3 +1,30 @@
+# v2.0.6 (Thu Jul 27 2023)
+
+#### 🐛 Fixes
+
+- Replace development status to map status [#169](https://github.com/vexuas/nessie/pull/169) ([@vexuas](https://github.com/vexuas))
+
+#### 🔧 Tweaks
+
+- Add license file [#172](https://github.com/vexuas/nessie/pull/172) ([@vexuas](https://github.com/vexuas))
+- Add basic guides to setting up self-hosted automatic map status [#171](https://github.com/vexuas/nessie/pull/171) ([@vexuas](https://github.com/vexuas))
+- Update readme [#168](https://github.com/vexuas/nessie/pull/168) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 07 14 [#167](https://github.com/vexuas/nessie/pull/167) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump word-wrap from 1.2.3 to 1.2.4 [#170](https://github.com/vexuas/nessie/pull/170) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.5 (Fri Jul 14 2023)
 
 #### 🔧 Tweaks
