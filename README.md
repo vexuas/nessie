@@ -67,7 +67,29 @@ Nessie uses Discord's Slash Commands `/`:
 ## Setting Up Automatic Map Status
 Gonna add a detailed guide here someday but use `status help` for now! It's probably straightforward enough. Probably.
 
-Cool links regarding the status command:
+For self-hosted projects, you are required to set up a [PostgreSQL](https://www.postgresql.org/) database to make the automatic updates work. Without the database, it will create the relevant channels, webhooks and the initial status message but the functionality stops there. I should probably also set up some guides for that but here are a couple of links to get you started with it for now:
+- Windows: https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/
+- Mac: https://postgresapp.com/
+- Linux: https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql-linux/
+
+After setting up the database, you would need to fill in the environment variable `DATABASE_CONFIG` with your database credentials. The typing for this is generally
+```ts
+type DatabaseConfig = {
+  database: string;
+  host: string;
+  user: string;
+  port: number;
+  password: string;
+  ssl: {
+    rejectUnauthorized: boolean;
+  };
+};
+```
+A more detailed breakdown of this can be found through the [node-postgres package](https://node-postgres.com/)
+
+With these done, give `status start` a whirl and the automatic updates *should* be working now
+
+Some cool links regarding the status command:
 - [Design Prototypes](https://www.figma.com/file/Zw83AgLQpObLpPlSoeEWjq/Automatic-Status-Prototype?node-id=144%3A4675)
 - [Adventures in Discord's Rate Limits](https://shizuka.notion.site/Adventures-in-Discord-s-Rate-Limits-4ef7fa20481f4e3b8a388d9cdb1021e7)
 - [Spike on Time Taken for Status Cycles](https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658)
