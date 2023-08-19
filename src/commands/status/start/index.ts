@@ -634,6 +634,7 @@ const handleStatusCycle = async ({
       statusLogChannel && (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
     }
   } catch (error: any) {
+    if (error.message === 'Internal Server Error') return;
     /**
      * Previously we sent an error notification to a channel whenever a status errors within a cycle
      * This was fine in the beginning so that I can be notified relatively fast
