@@ -1,4 +1,5 @@
 import { StringSelectMenuInteraction, ApplicationCommandOptionType } from 'discord.js';
+import { showStatusHelpMessage } from '../../commands/status/help';
 import {
   createStatus,
   goBackToGameModeSelection,
@@ -67,11 +68,17 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
         }
       }
       if (interaction.isAnySelectMenu()) {
+        await interaction.deferUpdate();
         switch (interaction.customId) {
           case 'statusStart__gameModeDropdown':
-            goToConfirmStatus({
+            await goToConfirmStatus({
               interaction: interaction as StringSelectMenuInteraction,
               mixpanel,
+            });
+            break;
+          case 'statusHelp__sectionDropdown':
+            await showStatusHelpMessage({
+              interaction: interaction as StringSelectMenuInteraction,
             });
             break;
         }

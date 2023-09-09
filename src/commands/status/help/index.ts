@@ -4,7 +4,9 @@ import {
   ChatInputCommandInteraction,
   inlineCode,
   StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
 } from 'discord.js';
+import { isEmpty } from 'lodash';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
@@ -38,40 +40,7 @@ const generateStatusHelpRow = (defaultValue: 'information' | 'setup' | 'permissi
   );
   return row;
 };
-const generateInformationSelectionMessage = () => {
-  const row = generateStatusHelpRow('information');
-  const embed: APIEmbed = {
-    description: 'Add information description here',
-    color: 3447003,
-  };
-  return {
-    embed,
-    row,
-  };
-};
-// const generateSetupSelectionMessage = () => {
-//   const row = generateStatusHelpRow('setup');
-//   const embed: APIEmbed = {
-//     description: 'Add setup description here',
-//     color: 3447003,
-//   };
-//   return {
-//     embed,
-//     row,
-//   };
-// };
-// const generatePermissionsSelectionMessage = () => {
-//   const row = generateStatusHelpRow('permissions');
-//   const embed: APIEmbed = {
-//     description: 'Add permissions description here',
-//     color: 3447003,
-//   };
-//   return {
-//     embed,
-//     row,
-//   };
-// };
-export const sendInformationInteraction = async ({
+export const sendStatusHelpInformationInteraction = async ({
   interaction,
   subCommand,
 }: {
@@ -79,13 +48,85 @@ export const sendInformationInteraction = async ({
   subCommand: string;
 }) => {
   try {
-    const { row } = generateInformationSelectionMessage();
+    const row = generateStatusHelpRow('information');
+    const embed: APIEmbed = {
+      description: 'Add information description here',
+      color: 3447003,
+    };
 
-    await interaction.editReply({ components: [row], content: 'something' });
+    await interaction.editReply({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction, subCommand });
   }
 };
+export const showStatusHelpMessage = async ({
+  interaction,
+}: {
+  interaction: StringSelectMenuInteraction;
+}) => {
+  const value = !isEmpty(interaction.values) ? interaction.values[0] : null;
+
+  switch (value) {
+    case 'sectionDropdown__informationValue':
+      await showStatusHelpInformation({ interaction });
+      break;
+    case 'sectionDropdown__setupValue':
+      await showStatusHelpSetup({ interaction });
+      break;
+    case 'sectionDropdown__permissionsValue':
+      await showStatusHelpPermissions({ interaction });
+      break;
+  }
+};
+export const showStatusHelpInformation = async ({
+  interaction,
+}: {
+  interaction: StringSelectMenuInteraction;
+}) => {
+  const row = generateStatusHelpRow('information');
+  const embed: APIEmbed = {
+    description: 'Add information description here',
+    color: 3447003,
+  };
+  try {
+    await interaction.message.edit({ embeds: [embed], components: [row] });
+  } catch (error) {
+    sendErrorLog({ error, interaction });
+  }
+};
+export const showStatusHelpSetup = async ({
+  interaction,
+}: {
+  interaction: StringSelectMenuInteraction;
+}) => {
+  const row = generateStatusHelpRow('setup');
+  const embed: APIEmbed = {
+    description: 'Add setup description here',
+    color: 3447003,
+  };
+  try {
+    await interaction.message.edit({ embeds: [embed], components: [row] });
+  } catch (error) {
+    sendErrorLog({ error, interaction });
+  }
+};
+export const showStatusHelpPermissions = async ({
+  interaction,
+}: {
+  interaction: StringSelectMenuInteraction;
+}) => {
+  const row = generateStatusHelpRow('permissions');
+  const embed: APIEmbed = {
+    description: 'Add permissions description here',
+    color: 3447003,
+  };
+  try {
+    await interaction.message.edit({ embeds: [embed], components: [row] });
+  } catch (error) {
+    sendErrorLog({ error, interaction });
+  }
+};
+
 /**
  * Handler for when a user initiates the /status help command
  * Displays information of status command, explains what it does and permissions it needs
