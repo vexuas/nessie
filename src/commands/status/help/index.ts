@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   APIEmbed,
+  bold,
   ChatInputCommandInteraction,
   inlineCode,
   StringSelectMenuBuilder,
@@ -14,6 +15,14 @@ import {
   sendErrorLog,
 } from '../../../utils/helpers';
 
+const informationDescription = `This command will send automatic updates of Apex Legends Map Rotations. Currently Nessie supports\n• ${bold(
+  'Battle Royale Pubs'
+)}\n• ${bold('Battle Royale Ranked')}\n• ${bold(
+  'Mixtape modes'
+)}\n\n Automatic updates occur every ${bold(
+  '5'
+)} minutes.\n\nNessie also offers the option to get notified when a particular map starts.`;
+
 const generateStatusHelpRow = (defaultValue: 'information' | 'setup' | 'permissions') => {
   const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
     new StringSelectMenuBuilder()
@@ -25,16 +34,19 @@ const generateStatusHelpRow = (defaultValue: 'information' | 'setup' | 'permissi
           label: 'Information',
           value: 'sectionDropdown__informationValue',
           default: defaultValue === 'information',
+          emoji: { name: 'ℹ️' },
         },
         {
           label: 'Setup',
           value: 'sectionDropdown__setupValue',
           default: defaultValue === 'setup',
+          emoji: { name: '🛠️' },
         },
         {
           label: 'Permissions',
           value: 'sectionDropdown__permissionsValue',
           default: defaultValue === 'permissions',
+          emoji: { name: '⚙️' },
         },
       ])
   );
@@ -50,7 +62,7 @@ export const sendStatusHelpInformationInteraction = async ({
   try {
     const row = generateStatusHelpRow('information');
     const embed: APIEmbed = {
-      description: 'Add information description here',
+      description: informationDescription,
       color: 3447003,
     };
 
@@ -85,7 +97,7 @@ export const showStatusHelpInformation = async ({
 }) => {
   const row = generateStatusHelpRow('information');
   const embed: APIEmbed = {
-    description: 'Add information description here',
+    description: informationDescription,
     color: 3447003,
   };
   try {
