@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { AppCommand, AppCommandOptions } from '../commands';
-import { sendHelpInteraction } from './help';
+import { sendInformationInteraction } from './help';
 import { sendStartInteraction } from './start';
 import { sendStopInteraction } from './stop';
 
@@ -25,7 +25,8 @@ export default {
     await interaction.deferReply();
     switch (subCommand) {
       case 'help':
-        return sendHelpInteraction({ interaction, subCommand });
+        return sendInformationInteraction({ interaction, subCommand });
+      // return sendHelpInteraction({ interaction, subCommand });
       case 'start':
         return sendStartInteraction({ interaction, subCommand });
       case 'stop':

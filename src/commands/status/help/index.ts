@@ -1,4 +1,10 @@
-import { ChatInputCommandInteraction, inlineCode } from 'discord.js';
+import {
+  ActionRowBuilder,
+  APIEmbed,
+  ChatInputCommandInteraction,
+  inlineCode,
+  StringSelectMenuBuilder,
+} from 'discord.js';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
@@ -6,6 +12,80 @@ import {
   sendErrorLog,
 } from '../../../utils/helpers';
 
+const generateStatusHelpRow = (defaultValue: 'information' | 'setup' | 'permissions') => {
+  const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId('statusHelp__sectionDropdown')
+      .setMinValues(1)
+      .setMaxValues(1)
+      .addOptions([
+        {
+          label: 'Information',
+          value: 'sectionDropdown__informationValue',
+          default: defaultValue === 'information',
+        },
+        {
+          label: 'Setup',
+          value: 'sectionDropdown__setupValue',
+          default: defaultValue === 'setup',
+        },
+        {
+          label: 'Permissions',
+          value: 'sectionDropdown__permissionsValue',
+          default: defaultValue === 'permissions',
+        },
+      ])
+  );
+  return row;
+};
+const generateInformationSelectionMessage = () => {
+  const row = generateStatusHelpRow('information');
+  const embed: APIEmbed = {
+    description: 'Add information description here',
+    color: 3447003,
+  };
+  return {
+    embed,
+    row,
+  };
+};
+// const generateSetupSelectionMessage = () => {
+//   const row = generateStatusHelpRow('setup');
+//   const embed: APIEmbed = {
+//     description: 'Add setup description here',
+//     color: 3447003,
+//   };
+//   return {
+//     embed,
+//     row,
+//   };
+// };
+// const generatePermissionsSelectionMessage = () => {
+//   const row = generateStatusHelpRow('permissions');
+//   const embed: APIEmbed = {
+//     description: 'Add permissions description here',
+//     color: 3447003,
+//   };
+//   return {
+//     embed,
+//     row,
+//   };
+// };
+export const sendInformationInteraction = async ({
+  interaction,
+  subCommand,
+}: {
+  interaction: ChatInputCommandInteraction;
+  subCommand: string;
+}) => {
+  try {
+    const { row } = generateInformationSelectionMessage();
+
+    await interaction.editReply({ components: [row], content: 'something' });
+  } catch (error) {
+    sendErrorLog({ error, interaction, subCommand });
+  }
+};
 /**
  * Handler for when a user initiates the /status help command
  * Displays information of status command, explains what it does and permissions it needs
