@@ -12,6 +12,7 @@ import {
   PermissionFlagsBits,
   ButtonInteraction,
   GuildMember,
+  StringSelectMenuInteraction,
 } from 'discord.js';
 import {
   BOOT_NOTIFICATION_CHANNEL_ID,
@@ -386,7 +387,9 @@ export const generateRankedEmbed = (
   return embedData;
 };
 //TODO: Refactor this someday
-export const checkMissingBotPermissions = (interaction: ChatInputCommandInteraction) => {
+export const checkMissingBotPermissions = (
+  interaction: ChatInputCommandInteraction | StringSelectMenuInteraction
+) => {
   const { guild } = interaction;
 
   const hasAdmin =
@@ -422,7 +425,9 @@ export const checkMissingBotPermissions = (interaction: ChatInputCommandInteract
     hasMissingPermissions,
   };
 };
-export const checkIfUserHasManageServer = (interaction: ChatInputCommandInteraction) => {
+export const checkIfUserHasManageServer = (
+  interaction: ChatInputCommandInteraction | StringSelectMenuInteraction
+) => {
   return (
     interaction.member &&
     interaction.member instanceof GuildMember &&

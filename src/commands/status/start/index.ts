@@ -235,7 +235,6 @@ export const goToConfirmStatus = async ({
 }) => {
   const { embed, row } = generateConfirmStatusMessage({ interaction });
   try {
-    await interaction.deferUpdate();
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm Error' });
