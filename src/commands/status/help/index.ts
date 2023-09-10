@@ -3,6 +3,7 @@ import {
   APIEmbed,
   bold,
   ChatInputCommandInteraction,
+  inlineCode,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
@@ -107,7 +108,13 @@ export const showStatusHelpSetup = async ({
 }) => {
   const row = generateStatusHelpRow('setup');
   const embed: APIEmbed = {
-    description: 'Add setup description here',
+    description: `To start an automatic map status, use ${inlineCode(
+      '/status start'
+    )}\n\nUpon choosing your game modes, Nessie will create a set of:\n• ${inlineCode(
+      'Category Channel'
+    )}\n• ${inlineCode('Text Channel')}\n• ${inlineCode(
+      'Webhook'
+    )}\n\nUpdates will then be sent in these channels ${bold('every 5 minutes')}`,
     color: 3447003,
   };
   try {
