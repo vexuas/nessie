@@ -107,6 +107,7 @@ export const showStatusHelpSetup = async ({
   interaction: StringSelectMenuInteraction;
 }) => {
   const row = generateStatusHelpRow('setup');
+  // TODO: Add created roles after wiring up
   const embed: APIEmbed = {
     description: `To start an automatic map status, use ${inlineCode(
       '/status start'
