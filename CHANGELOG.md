@@ -1,3 +1,19 @@
+# v2.0.7 (Sun Aug 20 2023)
+
+#### 🔧 Tweaks
+
+- Ignore internal server errors [#174](https://github.com/vexuas/nessie/pull/174) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 07 27 [#173](https://github.com/vexuas/nessie/pull/173) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.6 (Thu Jul 27 2023)
 
 #### 🐛 Fixes
