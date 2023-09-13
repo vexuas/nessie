@@ -1,4 +1,5 @@
 import { StringSelectMenuInteraction, ApplicationCommandOptionType } from 'discord.js';
+import { createSpikeRole } from '../../commands/spikeRoles';
 import { showStatusHelpMessage } from '../../commands/status/help';
 import {
   createStatus,
@@ -59,6 +60,9 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             break;
           case 'statusStop__stopButton':
             deleteGuildStatus({ interaction, nessie: app, mixpanel });
+            break;
+          case 'spikeRole__createRole':
+            createSpikeRole(interaction);
             break;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
