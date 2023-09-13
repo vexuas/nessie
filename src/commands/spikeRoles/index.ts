@@ -23,6 +23,22 @@ export const createSpikeRole = async (interaction: ButtonInteraction) => {
     sendErrorLog({ interaction, error });
   }
 };
+export const assignSpikeRole = async (interaction: ButtonInteraction) => {
+  try {
+    await interaction.deferUpdate();
+    const { guild, member } = interaction;
+    const role = await guild?.roles.fetch('1151576864314363976');
+
+    member &&
+      role &&
+      (await guild?.members.addRole({
+        user: member.user.id,
+        role: role.id,
+      }));
+  } catch (error) {
+    sendErrorLog({ interaction, error });
+  }
+};
 
 export default {
   data: new SlashCommandBuilder()
@@ -35,7 +51,11 @@ export default {
         new ButtonBuilder()
           .setLabel('Create Role')
           .setStyle(ButtonStyle.Success)
-          .setCustomId('spikeRole__createRole')
+          .setCustomId('spikeRole__createRole'),
+        new ButtonBuilder()
+          .setLabel('Assign Role')
+          .setStyle(ButtonStyle.Primary)
+          .setCustomId('spikeRole__assignRole')
       );
       const {
         hasAdmin,
