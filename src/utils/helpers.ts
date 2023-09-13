@@ -412,9 +412,18 @@ export const checkMissingBotPermissions = (
     guild &&
     guild.members.me &&
     guild.members.me.permissions.has(PermissionFlagsBits.SendMessages, false);
+  const hasManageRoles =
+    guild &&
+    guild.members.me &&
+    guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles, false);
 
   const hasMissingPermissions =
-    (!hasManageChannels || !hasViewChannel || !hasManageWebhooks || !hasSendMessages) && !hasAdmin; //Overrides missing permissions if nessie has Admin
+    (!hasManageChannels ||
+      !hasViewChannel ||
+      !hasManageWebhooks ||
+      !hasSendMessages ||
+      !hasManageRoles) &&
+    !hasAdmin; //Overrides missing permissions if nessie has Admin
 
   return {
     hasAdmin,
@@ -423,6 +432,7 @@ export const checkMissingBotPermissions = (
     hasSendMessages,
     hasViewChannel,
     hasMissingPermissions,
+    hasManageRoles,
   };
 };
 export const checkIfUserHasManageServer = (
