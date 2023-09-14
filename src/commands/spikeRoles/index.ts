@@ -39,6 +39,17 @@ export const assignSpikeRole = async (interaction: ButtonInteraction) => {
     sendErrorLog({ interaction, error });
   }
 };
+export const pingSpikeRole = async (interaction: ButtonInteraction) => {
+  try {
+    await interaction.deferUpdate();
+    const { channel } = interaction;
+
+    channel &&
+      (await channel.send({ content: `${roleMention('1151576864314363976')} Map start!` }));
+  } catch (error) {
+    sendErrorLog({ interaction, error });
+  }
+};
 
 export default {
   data: new SlashCommandBuilder()
@@ -55,7 +66,11 @@ export default {
         new ButtonBuilder()
           .setLabel('Assign Role')
           .setStyle(ButtonStyle.Primary)
-          .setCustomId('spikeRole__assignRole')
+          .setCustomId('spikeRole__assignRole'),
+        new ButtonBuilder()
+          .setLabel('Ping Role')
+          .setStyle(ButtonStyle.Danger)
+          .setCustomId('spikeRole__pingRole')
       );
       const {
         hasAdmin,

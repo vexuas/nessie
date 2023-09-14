@@ -1,5 +1,5 @@
 import { StringSelectMenuInteraction, ApplicationCommandOptionType } from 'discord.js';
-import { assignSpikeRole, createSpikeRole } from '../../commands/spikeRoles';
+import { assignSpikeRole, createSpikeRole, pingSpikeRole } from '../../commands/spikeRoles';
 import { showStatusHelpMessage } from '../../commands/status/help';
 import {
   createStatus,
@@ -66,6 +66,9 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
             break;
           case 'spikeRole__assignRole':
             assignSpikeRole(interaction);
+            break;
+          case 'spikeRole__pingRole':
+            pingSpikeRole(interaction);
             break;
           default:
             if (interaction.customId.includes('statusStart__confirmButton')) {
