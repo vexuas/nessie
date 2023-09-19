@@ -14,9 +14,9 @@ import {
   sendErrorLog,
 } from '../../../utils/helpers';
 
-const informationDescription = `This command will send automatic updates of Apex Legends Map Rotations. Currently Nessie supports:\n• Battle Royale Pubs\n• Battle Royale Ranked\n• Mixtape modes\n\n Automatic updates occur every ${bold(
+const informationDescription = `This command will send automatic updates of Apex Legends Map Rotations. Currently Nessie supports:\n• Battle Royale Pubs\n• Battle Royale Ranked\n\n Automatic updates occur every ${bold(
   '5'
-)} minutes.\n\nNessie also offers the option to get notified when a particular map starts.`;
+)} minutes.`;
 
 const generateStatusHelpRow = (defaultValue: 'information' | 'setup' | 'permissions') => {
   const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -57,6 +57,7 @@ export const sendStatusHelpInformationInteraction = async ({
   try {
     const row = generateStatusHelpRow('information');
     const embed: APIEmbed = {
+      title: 'Information',
       description: informationDescription,
       color: 3447003,
     };
@@ -92,6 +93,7 @@ export const showStatusHelpInformation = async ({
 }) => {
   const row = generateStatusHelpRow('information');
   const embed: APIEmbed = {
+    title: 'Information',
     description: informationDescription,
     color: 3447003,
   };
@@ -109,6 +111,7 @@ export const showStatusHelpSetup = async ({
   const row = generateStatusHelpRow('setup');
   // TODO: Add created roles after wiring up
   const embed: APIEmbed = {
+    title: 'Setup',
     description: `To start an automatic map status, use ${inlineCode(
       '/status start'
     )}\n\nUpon choosing your game modes, Nessie will create a set of:\n• ${inlineCode(
@@ -141,6 +144,7 @@ export const showStatusHelpPermissions = async ({
 
   const row = generateStatusHelpRow('permissions');
   const embed: APIEmbed = {
+    title: 'Permissions',
     description: `Nessie requires certain permissions to properly create automatic updates. See the checklist below for the full list.`,
     fields: [
       {
