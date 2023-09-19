@@ -1,3 +1,21 @@
+# v2.0.8 (Wed Sep 20 2023)
+
+#### 🔧 Tweaks
+
+- Remove alerts information for now [#179](https://github.com/vexuas/nessie/pull/179) ([@vexuas](https://github.com/vexuas))
+- Replace ltm with mixtape [#178](https://github.com/vexuas/nessie/pull/178) ([@vexuas](https://github.com/vexuas))
+- Update status help layout [#176](https://github.com/vexuas/nessie/pull/176) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 08 20 [#175](https://github.com/vexuas/nessie/pull/175) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.7 (Sun Aug 20 2023)
 
 #### 🔧 Tweaks
