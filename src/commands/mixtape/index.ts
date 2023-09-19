@@ -34,7 +34,7 @@ export const generateLimitedTimeEventEmbed = (data: MapRotationLimitedTimeMapSch
 export default {
   commandType: 'Maps',
   data: new SlashCommandBuilder()
-    .setName('ltm')
+    .setName('mixtape')
     .setDescription('Shows current limited time mode map rotation'),
   async execute({ interaction }: AppCommandOptions) {
     try {
