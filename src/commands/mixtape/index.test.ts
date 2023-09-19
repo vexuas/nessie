@@ -55,7 +55,7 @@ describe('Ltm Command', () => {
   it('displays the correct title', () => {
     const embed = generateMixtapeEmbed(mockData);
 
-    expect(embed.title).toBe(mockData.current.eventName);
+    expect(embed.title).toBe('Mixtape');
   });
   //TODO: Add test for different map url once getMapUrl is tested/refactored
   it('displays the correct image url', () => {
@@ -66,7 +66,7 @@ describe('Ltm Command', () => {
   it('displays the correct map in the footer', () => {
     const embed = generateMixtapeEmbed(mockData);
 
-    expect(embed.footer?.text).toBe(`Next Map: ${mockData.next.map}`);
+    expect(embed.footer?.text).toBe(`Next Mode: ${mockData.next.eventName} | ${mockData.next.map}`);
   });
   //FLAKY: Figure out a better way to test dates
   it.skip('displays the correct ending time of the current map at the timestamp', () => {
@@ -79,8 +79,10 @@ describe('Ltm Command', () => {
   it('displays the correct map in the Current Map field', () => {
     const embed = generateMixtapeEmbed(mockData);
 
-    expect(embed.fields && embed.fields[0].name).toBe('Current map');
-    expect(embed.fields && embed.fields[0].value).toContain(mockData.current.map);
+    expect(embed.fields && embed.fields[0].name).toBe('Current mode');
+    expect(embed.fields && embed.fields[0].value).toContain(
+      `${mockData.current.eventName} | ${mockData.current.map}`
+    );
   });
   //TODO: Add test for different countdown once getCountdown is tested/refactored
   it('displays the correct countdown in the Time Left field', () => {
