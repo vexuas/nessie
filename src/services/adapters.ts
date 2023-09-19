@@ -5,7 +5,7 @@ import {
   MapRotationArenasRankedSchema,
   MapRotationArenasSchema,
   MapRotationBattleRoyaleSchema,
-  MapRotationLimitedTimeMapSchema,
+  MapRotationMixtapeSchema,
   MapRotationRankedSchema,
 } from '../schemas/mapRotation';
 
@@ -32,7 +32,7 @@ export async function getArenasRanked(): Promise<MapRotationArenasRankedSchema> 
   const response = await getRotationData();
   return response.arenasRanked;
 }
-export async function getLimitedTimeEvent(): Promise<MapRotationLimitedTimeMapSchema> {
+export async function getMixtape(): Promise<MapRotationMixtapeSchema> {
   const response = await getRotationData();
   return response.ltm;
 }

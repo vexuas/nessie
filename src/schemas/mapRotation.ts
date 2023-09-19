@@ -3,7 +3,7 @@ export interface MapRotationAPIObject {
   arenas: MapRotationArenasSchema;
   ranked: MapRotationRankedSchema;
   arenasRanked: MapRotationArenasRankedSchema;
-  ltm: MapRotationLimitedTimeMapSchema;
+  ltm: MapRotationMixtapeSchema;
 }
 interface MapRotationCurrentSchema {
   start: number;
@@ -30,11 +30,11 @@ interface MapRotationNextSchema {
   DurationInMinutes: number;
   asset: string;
 }
-interface MapRotationLimitedTimeMapCurrentSchema extends MapRotationCurrentSchema {
+interface MapRotationMixtapeCurrentSchema extends MapRotationCurrentSchema {
   isActive: boolean;
   eventName: string;
 }
-interface MapRotationLimitedTimeMapNextSchema extends MapRotationNextSchema {
+interface MapRotationMixtapeNextSchema extends MapRotationNextSchema {
   isActive: boolean;
   eventName: string;
 }
@@ -54,7 +54,7 @@ export interface MapRotationArenasRankedSchema {
   current: MapRotationCurrentSchema;
   next?: MapRotationNextSchema;
 }
-export interface MapRotationLimitedTimeMapSchema {
-  current: MapRotationLimitedTimeMapCurrentSchema;
-  next: MapRotationLimitedTimeMapNextSchema;
+export interface MapRotationMixtapeSchema {
+  current: MapRotationMixtapeCurrentSchema;
+  next: MapRotationMixtapeNextSchema;
 }

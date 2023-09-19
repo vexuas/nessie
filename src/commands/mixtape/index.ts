@@ -1,25 +1,24 @@
 import { APIEmbed, SlashCommandBuilder } from 'discord.js';
-import { MapRotationLimitedTimeMapSchema } from '../../schemas/mapRotation';
-import { getLimitedTimeEvent } from '../../services/adapters';
-import { getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
+import { MapRotationMixtapeSchema } from '../../schemas/mapRotation';
+import { getMixtape } from '../../services/adapters';
+import { getCountdown, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
-export const generateLimitedTimeEventEmbed = (data: MapRotationLimitedTimeMapSchema): APIEmbed => {
-  const mapURL = getMapUrl(data.current.code);
+export const generateMixtapeEmbed = (data: MapRotationMixtapeSchema): APIEmbed => {
   const embedData: APIEmbed = {
-    title: data.current.eventName,
+    title: `Mixtape`,
     color: 15105570,
     image: {
-      url: mapURL && mapURL.length > 0 ? mapURL : data.current.asset,
+      url: data.current.asset,
     },
     timestamp: new Date(Date.now() + data.current.remainingSecs * 1000).toISOString(),
     footer: {
-      text: `Next Map: ${data.next.map}`,
+      text: `Next Mode: ${data.next.eventName} | ${data.next.map}`,
     },
     fields: [
       {
-        name: 'Current map',
-        value: '```fix\n\n' + data.current.map + '```',
+        name: 'Current mode',
+        value: '```fix\n\n' + `${data.current.eventName} | ${data.current.map}` + '```',
         inline: true,
       },
       {
@@ -34,13 +33,14 @@ export const generateLimitedTimeEventEmbed = (data: MapRotationLimitedTimeMapSch
 export default {
   commandType: 'Maps',
   data: new SlashCommandBuilder()
-    .setName('ltm')
-    .setDescription('Shows current limited time mode map rotation'),
+    .setName('mixtape')
+    .setDescription('Shows current mode and map rotation for mixtape'),
   async execute({ interaction }: AppCommandOptions) {
     try {
       await interaction.deferReply();
-      const data = await getLimitedTimeEvent();
-      const embed = generateLimitedTimeEventEmbed(data);
+      const data = await getMixtape();
+      console.log(data);
+      const embed = generateMixtapeEmbed(data);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       sendErrorLog({ error, interaction });

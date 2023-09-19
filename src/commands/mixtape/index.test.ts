@@ -1,7 +1,7 @@
-import { generateLimitedTimeEventEmbed } from '.';
-import { MapRotationLimitedTimeMapSchema } from '../../schemas/mapRotation';
+import { generateMixtapeEmbed } from '.';
+import { MapRotationMixtapeSchema } from '../../schemas/mapRotation';
 
-const mockData: MapRotationLimitedTimeMapSchema = {
+const mockData: MapRotationMixtapeSchema = {
   current: {
     start: 1688924700,
     end: 1688925600,
@@ -35,12 +35,12 @@ const mockData: MapRotationLimitedTimeMapSchema = {
 
 describe('Ltm Command', () => {
   it('generates an embed correctly', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
     expect(embed).not.toBeUndefined();
   });
   it('displays the correct fields in the embed', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
     expect(embed.title).not.toBeUndefined();
     expect(embed.color).not.toBeUndefined();
@@ -53,38 +53,40 @@ describe('Ltm Command', () => {
     expect(embed.timestamp).not.toBeUndefined();
   });
   it('displays the correct title', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
-    expect(embed.title).toBe(mockData.current.eventName);
+    expect(embed.title).toBe('Mixtape');
   });
   //TODO: Add test for different map url once getMapUrl is tested/refactored
   it('displays the correct image url', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
     expect(embed.image?.url).toBe(mockData.current.asset);
   });
   it('displays the correct map in the footer', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
-    expect(embed.footer?.text).toBe(`Next Map: ${mockData.next.map}`);
+    expect(embed.footer?.text).toBe(`Next Mode: ${mockData.next.eventName} | ${mockData.next.map}`);
   });
   //FLAKY: Figure out a better way to test dates
   it.skip('displays the correct ending time of the current map at the timestamp', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
     expect(embed.timestamp).toBe(
       new Date(Date.now() + mockData.current.remainingSecs * 1000).toISOString()
     );
   });
   it('displays the correct map in the Current Map field', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
-    expect(embed.fields && embed.fields[0].name).toBe('Current map');
-    expect(embed.fields && embed.fields[0].value).toContain(mockData.current.map);
+    expect(embed.fields && embed.fields[0].name).toBe('Current mode');
+    expect(embed.fields && embed.fields[0].value).toContain(
+      `${mockData.current.eventName} | ${mockData.current.map}`
+    );
   });
   //TODO: Add test for different countdown once getCountdown is tested/refactored
   it('displays the correct countdown in the Time Left field', () => {
-    const embed = generateLimitedTimeEventEmbed(mockData);
+    const embed = generateMixtapeEmbed(mockData);
 
     expect(embed.fields && embed.fields[1].name).toBe('Time left');
     expect(embed.fields && embed.fields[1].value).toContain('04 mins 00 secs');
