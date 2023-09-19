@@ -8,6 +8,8 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import { isEmpty } from 'lodash';
+import { Mixpanel } from 'mixpanel';
+import { sendAnalyticsEvent } from '../../../services/analytics';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
@@ -69,27 +71,31 @@ export const sendStatusHelpInformationInteraction = async ({
 };
 export const showStatusHelpMessage = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const value = !isEmpty(interaction.values) ? interaction.values[0] : null;
 
   switch (value) {
     case 'sectionDropdown__informationValue':
-      await showStatusHelpInformation({ interaction });
+      await showStatusHelpInformation({ interaction, mixpanel });
       break;
     case 'sectionDropdown__setupValue':
-      await showStatusHelpSetup({ interaction });
+      await showStatusHelpSetup({ interaction, mixpanel });
       break;
     case 'sectionDropdown__permissionsValue':
-      await showStatusHelpPermissions({ interaction });
+      await showStatusHelpPermissions({ interaction, mixpanel });
       break;
   }
 };
 export const showStatusHelpInformation = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const row = generateStatusHelpRow('information');
   const embed: APIEmbed = {
@@ -101,12 +107,23 @@ export const showStatusHelpInformation = async ({
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction });
+  } finally {
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status help information select menu',
+      });
   }
 };
 export const showStatusHelpSetup = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const row = generateStatusHelpRow('setup');
   // TODO: Add created roles after wiring up
@@ -125,12 +142,23 @@ export const showStatusHelpSetup = async ({
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction });
+  } finally {
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status help setup select menu',
+      });
   }
 };
 export const showStatusHelpPermissions = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const {
     hasAdmin,
@@ -174,5 +202,14 @@ export const showStatusHelpPermissions = async ({
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction });
+  } finally {
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status help permissions select menu',
+      });
   }
 };

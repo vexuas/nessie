@@ -79,6 +79,7 @@ export default function ({ app, mixpanel, appCommands }: EventModule) {
           case 'statusHelp__sectionDropdown':
             await showStatusHelpMessage({
               interaction: interaction as StringSelectMenuInteraction,
+              mixpanel,
             });
             break;
         }
