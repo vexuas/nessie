@@ -8,15 +8,17 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import { isEmpty } from 'lodash';
+import { Mixpanel } from 'mixpanel';
+import { sendAnalyticsEvent } from '../../../services/analytics';
 import {
   checkIfUserHasManageServer,
   checkMissingBotPermissions,
   sendErrorLog,
 } from '../../../utils/helpers';
 
-const informationDescription = `This command will send automatic updates of Apex Legends Map Rotations. Currently Nessie supports:\n• Battle Royale Pubs\n• Battle Royale Ranked\n• Mixtape modes\n\n Automatic updates occur every ${bold(
+const informationDescription = `This command will send automatic updates of Apex Legends Map Rotations. Currently Nessie supports:\n• Battle Royale Pubs\n• Battle Royale Ranked\n\n Automatic updates occur every ${bold(
   '5'
-)} minutes.\n\nNessie also offers the option to get notified when a particular map starts.`;
+)} minutes.`;
 
 const generateStatusHelpRow = (defaultValue: 'information' | 'setup' | 'permissions') => {
   const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -57,6 +59,7 @@ export const sendStatusHelpInformationInteraction = async ({
   try {
     const row = generateStatusHelpRow('information');
     const embed: APIEmbed = {
+      title: 'Information',
       description: informationDescription,
       color: 3447003,
     };
@@ -68,30 +71,35 @@ export const sendStatusHelpInformationInteraction = async ({
 };
 export const showStatusHelpMessage = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const value = !isEmpty(interaction.values) ? interaction.values[0] : null;
 
   switch (value) {
     case 'sectionDropdown__informationValue':
-      await showStatusHelpInformation({ interaction });
+      await showStatusHelpInformation({ interaction, mixpanel });
       break;
     case 'sectionDropdown__setupValue':
-      await showStatusHelpSetup({ interaction });
+      await showStatusHelpSetup({ interaction, mixpanel });
       break;
     case 'sectionDropdown__permissionsValue':
-      await showStatusHelpPermissions({ interaction });
+      await showStatusHelpPermissions({ interaction, mixpanel });
       break;
   }
 };
 export const showStatusHelpInformation = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const row = generateStatusHelpRow('information');
   const embed: APIEmbed = {
+    title: 'Information',
     description: informationDescription,
     color: 3447003,
   };
@@ -99,16 +107,28 @@ export const showStatusHelpInformation = async ({
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction });
+  } finally {
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status help information select menu',
+      });
   }
 };
 export const showStatusHelpSetup = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const row = generateStatusHelpRow('setup');
   // TODO: Add created roles after wiring up
   const embed: APIEmbed = {
+    title: 'Setup',
     description: `To start an automatic map status, use ${inlineCode(
       '/status start'
     )}\n\nUpon choosing your game modes, Nessie will create a set of:\n• ${inlineCode(
@@ -122,12 +142,23 @@ export const showStatusHelpSetup = async ({
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction });
+  } finally {
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status help setup select menu',
+      });
   }
 };
 export const showStatusHelpPermissions = async ({
   interaction,
+  mixpanel,
 }: {
   interaction: StringSelectMenuInteraction;
+  mixpanel?: Mixpanel | null;
 }) => {
   const {
     hasAdmin,
@@ -141,6 +172,7 @@ export const showStatusHelpPermissions = async ({
 
   const row = generateStatusHelpRow('permissions');
   const embed: APIEmbed = {
+    title: 'Permissions',
     description: `Nessie requires certain permissions to properly create automatic updates. See the checklist below for the full list.`,
     fields: [
       {
@@ -170,5 +202,14 @@ export const showStatusHelpPermissions = async ({
     await interaction.message.edit({ embeds: [embed], components: [row] });
   } catch (error) {
     sendErrorLog({ error, interaction });
+  } finally {
+    mixpanel &&
+      sendAnalyticsEvent({
+        user: interaction.user,
+        channel: interaction.inGuild() ? interaction.channel : null,
+        guild: interaction.guild,
+        client: mixpanel,
+        eventName: 'Click status help permissions select menu',
+      });
   }
 };
