@@ -1,7 +1,7 @@
 import { generateMixtapeEmbed } from '.';
-import { MapRotationLimitedTimeMapSchema } from '../../schemas/mapRotation';
+import { MapRotationMixtapeSchema } from '../../schemas/mapRotation';
 
-const mockData: MapRotationLimitedTimeMapSchema = {
+const mockData: MapRotationMixtapeSchema = {
   current: {
     start: 1688924700,
     end: 1688925600,

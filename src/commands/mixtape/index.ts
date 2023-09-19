@@ -1,10 +1,10 @@
 import { APIEmbed, SlashCommandBuilder } from 'discord.js';
-import { MapRotationLimitedTimeMapSchema } from '../../schemas/mapRotation';
-import { getLimitedTimeEvent } from '../../services/adapters';
+import { MapRotationMixtapeSchema } from '../../schemas/mapRotation';
+import { getMixtape } from '../../services/adapters';
 import { getCountdown, getMapUrl, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
-export const generateMixtapeEmbed = (data: MapRotationLimitedTimeMapSchema): APIEmbed => {
+export const generateMixtapeEmbed = (data: MapRotationMixtapeSchema): APIEmbed => {
   const mapURL = getMapUrl(data.current.code);
   const embedData: APIEmbed = {
     title: data.current.eventName,
@@ -39,7 +39,7 @@ export default {
   async execute({ interaction }: AppCommandOptions) {
     try {
       await interaction.deferReply();
-      const data = await getLimitedTimeEvent();
+      const data = await getMixtape();
       const embed = generateMixtapeEmbed(data);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
