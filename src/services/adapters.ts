@@ -36,3 +36,8 @@ export async function getMixtape(): Promise<MapRotationMixtapeSchema> {
   const response = await getRotationData();
   return response.ltm;
 }
+export async function getSeasonInformation(): Promise<any> {
+  const response: string = (await got.get('https://api.jumpmaster.xyz/seasons/Current')).body;
+  const r = JSON.parse(response);
+  console.log(r);
+}

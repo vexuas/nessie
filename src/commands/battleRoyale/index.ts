@@ -1,5 +1,9 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { getBattleRoyalePubs, getBattleRoyaleRanked } from '../../services/adapters';
+import {
+  getBattleRoyalePubs,
+  getBattleRoyaleRanked,
+  getSeasonInformation,
+} from '../../services/adapters';
 import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
@@ -24,6 +28,7 @@ export default {
       switch (optionMode) {
         case 'br_pubs':
           data = await getBattleRoyalePubs();
+          await getSeasonInformation();
           embed = generatePubsEmbed(data);
           break;
         case 'br_ranked':
