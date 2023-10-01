@@ -32,6 +32,7 @@ import {
   generateErrorEmbed,
   sendErrorLog,
   sendStatusErrorLog,
+  formatSeasonEndCountdown,
 } from '../../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
 import { getRotationData, getSeasonInformation } from '../../../services/adapters';
@@ -161,7 +162,11 @@ const generateConfirmStatusMessage = ({
  */
 const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject, season: SeasonAPISchema) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked, 'Battle Royale', season);
+  const seasonEnd = formatSeasonEndCountdown({
+    seasonEnd: season.dates.End * 1000,
+    currentDate: new Date(),
+  });
+  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked, 'Battle Royale', seasonEnd);
   const informationEmbed = {
     description: '**Updates occur every 5 minutes**',
     color: 3447003,

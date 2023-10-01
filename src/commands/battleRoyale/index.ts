@@ -4,7 +4,12 @@ import {
   getBattleRoyaleRanked,
   getSeasonInformation,
 } from '../../services/adapters';
-import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
+import {
+  formatSeasonEndCountdown,
+  generatePubsEmbed,
+  generateRankedEmbed,
+  sendErrorLog,
+} from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
 export default {
@@ -33,7 +38,11 @@ export default {
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
           const season = await getSeasonInformation();
-          embed = generateRankedEmbed(data, 'Battle Royale', season);
+          const seasonEnd = formatSeasonEndCountdown({
+            seasonEnd: season.dates.End * 1000,
+            currentDate: new Date(),
+          });
+          embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd);
           break;
       }
       await interaction.editReply({ embeds: [embed] });
