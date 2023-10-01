@@ -33,7 +33,7 @@ export default {
       switch (optionMode) {
         case 'br_pubs':
           data = await getBattleRoyalePubs();
-          embed = generatePubsEmbed(data, 'Battle Royale');
+          embed = generatePubsEmbed(data);
           break;
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
