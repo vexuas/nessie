@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, formatDistanceStrict } from 'date-fns';
 import {
   AnySelectMenuInteraction,
   APIEmbed,
@@ -528,4 +528,16 @@ export const sendWrongUserWarning = async ({
       eventName: 'Click wrong user button',
     });
   interaction.editReply({ embeds: [wrongUserEmbed] });
+};
+
+export const formatSeasonEndCountdown = ({
+  seasonEnd,
+  currentDate = new Date(),
+}: {
+  seasonEnd: number | Date;
+  currentDate?: Date;
+}) => {
+  return formatDistanceStrict(seasonEnd, currentDate, {
+    unit: 'day',
+  });
 };
