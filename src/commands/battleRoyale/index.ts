@@ -38,6 +38,7 @@ export default {
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
           const season = await getSeasonInformation();
+          //TODO: Figure out formatting for different timezones eventually
           const seasonEnd = formatSeasonEndCountdown({
             seasonEnd: season.dates.End * 1000,
             currentDate: new Date(),
