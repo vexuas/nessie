@@ -21,7 +21,6 @@ export async function getRotationData(): Promise<MapRotationAPIObject> {
   return JSON.parse(response);
 }
 export async function getSeasonInformation(): Promise<SeasonAPISchema> {
-  //
   const response: string = (await got.get(seasonUrl)).body;
   return JSON.parse(response);
 }
