@@ -1,4 +1,4 @@
-import { format, formatDistanceStrict } from 'date-fns';
+import { differenceInMilliseconds, format, formatDistanceStrict, isBefore } from 'date-fns';
 import {
   AnySelectMenuInteraction,
   APIEmbed,
@@ -358,7 +358,7 @@ export const generatePubsEmbed = (
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
   type = 'Battle Royale',
-  seasonEnd?: string
+  seasonEnd?: string | null
 ) => {
   const embedData: any = {
     title: `${type} | Ranked`,
@@ -535,9 +535,19 @@ export const formatSeasonEndCountdown = ({
   currentDate = new Date(),
 }: {
   seasonEnd: number | Date;
-  currentDate?: Date;
-}) => {
-  return formatDistanceStrict(seasonEnd, currentDate, {
-    unit: 'day',
-  });
+  currentDate?: number | Date;
+}): string | null => {
+  const hasEnded = isBefore(seasonEnd, currentDate);
+  if (hasEnded) return null;
+
+  const difference = differenceInMilliseconds(currentDate, seasonEnd);
+  if (difference > 259200000) {
+    return formatDistanceStrict(seasonEnd, currentDate, {
+      unit: 'day',
+    });
+  } else {
+    return formatDistanceStrict(seasonEnd, currentDate, {
+      unit: 'hour',
+    });
+  }
 };
