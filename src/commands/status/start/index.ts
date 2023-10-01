@@ -36,7 +36,7 @@ import {
 import { v4 as uuidV4 } from 'uuid';
 import { getRotationData } from '../../../services/adapters';
 import { nessieLogo } from '../../../utils/constants';
-import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
+import { differenceInMilliseconds, differenceInSeconds, format, formatDistance } from 'date-fns';
 import Scheduler from '../../../services/scheduler';
 import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
 import { isEmpty } from 'lodash';
@@ -310,6 +310,15 @@ export const _cancelStatusStart = async ({
       });
   }
 };
+const createSpikeRole = async (interaction: ButtonInteraction, index: number) => {
+  try {
+    const { guild } = interaction;
+    await interaction.deferUpdate();
+    guild && (await guild.roles.create({ name: `Spike Role ${index}` }));
+  } catch (error) {
+    sendErrorLog({ interaction, error });
+  }
+};
 /**
  * Handler for when a user clicks the Confirm button in Confirm Status Step
  * This is the most important aspect as it will initialise the process of map status
@@ -397,6 +406,16 @@ export const createStatus = async ({
         embeds: statusBattleRoyaleEmbed,
       }));
 
+    const spikeStart = new Date();
+    for (let i = 0; i < 10; i++) {
+      await createSpikeRole(interaction, i);
+    }
+    const spikeEnd = new Date();
+    console.log(
+      formatDistance(spikeEnd, spikeStart, {
+        includeSeconds: true,
+      })
+    );
     /**
      * Create new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
