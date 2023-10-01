@@ -1,4 +1,4 @@
-import { format, formatDistanceStrict } from 'date-fns';
+import { format } from 'date-fns';
 import {
   AnySelectMenuInteraction,
   APIEmbed,
@@ -32,7 +32,6 @@ import {
 } from '../schemas/mapRotation';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../services/analytics';
-import { SeasonAPISchema } from '../schemas/season';
 
 export const serverNotificationEmbed = async ({
   app,
@@ -359,7 +358,7 @@ export const generatePubsEmbed = (
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
   type = 'Battle Royale',
-  season?: SeasonAPISchema
+  seasonEnd?: string
 ) => {
   const embedData: any = {
     title: `${type} | Ranked`,
@@ -367,13 +366,7 @@ export const generateRankedEmbed = (
     image: {
       url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
-    description: season
-      ? `Season ends in ${inlineCode(
-          formatDistanceStrict(season.dates.End * 1000, new Date(), {
-            unit: 'day',
-          })
-        )}`
-      : null,
+    description: seasonEnd ? `Season ends in ${inlineCode(seasonEnd)}` : undefined,
     fields: [
       {
         name: 'Current map',
