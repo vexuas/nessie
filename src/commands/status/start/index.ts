@@ -34,7 +34,7 @@ import {
   sendStatusErrorLog,
 } from '../../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
-import { getRotationData } from '../../../services/adapters';
+import { getRotationData, getSeasonInformation } from '../../../services/adapters';
 import { nessieLogo } from '../../../utils/constants';
 import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
 import Scheduler from '../../../services/scheduler';
@@ -43,6 +43,7 @@ import { isEmpty } from 'lodash';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../../../services/analytics';
 import { MapRotationAPIObject } from '../../../schemas/mapRotation';
+import { SeasonAPISchema } from '../../../schemas/season';
 
 const errorNotification = {
   count: 0,
@@ -158,9 +159,9 @@ const generateConfirmStatusMessage = ({
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
  */
-const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject) => {
+const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject, season: SeasonAPISchema) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked);
+  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked, 'Battle Royale', season);
   const informationEmbed = {
     description: '**Updates occur every 5 minutes**',
     color: 3447003,
@@ -352,7 +353,8 @@ export const createStatus = async ({
     await interaction.message.edit({ embeds: [embedLoadingChannels], components: [] });
 
     const rotationData = await getRotationData();
-    const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData);
+    const seasonData = await getSeasonInformation();
+    const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
     /**
      * Gets the @everyone role of the guild
      * Important so w can't prevent non-admin users from sending any messages in status channels
@@ -488,7 +490,8 @@ export const scheduleStatus = (nessie: Client) => {
     try {
       if (allStatus) {
         const rotationData = await getRotationData();
-        const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData);
+        const seasonData = await getSeasonInformation();
+        const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
         const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
         allStatus.forEach(async (status, index) => {
           await handleStatusCycle({

@@ -8,6 +8,7 @@ import {
   MapRotationMixtapeSchema,
   MapRotationRankedSchema,
 } from '../schemas/mapRotation';
+import { SeasonAPISchema } from '../schemas/season';
 
 //Documentation on API: https://apexlegendsapi.com/documentation.php
 const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
@@ -36,8 +37,7 @@ export async function getMixtape(): Promise<MapRotationMixtapeSchema> {
   const response = await getRotationData();
   return response.ltm;
 }
-export async function getSeasonInformation(): Promise<any> {
+export async function getSeasonInformation(): Promise<SeasonAPISchema> {
   const response: string = (await got.get('https://api.jumpmaster.xyz/seasons/Current')).body;
-  const r = JSON.parse(response);
-  console.log(r);
+  return JSON.parse(response);
 }

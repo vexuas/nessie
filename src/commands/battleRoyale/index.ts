@@ -28,12 +28,12 @@ export default {
       switch (optionMode) {
         case 'br_pubs':
           data = await getBattleRoyalePubs();
-          await getSeasonInformation();
-          embed = generatePubsEmbed(data);
+          embed = generatePubsEmbed(data, 'Battle Royale');
           break;
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
-          embed = generateRankedEmbed(data);
+          const season = await getSeasonInformation();
+          embed = generateRankedEmbed(data, 'Battle Royale', season);
           break;
       }
       await interaction.editReply({ embeds: [embed] });
