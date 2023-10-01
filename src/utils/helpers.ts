@@ -368,7 +368,11 @@ export const generateRankedEmbed = (
       url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
     description: season
-      ? `Season ends in ${inlineCode(formatDistanceStrict(season.dates.End * 1000, new Date()))}`
+      ? `Season ends in ${inlineCode(
+          formatDistanceStrict(season.dates.End * 1000, new Date(), {
+            unit: 'day',
+          })
+        )}`
       : null,
     fields: [
       {
