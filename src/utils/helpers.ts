@@ -540,14 +540,8 @@ export const formatSeasonEndCountdown = ({
   const hasEnded = isBefore(seasonEnd, currentDate);
   if (hasEnded) return null;
 
-  const difference = differenceInMilliseconds(currentDate, seasonEnd);
-  if (difference > 259200000) {
-    return formatDistanceStrict(seasonEnd, currentDate, {
-      unit: 'day',
-    });
-  } else {
-    return formatDistanceStrict(seasonEnd, currentDate, {
-      unit: 'hour',
-    });
-  }
+  const difference = differenceInMilliseconds(seasonEnd, currentDate);
+  return formatDistanceStrict(seasonEnd, currentDate, {
+    unit: difference < 259200000 ? 'hour' : 'day', //Show hours when it's less than 3 days left
+  });
 };
