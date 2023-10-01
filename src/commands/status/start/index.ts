@@ -13,6 +13,7 @@ import {
   inlineCode,
   StringSelectMenuInteraction,
   TextChannel,
+  roleMention,
 } from 'discord.js';
 import {
   deleteStatus,
@@ -36,7 +37,7 @@ import {
 import { v4 as uuidV4 } from 'uuid';
 import { getRotationData } from '../../../services/adapters';
 import { nessieLogo } from '../../../utils/constants';
-import { differenceInMilliseconds, differenceInSeconds, format, formatDistance } from 'date-fns';
+import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
 import Scheduler from '../../../services/scheduler';
 import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
 import { isEmpty } from 'lodash';
@@ -313,8 +314,8 @@ export const _cancelStatusStart = async ({
 const createSpikeRole = async (interaction: ButtonInteraction, index: number) => {
   try {
     const { guild } = interaction;
-    await interaction.deferUpdate();
-    guild && (await guild.roles.create({ name: `Spike Role ${index}` }));
+    const role = guild && (await guild.roles.create({ name: `Spike Role ${index}` }));
+    return role;
   } catch (error) {
     sendErrorLog({ interaction, error });
   }
@@ -368,6 +369,20 @@ export const createStatus = async ({
      */
     const everyoneRole = interaction.guild.roles.cache.find((role) => role.name === '@everyone');
 
+    const spikeStart = new Date();
+    let count = 0;
+    const roleList = [];
+    let roleString = '';
+    for (let i = 0; count < 40; i++) {
+      count++;
+      const spikeRole = await createSpikeRole(interaction, i);
+      spikeRole && roleList.push(spikeRole.id);
+    }
+    const spikeEnd = new Date();
+    roleList.forEach((l) => (roleString = `${roleString}\n- ${roleMention(l)}`));
+    console.log(differenceInSeconds(spikeEnd, spikeStart));
+    console.log(roleList);
+
     const statusCategory = await interaction.guild.channels.create({
       name: 'Apex Legends Map Status',
       type: ChannelType.GuildCategory,
@@ -406,16 +421,6 @@ export const createStatus = async ({
         embeds: statusBattleRoyaleEmbed,
       }));
 
-    const spikeStart = new Date();
-    for (let i = 0; i < 10; i++) {
-      await createSpikeRole(interaction, i);
-    }
-    const spikeEnd = new Date();
-    console.log(
-      formatDistance(spikeEnd, spikeStart, {
-        includeSeconds: true,
-      })
-    );
     /**
      * Create new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
@@ -442,7 +447,10 @@ export const createStatus = async ({
 
     await insertNewStatus(newStatus); //TODO: Add typing
     const embedSuccess = {
-      description: `Created map status at ${statusBattleRoyaleChannel}`,
+      description: `Created map status at ${statusBattleRoyaleChannel}\nTime taken to create ${count} roles: ${differenceInSeconds(
+        spikeEnd,
+        spikeStart
+      )} seconds${roleString}`,
       color: 3066993,
     };
 
