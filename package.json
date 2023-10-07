@@ -9,7 +9,7 @@
     "config:bot": "echo \"//Bot Configuration; Required\nexport const BOT_TOKEN = '';\nexport const BOT_ID = '';\nexport const GUILD_ID = '';\n\" >> src/config/environment.ts",
     "config:als": "echo \"//API key to retrieve apex data\nexport const ALS_API_KEY = '';\n\" >> src/config/environment.ts",
     "config:env": "echo \"//Environment\nexport const ENV = 'dev';\n\" >> src/config/environment.ts",
-    "config:notification": "echo \"//Notifications\nexport const GUILD_NOTIFICATION_WEBHOOK_URL = '';\nexport const ERROR_NOTIFICATION_WEBHOOK_URL = '';\nexport const BOOT_NOTIFICATION_CHANNEL_ID = '';\n\" >> src/config/environment.ts",
+    "config:notification": "echo \"//Notifications\nexport const GUILD_NOTIFICATION_WEBHOOK_URL = '';\nexport const ERROR_NOTIFICATION_WEBHOOK_URL = '';\nexport const STATUS_LOG_WEBHOOK_URL = '';\nexport const BOOT_NOTIFICATION_CHANNEL_ID = '';\n\" >> src/config/environment.ts",
     "config:database": "echo \"//Database\nexport const DATABASE_CONFIG = null;\n\" >> src/config/environment.ts",
     "config:product": "echo \"//Product Tracking\nexport const MIXPANEL_ID = '';\n\" >> src/config/environment.ts",
     "config:topgg": "echo \"//TopGG Tracking\nexport const TOP_GG_TOKEN = '';\n\" >> src/config/environment.ts",
