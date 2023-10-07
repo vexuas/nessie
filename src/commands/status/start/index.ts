@@ -39,7 +39,10 @@ import { getRotationData, getSeasonInformation } from '../../../services/adapter
 import { nessieLogo } from '../../../utils/constants';
 import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
 import Scheduler from '../../../services/scheduler';
-import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
+import {
+  ERROR_NOTIFICATION_WEBHOOK_URL,
+  STATUS_LOG_WEBHOOK_URL,
+} from '../../../config/environment';
 import { isEmpty } from 'lodash';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../../../services/analytics';
@@ -160,12 +163,17 @@ const generateConfirmStatusMessage = ({
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
  */
-const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject, season: SeasonAPISchema) => {
+const generateBattleRoyaleStatusEmbeds = (
+  data: MapRotationAPIObject,
+  season: SeasonAPISchema | null
+) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const seasonEnd = formatSeasonEndCountdown({
-    seasonEnd: season.dates.End * 1000,
-    currentDate: new Date(),
-  });
+  const seasonEnd = season
+    ? formatSeasonEndCountdown({
+        seasonEnd: season.dates.End * 1000,
+        currentDate: new Date(),
+      })
+    : null;
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked, 'Battle Royale', seasonEnd);
   const informationEmbed = {
     description: '**Updates occur every 5 minutes**',
@@ -316,6 +324,72 @@ export const _cancelStatusStart = async ({
       });
   }
 };
+const sendStatusStartLog = async (
+  interaction: ButtonInteraction,
+  isBattleRoyaleSelected: boolean
+) => {
+  if (!STATUS_LOG_WEBHOOK_URL) return;
+  const statusLogEmbed = {
+    title: 'New Status Created',
+    color: 3066993,
+    fields: [
+      {
+        name: 'Guild',
+        value: interaction.guild ? interaction.guild.name : '',
+      },
+      {
+        name: 'Game Modes',
+        value: isBattleRoyaleSelected ? 'Battle Royale' : '-',
+      },
+    ],
+  };
+  const statusLogWebhook = new WebhookClient({ url: STATUS_LOG_WEBHOOK_URL });
+  await statusLogWebhook.send({ embeds: [statusLogEmbed] });
+};
+const sendStatusCycleLog = async ({
+  totalCount,
+  startTime,
+  endTime,
+}: {
+  totalCount: number;
+  endTime: number;
+  startTime?: number;
+}) => {
+  if (!STATUS_LOG_WEBHOOK_URL) return;
+  const statusLogEmbed = {
+    title: 'Nessie | Auto Map Status Log',
+    description: 'Successfully finished status cycle',
+    color: 3066993,
+    fields: [
+      {
+        name: 'Status Count',
+        value: inlineCode(totalCount.toString()),
+        inline: true,
+      },
+      {
+        name: 'Start Time',
+        value: startTime ? inlineCode(format(startTime, 'dd MMM yyyy, h:mm:ss a')) : '-',
+      },
+      {
+        name: 'End Time',
+        value: inlineCode(format(endTime, 'dd MMM yyyy, h:mm:ss a')),
+      },
+      {
+        name: 'Time Taken',
+        value: startTime
+          ? inlineCode(
+              `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
+                endTime,
+                startTime
+              )} milliseconds`
+            )
+          : '-',
+      },
+    ],
+  };
+  const statusLogWebhook = new WebhookClient({ url: STATUS_LOG_WEBHOOK_URL });
+  await statusLogWebhook.send({ embeds: [statusLogEmbed] });
+};
 /**
  * Handler for when a user clicks the Confirm button in Confirm Status Step
  * This is the most important aspect as it will initialise the process of map status
@@ -334,7 +408,6 @@ export const _cancelStatusStart = async ({
  */
 export const createStatus = async ({
   interaction,
-  nessie,
   mixpanel,
 }: {
   interaction: ButtonInteraction;
@@ -435,25 +508,9 @@ export const createStatus = async ({
     };
 
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+
     //Sends status creation log after everything is done
-    const statusLogChannel = nessie.channels.cache.get('976863441526595644');
-    const statusLogEmbed = {
-      title: 'New Status Created',
-      color: 3066993,
-      fields: [
-        {
-          name: 'Guild',
-          value: interaction.guild.name,
-        },
-        {
-          name: 'Game Modes',
-          value: isBattleRoyaleSelected ? 'Battle Royale' : '-',
-        },
-      ],
-    };
-    statusLogChannel &&
-      statusLogChannel.type === ChannelType.GuildText &&
-      (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
+    await sendStatusStartLog(interaction, isBattleRoyaleSelected);
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm' });
   } finally {
@@ -604,41 +661,7 @@ const handleStatusCycle = async ({
      */
     if (totalCount && index === totalCount - 1) {
       const endTime = Date.now();
-      const statusLogChannel = nessie.channels.cache.get('976863441526595644') as
-        | TextChannel
-        | undefined;
-      const statusLogEmbed = {
-        title: 'Nessie | Auto Map Status Log',
-        description: 'Successfully finished status cycle',
-        color: 3066993,
-        fields: [
-          {
-            name: 'Status Count',
-            value: inlineCode(totalCount.toString()),
-            inline: true,
-          },
-          {
-            name: 'Start Time',
-            value: startTime ? inlineCode(format(startTime, 'dd MMM yyyy, h:mm:ss a')) : '-',
-          },
-          {
-            name: 'End Time',
-            value: inlineCode(format(endTime, 'dd MMM yyyy, h:mm:ss a')),
-          },
-          {
-            name: 'Time Taken',
-            value: startTime
-              ? inlineCode(
-                  `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
-                    endTime,
-                    startTime
-                  )} milliseconds`
-                )
-              : '-',
-          },
-        ],
-      };
-      statusLogChannel && (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
+      await sendStatusCycleLog({ totalCount, startTime, endTime });
     }
   } catch (error: any) {
     if (error.message === 'Internal Server Error') return;
