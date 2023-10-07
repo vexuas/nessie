@@ -39,7 +39,10 @@ import { getRotationData, getSeasonInformation } from '../../../services/adapter
 import { nessieLogo } from '../../../utils/constants';
 import { differenceInMilliseconds, differenceInSeconds, format } from 'date-fns';
 import Scheduler from '../../../services/scheduler';
-import { ERROR_NOTIFICATION_WEBHOOK_URL } from '../../../config/environment';
+import {
+  ERROR_NOTIFICATION_WEBHOOK_URL,
+  STATUS_LOG_WEBHOOK_URL,
+} from '../../../config/environment';
 import { isEmpty } from 'lodash';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../../../services/analytics';
@@ -316,6 +319,28 @@ export const _cancelStatusStart = async ({
       });
   }
 };
+const sendStatusStartLog = async (
+  interaction: ButtonInteraction,
+  isBattleRoyaleSelected: boolean
+) => {
+  if (!STATUS_LOG_WEBHOOK_URL) return;
+  const statusLogEmbed = {
+    title: 'New Status Created',
+    color: 3066993,
+    fields: [
+      {
+        name: 'Guild',
+        value: interaction.guild ? interaction.guild.name : '',
+      },
+      {
+        name: 'Game Modes',
+        value: isBattleRoyaleSelected ? 'Battle Royale' : '-',
+      },
+    ],
+  };
+  const statusLogWebhook = new WebhookClient({ url: STATUS_LOG_WEBHOOK_URL });
+  await statusLogWebhook.send({ embeds: [statusLogEmbed] });
+};
 /**
  * Handler for when a user clicks the Confirm button in Confirm Status Step
  * This is the most important aspect as it will initialise the process of map status
@@ -334,7 +359,6 @@ export const _cancelStatusStart = async ({
  */
 export const createStatus = async ({
   interaction,
-  nessie,
   mixpanel,
 }: {
   interaction: ButtonInteraction;
@@ -435,25 +459,9 @@ export const createStatus = async ({
     };
 
     await interaction.message.edit({ embeds: [embedSuccess], components: [] });
+
     //Sends status creation log after everything is done
-    const statusLogChannel = nessie.channels.cache.get('976863441526595644');
-    const statusLogEmbed = {
-      title: 'New Status Created',
-      color: 3066993,
-      fields: [
-        {
-          name: 'Guild',
-          value: interaction.guild.name,
-        },
-        {
-          name: 'Game Modes',
-          value: isBattleRoyaleSelected ? 'Battle Royale' : '-',
-        },
-      ],
-    };
-    statusLogChannel &&
-      statusLogChannel.type === ChannelType.GuildText &&
-      (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
+    await sendStatusStartLog(interaction, isBattleRoyaleSelected);
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Start Confirm' });
   } finally {
