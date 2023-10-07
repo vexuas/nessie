@@ -3,12 +3,13 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  ChannelType,
   ChatInputCommandInteraction,
   Client,
   inlineCode,
+  WebhookClient,
 } from 'discord.js';
 import { Mixpanel } from 'mixpanel';
+import { STATUS_LOG_WEBHOOK_URL } from '../../../config/environment';
 import { sendAnalyticsEvent } from '../../../services/analytics';
 import { deleteStatus, getStatus } from '../../../services/database';
 import {
@@ -113,6 +114,21 @@ export const _cancelStatusStop = async ({
       });
   }
 };
+const sendStatusStopLog = async (interaction: ButtonInteraction) => {
+  if (!STATUS_LOG_WEBHOOK_URL) return;
+  const statusLogEmbed = {
+    title: 'Status Deleted',
+    color: 16711680,
+    fields: [
+      {
+        name: 'Guild',
+        value: interaction.guild ? interaction.guild.name : '',
+      },
+    ],
+  };
+  const statusLogWebhook = new WebhookClient({ url: STATUS_LOG_WEBHOOK_URL });
+  await statusLogWebhook.send({ embeds: [statusLogEmbed] });
+};
 /**
  * Handler for stopping the process of map status
  * Gets called when a user clicks the confirm button of the /status stop reply
@@ -164,20 +180,7 @@ export const deleteGuildStatus = async ({
         (await interaction.message.edit({ embeds: [embedSuccess], components: [] }));
 
       //Sends status deletion log after everything is done
-      const statusLogChannel = nessie.channels.cache.get('976863441526595644');
-      const statusLogEmbed = {
-        title: 'Status Deleted',
-        color: 16711680,
-        fields: [
-          {
-            name: 'Guild',
-            value: interaction.guild ? interaction.guild.name : '',
-          },
-        ],
-      };
-      statusLogChannel &&
-        statusLogChannel.type === ChannelType.GuildText &&
-        (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
+      await sendStatusStopLog(interaction);
     }
   } catch (error) {
     sendErrorLog({ error, interaction, customTitle: 'Status Stop Error' });
