@@ -163,12 +163,17 @@ const generateConfirmStatusMessage = ({
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
  */
-const generateBattleRoyaleStatusEmbeds = (data: MapRotationAPIObject, season: SeasonAPISchema) => {
+const generateBattleRoyaleStatusEmbeds = (
+  data: MapRotationAPIObject,
+  season: SeasonAPISchema | null
+) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const seasonEnd = formatSeasonEndCountdown({
-    seasonEnd: season.dates.End * 1000,
-    currentDate: new Date(),
-  });
+  const seasonEnd = season
+    ? formatSeasonEndCountdown({
+        seasonEnd: season.dates.End * 1000,
+        currentDate: new Date(),
+      })
+    : null;
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked, 'Battle Royale', seasonEnd);
   const informationEmbed = {
     description: '**Updates occur every 5 minutes**',

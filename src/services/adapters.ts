@@ -9,6 +9,7 @@ import {
   MapRotationRankedSchema,
 } from '../schemas/mapRotation';
 import { SeasonAPISchema } from '../schemas/season';
+import { sendErrorLog } from '../utils/helpers';
 
 //Documentation on API: https://apexlegendsapi.com/documentation.php
 const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
@@ -20,9 +21,14 @@ export async function getRotationData(): Promise<MapRotationAPIObject> {
   const response: string = (await got.get(url)).body;
   return JSON.parse(response);
 }
-export async function getSeasonInformation(): Promise<SeasonAPISchema> {
-  const response: string = (await got.get(seasonUrl)).body;
-  return JSON.parse(response);
+export async function getSeasonInformation(): Promise<SeasonAPISchema | null> {
+  try {
+    const response: string = (await got.get(seasonUrl)).body;
+    return JSON.parse(response);
+  } catch (error) {
+    sendErrorLog({ error });
+    return null;
+  }
 }
 
 export async function getBattleRoyalePubs(): Promise<MapRotationBattleRoyaleSchema> {
