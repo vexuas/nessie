@@ -341,6 +341,50 @@ const sendStatusStartLog = async (
   const statusLogWebhook = new WebhookClient({ url: STATUS_LOG_WEBHOOK_URL });
   await statusLogWebhook.send({ embeds: [statusLogEmbed] });
 };
+const sendStatusCycleLog = async ({
+  totalCount,
+  startTime,
+  endTime,
+}: {
+  totalCount: number;
+  endTime: number;
+  startTime?: number;
+}) => {
+  if (!STATUS_LOG_WEBHOOK_URL) return;
+  const statusLogEmbed = {
+    title: 'Nessie | Auto Map Status Log',
+    description: 'Successfully finished status cycle',
+    color: 3066993,
+    fields: [
+      {
+        name: 'Status Count',
+        value: inlineCode(totalCount.toString()),
+        inline: true,
+      },
+      {
+        name: 'Start Time',
+        value: startTime ? inlineCode(format(startTime, 'dd MMM yyyy, h:mm:ss a')) : '-',
+      },
+      {
+        name: 'End Time',
+        value: inlineCode(format(endTime, 'dd MMM yyyy, h:mm:ss a')),
+      },
+      {
+        name: 'Time Taken',
+        value: startTime
+          ? inlineCode(
+              `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
+                endTime,
+                startTime
+              )} milliseconds`
+            )
+          : '-',
+      },
+    ],
+  };
+  const statusLogWebhook = new WebhookClient({ url: STATUS_LOG_WEBHOOK_URL });
+  await statusLogWebhook.send({ embeds: [statusLogEmbed] });
+};
 /**
  * Handler for when a user clicks the Confirm button in Confirm Status Step
  * This is the most important aspect as it will initialise the process of map status
@@ -612,41 +656,7 @@ const handleStatusCycle = async ({
      */
     if (totalCount && index === totalCount - 1) {
       const endTime = Date.now();
-      const statusLogChannel = nessie.channels.cache.get('976863441526595644') as
-        | TextChannel
-        | undefined;
-      const statusLogEmbed = {
-        title: 'Nessie | Auto Map Status Log',
-        description: 'Successfully finished status cycle',
-        color: 3066993,
-        fields: [
-          {
-            name: 'Status Count',
-            value: inlineCode(totalCount.toString()),
-            inline: true,
-          },
-          {
-            name: 'Start Time',
-            value: startTime ? inlineCode(format(startTime, 'dd MMM yyyy, h:mm:ss a')) : '-',
-          },
-          {
-            name: 'End Time',
-            value: inlineCode(format(endTime, 'dd MMM yyyy, h:mm:ss a')),
-          },
-          {
-            name: 'Time Taken',
-            value: startTime
-              ? inlineCode(
-                  `${differenceInSeconds(endTime, startTime)} seconds | ${differenceInMilliseconds(
-                    endTime,
-                    startTime
-                  )} milliseconds`
-                )
-              : '-',
-          },
-        ],
-      };
-      statusLogChannel && (await statusLogChannel.send({ embeds: [statusLogEmbed] }));
+      await sendStatusCycleLog({ totalCount, startTime, endTime });
     }
   } catch (error: any) {
     if (error.message === 'Internal Server Error') return;
