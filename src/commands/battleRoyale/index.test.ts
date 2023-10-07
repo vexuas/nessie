@@ -175,3 +175,17 @@ describe('Battle Royale Ranked Command', () => {
     expect(embed.fields && embed.fields[1].value).toContain('23 hr 58 mins 28 secs');
   });
 });
+
+describe('Season Information', () => {
+  it('shows the correct season end description', () => {
+    const embed = generateRankedEmbed(mockRankedData, 'Battle Royale', '30 days');
+
+    expect(embed.description).not.toBeUndefined();
+    expect(embed.description).toBe('Season ends in `30 days`');
+  });
+  it('does not show the season end description if seasonEnd is not present', () => {
+    const embed = generateRankedEmbed(mockRankedData);
+
+    expect(embed.description).toBeUndefined();
+  });
+});

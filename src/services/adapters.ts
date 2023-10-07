@@ -8,14 +8,23 @@ import {
   MapRotationMixtapeSchema,
   MapRotationRankedSchema,
 } from '../schemas/mapRotation';
+import { SeasonAPISchema } from '../schemas/season';
 
 //Documentation on API: https://apexlegendsapi.com/documentation.php
 const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
+//Less publicly known api to retrieve season data; kudos to @SDCore
+//No authentication + rate limited so we should be mindful in using this
+const seasonUrl = 'https://api.jumpmaster.xyz/seasons/Current';
 
 export async function getRotationData(): Promise<MapRotationAPIObject> {
   const response: string = (await got.get(url)).body;
   return JSON.parse(response);
 }
+export async function getSeasonInformation(): Promise<SeasonAPISchema> {
+  const response: string = (await got.get(seasonUrl)).body;
+  return JSON.parse(response);
+}
+
 export async function getBattleRoyalePubs(): Promise<MapRotationBattleRoyaleSchema> {
   const response = await getRotationData();
   return response.battle_royale;

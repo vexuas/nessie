@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { differenceInMilliseconds, format, formatDistanceStrict, isBefore } from 'date-fns';
 import {
   AnySelectMenuInteraction,
   APIEmbed,
@@ -357,7 +357,8 @@ export const generatePubsEmbed = (
  */
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
-  type = 'Battle Royale'
+  type = 'Battle Royale',
+  seasonEnd?: string | null
 ) => {
   const embedData: any = {
     title: `${type} | Ranked`,
@@ -365,6 +366,7 @@ export const generateRankedEmbed = (
     image: {
       url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
+    description: seasonEnd ? `Season ends in ${inlineCode(seasonEnd)}` : undefined,
     fields: [
       {
         name: 'Current map',
@@ -526,4 +528,20 @@ export const sendWrongUserWarning = async ({
       eventName: 'Click wrong user button',
     });
   interaction.editReply({ embeds: [wrongUserEmbed] });
+};
+
+export const formatSeasonEndCountdown = ({
+  seasonEnd,
+  currentDate = new Date(),
+}: {
+  seasonEnd: number | Date;
+  currentDate?: number | Date;
+}): string | null => {
+  const hasEnded = isBefore(seasonEnd, currentDate);
+  if (hasEnded) return null;
+
+  const difference = differenceInMilliseconds(seasonEnd, currentDate);
+  return formatDistanceStrict(seasonEnd, currentDate, {
+    unit: difference < 259200000 ? 'hour' : 'day', //Show hours when it's less than 3 days left
+  });
 };

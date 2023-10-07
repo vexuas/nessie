@@ -1,6 +1,15 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { getBattleRoyalePubs, getBattleRoyaleRanked } from '../../services/adapters';
-import { generatePubsEmbed, generateRankedEmbed, sendErrorLog } from '../../utils/helpers';
+import {
+  getBattleRoyalePubs,
+  getBattleRoyaleRanked,
+  getSeasonInformation,
+} from '../../services/adapters';
+import {
+  formatSeasonEndCountdown,
+  generatePubsEmbed,
+  generateRankedEmbed,
+  sendErrorLog,
+} from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
 export default {
@@ -28,7 +37,13 @@ export default {
           break;
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
-          embed = generateRankedEmbed(data);
+          const season = await getSeasonInformation();
+          //TODO: Figure out formatting for different timezones eventually
+          const seasonEnd = formatSeasonEndCountdown({
+            seasonEnd: season.dates.End * 1000,
+            currentDate: new Date(),
+          });
+          embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd);
           break;
       }
       await interaction.editReply({ embeds: [embed] });
