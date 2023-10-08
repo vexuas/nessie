@@ -32,6 +32,7 @@ import {
 } from '../schemas/mapRotation';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../services/analytics';
+import { SeasonAPISchema } from '../schemas/season';
 
 export const serverNotificationEmbed = async ({
   app,
@@ -358,7 +359,7 @@ export const generatePubsEmbed = (
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
   type = 'Battle Royale',
-  seasonEnd?: string | null
+  seasonEnd?: string
 ) => {
   const embedData: any = {
     title: `${type} | Ranked`,
@@ -531,14 +532,16 @@ export const sendWrongUserWarning = async ({
 };
 
 export const formatSeasonEndCountdown = ({
-  seasonEnd,
+  season,
   currentDate = new Date(),
 }: {
-  seasonEnd: number | Date;
+  season: SeasonAPISchema | null;
   currentDate?: number | Date;
-}): string | null => {
+}): string | undefined => {
+  if (!season) return;
+  const seasonEnd = season.dates.end.rankedEnd * 1000;
   const hasEnded = isBefore(seasonEnd, currentDate);
-  if (hasEnded) return null;
+  if (hasEnded) return;
 
   const difference = differenceInMilliseconds(seasonEnd, currentDate);
   return formatDistanceStrict(seasonEnd, currentDate, {
