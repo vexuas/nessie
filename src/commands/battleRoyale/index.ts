@@ -13,6 +13,8 @@ import {
 } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 
+//Cache season data as we don't want to abuse the API as well as only needing the end date anyway
+//Isn't the best way storing this in a variable but didn't want to overengineer and having it in the database for now
 let cachedSeason: SeasonAPISchema | null = null;
 
 export default {

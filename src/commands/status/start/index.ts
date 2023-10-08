@@ -49,6 +49,8 @@ import { sendAnalyticsEvent } from '../../../services/analytics';
 import { MapRotationAPIObject } from '../../../schemas/mapRotation';
 import { SeasonAPISchema } from '../../../schemas/season';
 
+//Cache season data as we don't want to abuse the API as well as only needing the end date anyway
+//Isn't the best way storing this in a variable but didn't want to overengineer and having it in the database for now
 let cachedSeason: SeasonAPISchema | null = null;
 
 const errorNotification = {
