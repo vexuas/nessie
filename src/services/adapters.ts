@@ -15,7 +15,7 @@ import { sendErrorLog } from '../utils/helpers';
 const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
 //Less publicly known api to retrieve season data; kudos to @SDCore
 //No authentication + rate limited so we should be mindful in using this
-const seasonUrl = 'https://api.jumpmaster.xyz/seasons/Current';
+const seasonUrl = 'https://api.jumpmaster.xyz/seasons/Current?version=2';
 
 export async function getRotationData(): Promise<MapRotationAPIObject> {
   const response: string = (await got.get(url)).body;

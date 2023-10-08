@@ -168,12 +168,10 @@ const generateBattleRoyaleStatusEmbeds = (
   season: SeasonAPISchema | null
 ) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const seasonEnd = season
-    ? formatSeasonEndCountdown({
-        seasonEnd: season.dates.End * 1000,
-        currentDate: new Date(),
-      })
-    : null;
+  const seasonEnd = formatSeasonEndCountdown({
+    season,
+    currentDate: new Date(),
+  });
   const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked, 'Battle Royale', seasonEnd);
   const informationEmbed = {
     description: '**Updates occur every 5 minutes**',

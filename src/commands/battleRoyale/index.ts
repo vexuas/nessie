@@ -39,12 +39,10 @@ export default {
           data = await getBattleRoyaleRanked();
           const season = await getSeasonInformation();
           //TODO: Figure out formatting for different timezones eventually
-          const seasonEnd = season
-            ? formatSeasonEndCountdown({
-                seasonEnd: season.dates.End * 1000,
-                currentDate: new Date(),
-              })
-            : null;
+          const seasonEnd = formatSeasonEndCountdown({
+            season,
+            currentDate: new Date(),
+          });
           embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd);
           break;
       }

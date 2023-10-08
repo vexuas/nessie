@@ -1,12 +1,32 @@
 export interface SeasonAPISchema {
   info: {
-    ID: number;
-    Name: string;
-    Split: number;
+    season: number;
+    title: string;
+    split: number;
+    data: {
+      tagline: string;
+      url: string;
+      image: string;
+    };
   };
   dates: {
-    Start: number;
-    Split: number;
-    End: number;
+    start: {
+      timestamp: number;
+      readable: string;
+      since: number;
+      untilNext: number;
+    };
+    split: {
+      timestamp: number;
+      readable: string;
+      since: number;
+      untilNext: number;
+    };
+    end: {
+      timestamp: number;
+      readable: string;
+      rankedEnd: number;
+      rankedEndReadable: string;
+    };
   };
 }
