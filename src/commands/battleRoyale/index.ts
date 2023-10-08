@@ -38,6 +38,7 @@ export default {
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
           const season = await getSeasonInformation();
+          console.log(season);
           //TODO: Figure out formatting for different timezones eventually
           const seasonEnd = season
             ? formatSeasonEndCountdown({
