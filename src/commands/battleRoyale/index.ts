@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
+import { SeasonAPISchema } from '../../schemas/season';
 import {
   getBattleRoyalePubs,
   getBattleRoyaleRanked,
@@ -11,6 +12,8 @@ import {
   sendErrorLog,
 } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
+
+let cachedSeason: SeasonAPISchema | null = null;
 
 export default {
   commandType: 'Maps',
@@ -37,7 +40,8 @@ export default {
           break;
         case 'br_ranked':
           data = await getBattleRoyaleRanked();
-          const season = await getSeasonInformation();
+          const season = cachedSeason ?? (await getSeasonInformation());
+          cachedSeason = season;
           //TODO: Figure out formatting for different timezones eventually
           const seasonEnd = formatSeasonEndCountdown({
             season,
