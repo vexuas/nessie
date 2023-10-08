@@ -432,7 +432,7 @@ export const createStatus = async ({
 
     const rotationData = await getRotationData();
     const seasonData = cachedSeason ?? (await getSeasonInformation());
-    cachedSeason = seasonData;
+    if (!cachedSeason) cachedSeason = seasonData;
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
     /**
      * Gets the @everyone role of the guild
@@ -554,7 +554,7 @@ export const scheduleStatus = (nessie: Client) => {
       if (allStatus) {
         const rotationData = await getRotationData();
         const seasonData = cachedSeason ?? (await getSeasonInformation());
-        cachedSeason = seasonData;
+        if (!cachedSeason) cachedSeason = seasonData;
         const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
         const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
         allStatus.forEach(async (status, index) => {
