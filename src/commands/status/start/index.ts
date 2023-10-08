@@ -170,7 +170,7 @@ const generateBattleRoyaleStatusEmbeds = (
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
   const seasonEnd = season
     ? formatSeasonEndCountdown({
-        seasonEnd: season.dates.End * 1000,
+        seasonEnd: season.dates.end.rankedEnd * 1000,
         currentDate: new Date(),
       })
     : null;
