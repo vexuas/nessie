@@ -56,7 +56,7 @@ If you want to use Nessie for your own projects, you would need the following be
 
 Nessie uses Discord's Slash Commands `/`:
 - `br`: map rotation for battle royale
-- `ltm`: map rotation for limited time events
+- `mixtape`: map rotation for mixtape
 - `status help`: information on how to set up automatic map updates 
 - `status start`: display configuration steps to start automatic map updates
 - `status stop`: display configuration steps to stop existing automatic map updates
@@ -106,7 +106,7 @@ Full list [here](https://shizuka.notion.site/To-dos-and-Nice-to-Have-s-4946e00c7
 - ~~Make error handling a reusable component~~
 - ~~Use webhooks instead of manually sending logs through messages~~
 - Research multithreading
-- CircleCi Integration
+- ~~CircleCi Integration~~ [Using github actions]
 - ~~Metabase Integration~~ [Using Trevor instead]
 - Datadog Integration
 
