@@ -1,3 +1,25 @@
+# v2.0.9 (Wed Oct 11 2023)
+
+#### 🔧 Tweaks
+
+- Add SDCore to list of sources [#188](https://github.com/vexuas/nessie/pull/188) ([@vexuas](https://github.com/vexuas))
+- Cache season data in memory [#187](https://github.com/vexuas/nessie/pull/187) ([@vexuas](https://github.com/vexuas))
+- Add card to template [#186](https://github.com/vexuas/nessie/pull/186) ([@vexuas](https://github.com/vexuas))
+- Use v2 of season endpoint [#185](https://github.com/vexuas/nessie/pull/185) ([@vexuas](https://github.com/vexuas))
+- Move status logs as env variables [#184](https://github.com/vexuas/nessie/pull/184) ([@vexuas](https://github.com/vexuas))
+- Only edit status stop message if its not in status channel [#183](https://github.com/vexuas/nessie/pull/183) ([@vexuas](https://github.com/vexuas))
+- Wire up season end endpoint [#181](https://github.com/vexuas/nessie/pull/181) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 09 20 [#180](https://github.com/vexuas/nessie/pull/180) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.0.8 (Wed Sep 20 2023)
 
 #### 🔧 Tweaks
