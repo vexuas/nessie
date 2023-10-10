@@ -4,11 +4,11 @@
 
 # nessie <br>Apex Legends Map Status Discord Bot
 
-Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/
+Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/ and [@SDCore](https://github.com/SDCore)
 
 <img width="900" alt="image" src="https://user-images.githubusercontent.com/42207245/163541135-2cd5f86e-8a63-4982-9557-7eceb6164f7c.png">
 <div>
-  <img width="450" alt="image" src="https://github.com/vexuas/nessie/assets/42207245/5b366cba-2362-4a87-af08-1a2a2fea5b99">
+  <img width="450" alt="image" src="https://github.com/vexuas/nessie/assets/42207245/f6c84794-053d-4a6e-899c-2b351b2279d8">
   <img align="top" width="450" alt="image" src="https://github.com/vexuas/nessie/assets/42207245/c1018e89-1a66-4364-967a-b26a29e9355f">
 </div>
 
@@ -56,7 +56,7 @@ If you want to use Nessie for your own projects, you would need the following be
 
 Nessie uses Discord's Slash Commands `/`:
 - `br`: map rotation for battle royale
-- `ltm`: map rotation for limited time events
+- `mixtape`: map rotation for mixtape
 - `status help`: information on how to set up automatic map updates 
 - `status start`: display configuration steps to start automatic map updates
 - `status stop`: display configuration steps to stop existing automatic map updates
@@ -106,7 +106,7 @@ Full list [here](https://shizuka.notion.site/To-dos-and-Nice-to-Have-s-4946e00c7
 - ~~Make error handling a reusable component~~
 - ~~Use webhooks instead of manually sending logs through messages~~
 - Research multithreading
-- CircleCi Integration
+- ~~CircleCi Integration~~ [Using github actions]
 - ~~Metabase Integration~~ [Using Trevor instead]
 - Datadog Integration
 
