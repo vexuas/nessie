@@ -4,7 +4,7 @@
 
 # nessie <br>Apex Legends Map Status Discord Bot
 
-Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/
+Simple discord bot that provides an easy way to get status updates of map rotations in the game Apex Legends. Data extracted from https://apexlegendsapi.com/ and [@SDCore](https://github.com/SDCore)
 
 <img width="900" alt="image" src="https://user-images.githubusercontent.com/42207245/163541135-2cd5f86e-8a63-4982-9557-7eceb6164f7c.png">
 <div>
