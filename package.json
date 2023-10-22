@@ -32,6 +32,7 @@
     "lodash": "^4.17.21",
     "mixpanel": "^0.13.0",
     "pg": "^8.7.3",
+    "pluralize": "^8.0.0",
     "topgg-autoposter": "^2.0.0",
     "uuid": "^8.3.2"
   },
