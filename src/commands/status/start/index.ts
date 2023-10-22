@@ -76,12 +76,17 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
         .setCustomId('statusStart__gameModeDropdown')
         .setPlaceholder('Requires at least one game mode')
         .setMinValues(1)
-        .setMaxValues(1)
+        .setMaxValues(2)
         .addOptions([
           {
             label: 'Battle Royale',
             description: 'Pubs and Ranked Map Rotation for Battle Royale',
             value: 'gameModeDropdown__battleRoyaleValue',
+          },
+          {
+            label: 'Mixtape',
+            description: 'Map Rotation for Mixtape Modes',
+            value: 'gameModeDropdown__mixtapeValue',
           },
         ])
     );
