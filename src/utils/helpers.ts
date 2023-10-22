@@ -549,5 +549,5 @@ export const formatSeasonEndCountdown = ({
   });
 };
 
-export const pluralize = (count: number, noun: string, suffix = 's') =>
-  `${count} ${noun}${count !== 1 ? suffix : ''}`;
+export const pluralize = (count: number, text: string) =>
+  `${count} ${text}${count !== 1 ? 's' : ''}`;
