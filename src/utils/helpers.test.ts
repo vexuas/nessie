@@ -1,4 +1,4 @@
-import { formatSeasonEndCountdown } from './helpers';
+import { formatSeasonEndCountdown, pluralize } from './helpers';
 
 //TODO: Add tests for other helpers here too eventually
 describe('formatSeasonEndCountdown', () => {
@@ -67,5 +67,16 @@ describe('formatSeasonEndCountdown', () => {
     });
 
     expect(result).toBeUndefined();
+  });
+});
+
+describe('pluralize', () => {
+  it('returns the correct format if count is more than 1', () => {
+    const result = pluralize(2, 'channel');
+    expect(result).toBe('2 channels');
+  });
+  it('returns the correct format if count is 1', () => {
+    const result = pluralize(1, 'channel');
+    expect(result).toBe('1 channel');
   });
 });

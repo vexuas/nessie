@@ -33,6 +33,7 @@ import {
   sendErrorLog,
   sendStatusErrorLog,
   formatSeasonEndCountdown,
+  pluralize,
 } from '../../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
 import { getRotationData, getSeasonInformation } from '../../../services/adapters';
@@ -76,12 +77,17 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
         .setCustomId('statusStart__gameModeDropdown')
         .setPlaceholder('Requires at least one game mode')
         .setMinValues(1)
-        .setMaxValues(1)
+        .setMaxValues(2)
         .addOptions([
           {
             label: 'Battle Royale',
             description: 'Pubs and Ranked Map Rotation for Battle Royale',
             value: 'gameModeDropdown__battleRoyaleValue',
+          },
+          {
+            label: 'Mixtape',
+            description: 'Map Rotation for Mixtape Modes',
+            value: 'gameModeDropdown__mixtapeValue',
           },
         ])
     );
@@ -118,15 +124,21 @@ const generateConfirmStatusMessage = ({
    * To solve this, we're going to append the selected game modes on the customId of the button itself
    * Going to treat them like query params (?x&y)
    */
-  const isBattleRoyaleSelected = interaction.values.find(
+  const isBattleRoyaleSelected = !!interaction.values.find(
     (value) => value === 'gameModeDropdown__battleRoyaleValue'
+  );
+  const isMixtapeSelected = !!interaction.values.find(
+    (value) => value === 'gameModeDropdown__mixtapeValue'
   );
   const modeLength = interaction.values.length;
 
-  const confirmButtonId = `statusStart__confirmButton${modeLength > 0 ? '?' : ''}${
+  const confirmButtonId = `statusStart__confirmButton?${
     isBattleRoyaleSelected ? 'battle_royale' : ''
-  }`; //Full selection: statusStart__confirmButton?battle_royale&arenas;
-  const selectionText = `${isBattleRoyaleSelected ? '*Battle Royale*' : ''}`;
+  }${modeLength > 1 ? '&' : ''}${isMixtapeSelected ? 'mixtape' : ''}`; //Full selection: statusStart__confirmButton?battle_royale&mixtape;
+
+  const selectionText = `${isBattleRoyaleSelected ? '*Battle Royale*' : ''} ${
+    modeLength > 1 ? 'and' : ''
+  } ${isMixtapeSelected ? '*Mixtape*' : ''}`;
 
   const row = new ActionRowBuilder<ButtonBuilder>()
     .addComponents(
@@ -149,10 +161,13 @@ const generateConfirmStatusMessage = ({
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
-    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${modeLength} text-channel and ${modeLength} webhook for the automatic map updates:\n• ${inlineCode(
+    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${pluralize(
+      modeLength,
+      'text-channel'
+    )} and ${pluralize(modeLength, 'webhook')} for the automatic map updates:\n• ${inlineCode(
       'Apex Legends Map Status'
-    )}\n${
-      isBattleRoyaleSelected ? `• ${inlineCode('#apex-battle-royale')}\n` : ''
+    )}\n${isBattleRoyaleSelected ? `• ${inlineCode('#apex-battle-royale')}\n` : ''}${
+      isMixtapeSelected ? `• ${inlineCode('#apex-mixtape')}\n` : ''
     }• Webhook for each text channel\n\nUpdates get sent to these channels **every 5 minutes**`,
     color: 3447003,
   };
