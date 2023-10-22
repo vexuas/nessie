@@ -548,3 +548,6 @@ export const formatSeasonEndCountdown = ({
     unit: difference < 259200000 ? 'hour' : 'day', //Show hours when it's less than 3 days left
   });
 };
+
+export const pluralize = (count: number, noun: string, suffix = 's') =>
+  `${count} ${noun}${count !== 1 ? suffix : ''}`;

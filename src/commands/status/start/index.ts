@@ -33,6 +33,7 @@ import {
   sendErrorLog,
   sendStatusErrorLog,
   formatSeasonEndCountdown,
+  pluralize,
 } from '../../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
 import { getRotationData, getSeasonInformation } from '../../../services/adapters';
@@ -160,7 +161,10 @@ const generateConfirmStatusMessage = ({
     );
   const embed = {
     title: 'Step 2 | Status Confirmation',
-    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${modeLength} text-channel and ${modeLength} webhook for the automatic map updates:\n• ${inlineCode(
+    description: `You've selected ${selectionText}!\n\nBy confirming below, Nessie will create a new category channel, ${pluralize(
+      modeLength,
+      'text-channel'
+    )} and ${pluralize(modeLength, 'webhook')} for the automatic map updates:\n• ${inlineCode(
       'Apex Legends Map Status'
     )}\n${isBattleRoyaleSelected ? `• ${inlineCode('#apex-battle-royale')}\n` : ''}${
       isMixtapeSelected ? `• ${inlineCode('#apex-mixtape')}\n` : ''
