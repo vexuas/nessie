@@ -42,6 +42,7 @@
     "@types/jest": "^29.5.2",
     "@types/lodash": "^4.14.195",
     "@types/pg": "^8.10.2",
+    "@types/pluralize": "^0.0.32",
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
