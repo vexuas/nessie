@@ -2,6 +2,7 @@ export interface SeasonAPISchema {
   info: {
     season: number;
     title: string;
+    description?: string;
     split: number;
     data: {
       tagline: string;
