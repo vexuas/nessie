@@ -6,8 +6,7 @@ import {
   getSeasonInformation,
 } from '../../services/adapters';
 import {
-  formatSeasonEndCountdown,
-  formatSplitEndCountdown,
+  formatEndDateCountdown,
   generatePubsEmbed,
   generateRankedEmbed,
   sendErrorLog,
@@ -46,14 +45,18 @@ export default {
           const season = cachedSeason ?? (await getSeasonInformation());
           if (!cachedSeason) cachedSeason = season;
           //TODO: Figure out formatting for different timezones eventually
-          const seasonEnd = formatSeasonEndCountdown({
-            season,
-            currentDate: new Date(),
-          });
-          const splitEnd = formatSplitEndCountdown({
-            season,
-            currentDate: new Date(),
-          });
+          const seasonEnd = season
+            ? formatEndDateCountdown({
+                endDate: season.dates.end.rankedEnd * 1000,
+                currentDate: new Date(),
+              })
+            : null;
+          const splitEnd = season
+            ? formatEndDateCountdown({
+                endDate: season.dates.split.timestamp * 1000,
+                currentDate: new Date(),
+              })
+            : null;
           embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd, splitEnd);
           break;
       }
