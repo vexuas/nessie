@@ -549,5 +549,23 @@ export const formatSeasonEndCountdown = ({
   });
 };
 
+export const formatSplitEndCountdown = ({
+  season,
+  currentDate = new Date(),
+}: {
+  season: SeasonAPISchema | null;
+  currentDate?: number | Date;
+}): string | undefined => {
+  if (!season) return;
+  const splitEnd = season.dates.split.timestamp * 1000;
+  const hasEnded = isBefore(splitEnd, currentDate);
+  if (hasEnded) return;
+
+  const difference = differenceInMilliseconds(splitEnd, currentDate);
+  return formatDistanceStrict(splitEnd, currentDate, {
+    unit: difference < 259200000 ? 'hour' : 'day', //Show hours when it's less than 3 days left
+  });
+};
+
 export const pluralize = (count: number, text: string) =>
   `${count} ${text}${count !== 1 ? 's' : ''}`;
