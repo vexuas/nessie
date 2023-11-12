@@ -370,7 +370,7 @@ export const generateRankedEmbed = (
     },
     description:
       splitEnd || seasonEnd
-        ? `${splitEnd ? `Split ends in ${inlineCode(splitEnd)}\n` : ''}${
+        ? `${splitEnd ? `Split ends in ${inlineCode(splitEnd)} • ` : ''}${
             seasonEnd ? `Season ends in ${inlineCode(seasonEnd)}` : ''
           }`
         : undefined,
