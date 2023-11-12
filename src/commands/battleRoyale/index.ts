@@ -7,6 +7,7 @@ import {
 } from '../../services/adapters';
 import {
   formatSeasonEndCountdown,
+  formatSplitEndCountdown,
   generatePubsEmbed,
   generateRankedEmbed,
   sendErrorLog,
@@ -49,7 +50,11 @@ export default {
             season,
             currentDate: new Date(),
           });
-          embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd);
+          const splitEnd = formatSplitEndCountdown({
+            season,
+            currentDate: new Date(),
+          });
+          embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd, splitEnd);
           break;
       }
       await interaction.editReply({ embeds: [embed] });

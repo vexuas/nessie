@@ -359,7 +359,8 @@ export const generatePubsEmbed = (
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
   type = 'Battle Royale',
-  seasonEnd?: string
+  seasonEnd?: string,
+  splitEnd?: string
 ) => {
   const embedData: any = {
     title: `${type} | Ranked`,
@@ -367,7 +368,12 @@ export const generateRankedEmbed = (
     image: {
       url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
-    description: seasonEnd ? `Season ends in ${inlineCode(seasonEnd)}` : undefined,
+    description:
+      splitEnd || seasonEnd
+        ? `${splitEnd ? `Split ends in ${inlineCode(splitEnd)}\n` : ''}${
+            seasonEnd ? `Season ends in ${inlineCode(seasonEnd)}` : ''
+          }`
+        : undefined,
     fields: [
       {
         name: 'Current map',
