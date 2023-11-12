@@ -32,7 +32,6 @@ import {
 } from '../schemas/mapRotation';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../services/analytics';
-import { SeasonAPISchema } from '../schemas/season';
 
 export const serverNotificationEmbed = async ({
   app,
@@ -359,7 +358,8 @@ export const generatePubsEmbed = (
 export const generateRankedEmbed = (
   data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
   type = 'Battle Royale',
-  seasonEnd?: string
+  seasonEnd?: string | null,
+  splitEnd?: string | null
 ) => {
   const embedData: any = {
     title: `${type} | Ranked`,
@@ -367,7 +367,12 @@ export const generateRankedEmbed = (
     image: {
       url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
     },
-    description: seasonEnd ? `Season ends in ${inlineCode(seasonEnd)}` : undefined,
+    description:
+      splitEnd || seasonEnd
+        ? `${splitEnd ? `Split ends in ${inlineCode(splitEnd)} • ` : ''}${
+            seasonEnd ? `Season ends in ${inlineCode(seasonEnd)}` : ''
+          }`
+        : undefined,
     fields: [
       {
         name: 'Current map',
@@ -531,20 +536,18 @@ export const sendWrongUserWarning = async ({
   interaction.editReply({ embeds: [wrongUserEmbed] });
 };
 
-export const formatSeasonEndCountdown = ({
-  season,
+export const formatEndDateCountdown = ({
+  endDate,
   currentDate = new Date(),
 }: {
-  season: SeasonAPISchema | null;
+  endDate: number;
   currentDate?: number | Date;
 }): string | undefined => {
-  if (!season) return;
-  const seasonEnd = season.dates.end.rankedEnd * 1000;
-  const hasEnded = isBefore(seasonEnd, currentDate);
+  const hasEnded = isBefore(endDate, currentDate);
   if (hasEnded) return;
 
-  const difference = differenceInMilliseconds(seasonEnd, currentDate);
-  return formatDistanceStrict(seasonEnd, currentDate, {
+  const difference = differenceInMilliseconds(endDate, currentDate);
+  return formatDistanceStrict(endDate, currentDate, {
     unit: difference < 259200000 ? 'hour' : 'day', //Show hours when it's less than 3 days left
   });
 };

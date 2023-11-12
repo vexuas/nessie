@@ -32,7 +32,7 @@ import {
   generateErrorEmbed,
   sendErrorLog,
   sendStatusErrorLog,
-  formatSeasonEndCountdown,
+  formatEndDateCountdown,
   pluralize,
 } from '../../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
@@ -187,11 +187,24 @@ const generateBattleRoyaleStatusEmbeds = (
   season: SeasonAPISchema | null
 ) => {
   const battleRoyalePubsEmbed = generatePubsEmbed(data.battle_royale);
-  const seasonEnd = formatSeasonEndCountdown({
-    season,
-    currentDate: new Date(),
-  });
-  const battleRoyaleRankedEmbed = generateRankedEmbed(data.ranked, 'Battle Royale', seasonEnd);
+  const seasonEnd = season
+    ? formatEndDateCountdown({
+        endDate: season.dates.end.rankedEnd * 1000,
+        currentDate: new Date(),
+      })
+    : null;
+  const splitEnd = season
+    ? formatEndDateCountdown({
+        endDate: season.dates.split.timestamp * 1000,
+        currentDate: new Date(),
+      })
+    : null;
+  const battleRoyaleRankedEmbed = generateRankedEmbed(
+    data.ranked,
+    'Battle Royale',
+    seasonEnd,
+    splitEnd
+  );
   const informationEmbed = {
     description: '**Updates occur every 5 minutes**',
     color: 3447003,
