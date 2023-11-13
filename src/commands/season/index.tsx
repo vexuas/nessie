@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { APIEmbed, SlashCommandBuilder } from 'discord.js';
+import { APIEmbed, inlineCode, SlashCommandBuilder } from 'discord.js';
 import { SeasonAPISchema } from '../../schemas/season';
 import { getSeasonInformation } from '../../services/adapters';
 import { formatEndDateCountdown, getEmbedColor, sendErrorLog } from '../../utils/helpers';
@@ -9,21 +9,14 @@ export const generateSeasonEmbed = (season: SeasonAPISchema) => {
   const { info, dates } = season;
   const embed: APIEmbed = {
     title: `Season ${info.season} | ${info.title}`,
-    description: info.description ?? info.description,
+    description: `${info.description ?? ''}\n\nSeason Start: ${inlineCode(
+      format(new Date(dates.start.readable), 'dd MMM yyyy, h:mm a')
+    )}\nCurrent Split: ${inlineCode(info.split.toString())}`,
     color: getEmbedColor(),
     image: {
       url: info.data.image,
     },
     fields: [
-      {
-        name: 'Season Start',
-        value: '```xl\n\n' + format(new Date(dates.start.readable), 'dd MMM yyyy, h:mm a') + '```',
-      },
-      {
-        name: 'Current Split',
-        value: '```xl\n\n' + info.split.toString() + '```',
-        inline: true,
-      },
       {
         name: 'Split End',
         value:
@@ -31,12 +24,11 @@ export const generateSeasonEmbed = (season: SeasonAPISchema) => {
           `${format(
             new Date(dates.split.readable),
             'dd MMM yyyy, h:mm a'
-          )} | ${formatEndDateCountdown({
+          )} • ${formatEndDateCountdown({
             endDate: dates.split.timestamp * 1000,
             currentDate: new Date(),
           })}` +
           '```',
-        inline: true,
       },
       {
         name: 'Season End',
@@ -45,7 +37,7 @@ export const generateSeasonEmbed = (season: SeasonAPISchema) => {
           `${format(
             new Date(dates.end.rankedEndReadable),
             'dd MMM yyyy, h:mm a'
-          )} | ${formatEndDateCountdown({
+          )} • ${formatEndDateCountdown({
             endDate: dates.end.rankedEnd * 1000,
             currentDate: new Date(),
           })}` +
