@@ -56,6 +56,7 @@ export default {
   async execute({ interaction }: AppCommandOptions) {
     try {
       const seasonData = await getSeasonInformation();
+      console.log(seasonData);
       if (!seasonData)
         return await interaction.reply('Unavailable to get season data, try again later!');
       const embed = generateSeasonEmbed(seasonData);
