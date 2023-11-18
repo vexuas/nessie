@@ -33,7 +33,7 @@ const mockData: MapRotationMixtapeSchema = {
   },
 };
 
-describe('Ltm Command', () => {
+describe('Mixtape Command', () => {
   it('generates an embed correctly', () => {
     const embed = generateMixtapeEmbed(mockData);
 
