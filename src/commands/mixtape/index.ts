@@ -39,7 +39,6 @@ export default {
     try {
       await interaction.deferReply();
       const data = await getMixtape();
-      console.log(data);
       const embed = generateMixtapeEmbed(data);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
