@@ -219,6 +219,7 @@ const generateBattleRoyaleStatusEmbeds = (
  * Generates relevant embeds for the status arenas channel
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
+ * TODO: As of April 2024, the API does not return arenas data anymore. Clean this up when you get the time
  */
 const generateArenasStatusEmbeds = () => {
   const embedData: APIEmbed = {
@@ -581,7 +582,7 @@ export const scheduleStatus = (nessie: Client) => {
         const seasonData = cachedSeason ?? (await getSeasonInformation());
         if (!cachedSeason) cachedSeason = seasonData;
         const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
-        const arenasStatusEmbeds = generateArenasStatusEmbeds();
+        const arenasStatusEmbeds = generateArenasStatusEmbeds(); //TODO: Clean this up eventually
         allStatus.forEach(async (status, index) => {
           await handleStatusCycle({
             nessie,
