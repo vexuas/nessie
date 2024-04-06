@@ -84,11 +84,6 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
             description: 'Pubs and Ranked Map Rotation for Battle Royale',
             value: 'gameModeDropdown__battleRoyaleValue',
           },
-          {
-            label: 'Mixtape',
-            description: 'Map Rotation for Mixtape Modes',
-            value: 'gameModeDropdown__mixtapeValue',
-          },
         ])
     );
     embed = {
