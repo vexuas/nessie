@@ -1,3 +1,37 @@
+# v2.1.0 (Sat Apr 06 2024)
+
+#### 🚀 Enhancement
+
+- Create season command [#195](https://github.com/vexuas/nessie/pull/195) ([@vexuas](https://github.com/vexuas))
+
+#### 🐛 Fixes
+
+- Remove arenas embed generation for status cycles [#198](https://github.com/vexuas/nessie/pull/198) (gabr@Gabriels-MacBook-Pro.local [@vexuas](https://github.com/vexuas))
+
+#### 🔧 Tweaks
+
+- Revert season status start changes [#199](https://github.com/vexuas/nessie/pull/199) (gabr@Gabriels-MacBook-Pro.local [@vexuas](https://github.com/vexuas))
+- Add split end to ranked embed [#194](https://github.com/vexuas/nessie/pull/194) ([@vexuas](https://github.com/vexuas))
+- Update status start with mixtape selection [#193](https://github.com/vexuas/nessie/pull/193) ([@vexuas](https://github.com/vexuas))
+- Update readme [#190](https://github.com/vexuas/nessie/pull/190) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2023 10 11 [#189](https://github.com/vexuas/nessie/pull/189) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump @babel/traverse from 7.22.8 to 7.23.2 [#192](https://github.com/vexuas/nessie/pull/192) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump undici from 5.22.1 to 5.26.3 [#191](https://github.com/vexuas/nessie/pull/191) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 3
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+- Gabriel Rodriguez (gabr@Gabriels-MacBook-Pro.local)
+
+---
+
 # v2.0.9 (Wed Oct 11 2023)
 
 #### 🔧 Tweaks
