@@ -219,19 +219,15 @@ const generateBattleRoyaleStatusEmbeds = (
  * Generates relevant embeds for the status arenas channel
  * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
  * Had to split it between br and arenas after seeing that
+ * TODO: As of April 2024, the API does not return arenas data anymore. Clean this up when you get the time
  */
-const generateArenasStatusEmbeds = (data: MapRotationAPIObject) => {
-  const arenasPubsEmbed = generatePubsEmbed(data.arenas, 'Arenas');
-  const arenasRankedEmbed = generateRankedEmbed(data.arenasRanked, 'Arenas');
-  const informationEmbed = {
-    description: '**Updates occur every 5 minutes**',
-    color: 3447003,
-    timestamp: new Date(Date.now()).toISOString(),
-    footer: {
-      text: 'Last Update',
-    },
+const generateArenasStatusEmbeds = () => {
+  const embedData: APIEmbed = {
+    title: 'Arenas are no longer supported',
+    color: 16711680,
+    description: 'To delete this channel, use /status stop'
   };
-  return [informationEmbed, arenasRankedEmbed, arenasPubsEmbed];
+  return [embedData];
 };
 /**
  * Handler for when a user initiates the /status start command
@@ -575,7 +571,7 @@ export const createStatus = async ({
  * More detailed explanation here: https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658
  */
 export const scheduleStatus = (nessie: Client) => {
-  return new Scheduler('5 */5 * * * *', async () => {
+  return new Scheduler('10 */1 * * * *', async () => {
     errorNotification.count = 0;
     errorNotification.message = '';
     const startTime = Date.now();
@@ -586,7 +582,7 @@ export const scheduleStatus = (nessie: Client) => {
         const seasonData = cachedSeason ?? (await getSeasonInformation());
         if (!cachedSeason) cachedSeason = seasonData;
         const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
-        const arenasStatusEmbeds = generateArenasStatusEmbeds(rotationData);
+        const arenasStatusEmbeds = generateArenasStatusEmbeds(); //TODO: Clean this up eventually
         allStatus.forEach(async (status, index) => {
           await handleStatusCycle({
             nessie,
