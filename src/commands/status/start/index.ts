@@ -77,17 +77,12 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
         .setCustomId('statusStart__gameModeDropdown')
         .setPlaceholder('Requires at least one game mode')
         .setMinValues(1)
-        .setMaxValues(2)
+        .setMaxValues(1)
         .addOptions([
           {
             label: 'Battle Royale',
             description: 'Pubs and Ranked Map Rotation for Battle Royale',
             value: 'gameModeDropdown__battleRoyaleValue',
-          },
-          {
-            label: 'Mixtape',
-            description: 'Map Rotation for Mixtape Modes',
-            value: 'gameModeDropdown__mixtapeValue',
           },
         ])
     );
@@ -571,7 +566,7 @@ export const createStatus = async ({
  * More detailed explanation here: https://shizuka.notion.site/Spike-on-Status-Time-Taken-0c26284152f04a169c546fe7b582a658
  */
 export const scheduleStatus = (nessie: Client) => {
-  return new Scheduler('10 */1 * * * *', async () => {
+  return new Scheduler('5 */5 * * * *', async () => {
     errorNotification.count = 0;
     errorNotification.message = '';
     const startTime = Date.now();
