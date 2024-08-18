@@ -1,3 +1,26 @@
+# v2.1.1 (Sun Aug 18 2024)
+
+#### 🐛 Fixes
+
+- Fix undefined current error [#203](https://github.com/vexuas/nessie/pull/203) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2024 04 06 [#200](https://github.com/vexuas/nessie/pull/200) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump braces from 3.0.2 to 3.0.3 [#201](https://github.com/vexuas/nessie/pull/201) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump ws from 8.13.0 to 8.17.1 [#202](https://github.com/vexuas/nessie/pull/202) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump undici from 5.26.3 to 5.28.4 [#197](https://github.com/vexuas/nessie/pull/197) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.1.0 (Sat Apr 06 2024)
 
 #### 🚀 Enhancement
