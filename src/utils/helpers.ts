@@ -330,7 +330,7 @@ export const generatePubsEmbed = (
     title: `${type} | Pubs`,
     color: 3066993,
     image: {
-      url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
+      url: data.current.asset ?? getMapUrl(data.current.code)
     },
     timestamp: new Date(Date.now() + data.current.remainingSecs * 1000).toISOString(),
     footer: {
@@ -365,7 +365,7 @@ export const generateRankedEmbed = (
     title: `${type} | Ranked`,
     color: 7419530,
     image: {
-      url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
+      url: data.current.asset ?? getMapUrl(data.current.code)
     },
     description:
       splitEnd || seasonEnd
