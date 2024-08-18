@@ -323,14 +323,19 @@ export const getCountdown = (timer: string) => {
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  */
 export const generatePubsEmbed = (
-  data: MapRotationBattleRoyaleSchema | MapRotationArenasSchema,
+  data?: MapRotationBattleRoyaleSchema | MapRotationArenasSchema,
   type = 'Battle Royale'
 ): APIEmbed => {
+  if(!data) return {
+    title: `${type} | Ranked`,
+    color: 16711680,
+    description: 'Oops unavailable to get data. Please try again later!'
+  }
   const embedData: APIEmbed = {
     title: `${type} | Pubs`,
     color: 3066993,
     image: {
-      url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
+      url: data.current.asset ?? getMapUrl(data.current.code)
     },
     timestamp: new Date(Date.now() + data.current.remainingSecs * 1000).toISOString(),
     footer: {
@@ -356,16 +361,21 @@ export const generatePubsEmbed = (
  * Fairly simple, don't need any fancy timers and footers
  */
 export const generateRankedEmbed = (
-  data: MapRotationRankedSchema | MapRotationArenasRankedSchema,
+  data?: MapRotationRankedSchema | MapRotationArenasRankedSchema,
   type = 'Battle Royale',
   seasonEnd?: string | null,
   splitEnd?: string | null
 ) => {
+  if(!data) return {
+    title: `${type} | Ranked`,
+    color: 16711680,
+    description: 'Oops unavailable to get data. Please try again later!'
+  }
   const embedData: any = {
     title: `${type} | Ranked`,
     color: 7419530,
     image: {
-      url: type === 'Battle Royale' ? getMapUrl(data.current.code) : data.current.asset,
+      url: data.current.asset ?? getMapUrl(data.current.code)
     },
     description:
       splitEnd || seasonEnd
