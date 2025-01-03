@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/cron": "^2.0.1",
     "@types/got": "^9.6.12",
-    "@types/jest": "^29.5.2",
+    "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.14",
     "@types/pg": "^8.10.2",
     "@types/uuid": "^9.0.2",
@@ -47,7 +47,7 @@
     "auto": "^11.3.0",
     "eslint": "^8.42.0",
     "eslint-plugin-unused-imports": "^2.0.0",
-    "jest": "^29.6.1",
+    "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
     "tsc-watch": "^6.0.4",
     "typescript": "^5.1.3"
