@@ -1,3 +1,30 @@
+# v2.1.2 (Sat Jan 04 2025)
+
+#### 🔧 Tweaks
+
+- Forgot to set ecosystem in dependabot file [#208](https://github.com/vexuas/nessie/pull/208) ([@vexuas](https://github.com/vexuas))
+- Add monthly dependabot package updates [#207](https://github.com/vexuas/nessie/pull/207) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2024 08 18 [#204](https://github.com/vexuas/nessie/pull/204) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump jest and @types/jest [#211](https://github.com/vexuas/nessie/pull/211) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump @typescript-eslint/eslint-plugin from 5.59.11 to 5.62.0 [#212](https://github.com/vexuas/nessie/pull/212) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump auto from 10.46.0 to 11.3.0 [#210](https://github.com/vexuas/nessie/pull/210) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump @types/lodash from 4.14.195 to 4.17.14 [#209](https://github.com/vexuas/nessie/pull/209) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump cross-spawn from 7.0.3 to 7.0.6 [#206](https://github.com/vexuas/nessie/pull/206) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump micromatch from 4.0.5 to 4.0.8 [#205](https://github.com/vexuas/nessie/pull/205) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.1.1 (Sun Aug 18 2024)
 
 #### 🐛 Fixes
