@@ -274,7 +274,7 @@ export const generateAnnouncementMessage = (prefix: string) => {
  * I'll just leave this comment so I get reminded about it in the future
  * TODO: Revisit if this is necessary
  */
-export const getMapUrl = (map: string) => {
+export const getMapUrl = (map: string): string | null => {
   switch (map) {
     case 'kings_canyon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
@@ -295,7 +295,7 @@ export const getMapUrl = (map: string) => {
     case 'broken_moon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/1064934640739164240/broken_moon.jpg';
     default:
-      return '';
+      return null;
   }
 };
 /**
@@ -326,16 +326,17 @@ export const generatePubsEmbed = (
   data?: MapRotationBattleRoyaleSchema | MapRotationArenasSchema,
   type = 'Battle Royale'
 ): APIEmbed => {
-  if(!data) return {
-    title: `${type} | Ranked`,
-    color: 16711680,
-    description: 'Oops unavailable to get data. Please try again later!'
-  }
+  if (!data)
+    return {
+      title: `${type} | Ranked`,
+      color: 16711680,
+      description: 'Oops unavailable to get data. Please try again later!',
+    };
   const embedData: APIEmbed = {
     title: `${type} | Pubs`,
     color: 3066993,
     image: {
-      url: data.current.asset ?? getMapUrl(data.current.code)
+      url: getMapUrl(data.current.code) ?? data.current.asset,
     },
     timestamp: new Date(Date.now() + data.current.remainingSecs * 1000).toISOString(),
     footer: {
@@ -366,16 +367,17 @@ export const generateRankedEmbed = (
   seasonEnd?: string | null,
   splitEnd?: string | null
 ) => {
-  if(!data) return {
-    title: `${type} | Ranked`,
-    color: 16711680,
-    description: 'Oops unavailable to get data. Please try again later!'
-  }
+  if (!data)
+    return {
+      title: `${type} | Ranked`,
+      color: 16711680,
+      description: 'Oops unavailable to get data. Please try again later!',
+    };
   const embedData: any = {
     title: `${type} | Ranked`,
     color: 7419530,
     image: {
-      url: data.current.asset ?? getMapUrl(data.current.code)
+      url: getMapUrl(data.current.code) ?? data.current.asset,
     },
     description:
       splitEnd || seasonEnd
