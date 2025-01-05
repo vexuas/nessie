@@ -277,15 +277,15 @@ export const generateAnnouncementMessage = (prefix: string) => {
 export const getMapUrl = (map: string): string | null => {
   switch (map) {
     case 'kings_canyon_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
+      return 'https://vexuas.b-cdn.net/apex_legend_maps/kings_canyon.jpg';
     case 'worlds_edge_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544195488129034/worlds_edge.jpg';
+      return 'https://vexuas.b-cdn.net/apex_legend_maps/worlds_edge.jpg';
     case 'olympus_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
+      return 'https://vexuas.b-cdn.net/apex_legend_maps/olympus.jpg';
     case 'storm_point_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
+      return 'https://vexuas.b-cdn.net/apex_legend_maps/storm_point.jpg';
     case 'broken_moon_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/1064934640739164240/broken_moon.jpg';
+      return 'https://vexuas.b-cdn.net/apex_legend_maps/broken_moon.jpg';
     default:
       return null;
   }
