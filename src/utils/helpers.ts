@@ -274,8 +274,8 @@ export const generateAnnouncementMessage = (prefix: string) => {
  * I'll just leave this comment so I get reminded about it in the future
  * TODO: Revisit if this is necessary
  */
-export const getMapUrl = (map: string): string | null => {
-  switch (map) {
+export const getMapUrl = (map_code: string): string | null => {
+  switch (map_code) {
     case 'kings_canyon_rotation':
       return 'https://vexuas.b-cdn.net/apex_legend_maps/kings_canyon.jpg';
     case 'worlds_edge_rotation':
@@ -286,6 +286,8 @@ export const getMapUrl = (map: string): string | null => {
       return 'https://vexuas.b-cdn.net/apex_legend_maps/storm_point.jpg';
     case 'broken_moon_rotation':
       return 'https://vexuas.b-cdn.net/apex_legend_maps/broken_moon.jpg';
+    case 'edistrict_rotation':
+      return 'https://vexuas.b-cdn.net/apex_legend_maps/e-district.png';
     default:
       return null;
   }
