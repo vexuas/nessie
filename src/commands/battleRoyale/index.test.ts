@@ -85,9 +85,7 @@ describe('Battle Royale Pubs Command', () => {
   it('displays the correct image url', () => {
     const embed = generatePubsEmbed(mockPubsData);
 
-    expect(embed.image?.url).toBe(
-      'https://apexlegendsstatus.com/assets/maps/Worlds_Edge.png'
-    );
+    expect(embed.image?.url).toBe('https://vexuas.b-cdn.net/apex_legend_maps/worlds_edge.jpg');
   });
   it('displays the correct map in the footer', () => {
     const embed = generatePubsEmbed(mockPubsData);
@@ -144,9 +142,7 @@ describe('Battle Royale Ranked Command', () => {
   it('displays the correct image url', () => {
     const embed = generateRankedEmbed(mockRankedData);
 
-    expect(embed.image?.url).toBe(
-      'https://apexlegendsstatus.com/assets/maps/Worlds_Edge.png'
-    );
+    expect(embed.image?.url).toBe('https://vexuas.b-cdn.net/apex_legend_maps/worlds_edge.jpg');
   });
   it('displays the correct map in the footer', () => {
     const embed = generateRankedEmbed(mockRankedData);
