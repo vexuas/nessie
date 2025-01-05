@@ -278,18 +278,10 @@ export const getMapUrl = (map: string): string | null => {
   switch (map) {
     case 'kings_canyon_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
-    case 'Kings Canyon':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544176815099954/kings_canyon.jpg';
     case 'worlds_edge_rotation':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544195488129034/worlds_edge.jpg';
-    case `World's Edge`:
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544195488129034/worlds_edge.jpg';
     case 'olympus_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
-    case 'Olympus':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/896544165163323402/olympus_nessie.jpg';
-    case 'Storm Point':
-      return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
     case 'storm_point_rotation':
       return 'https://cdn.discordapp.com/attachments/896544134813319168/911631835300237332/storm_point_nessie.jpg';
     case 'broken_moon_rotation':
