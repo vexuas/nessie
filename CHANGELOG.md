@@ -1,3 +1,19 @@
+# v2.1.3 (Mon Jan 06 2025)
+
+#### 🔧 Tweaks
+
+- Update cdn to personal [#215](https://github.com/vexuas/nessie/pull/215) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 01 04 [#214](https://github.com/vexuas/nessie/pull/214) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.1.2 (Sat Jan 04 2025)
 
 #### 🔧 Tweaks
