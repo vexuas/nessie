@@ -1,3 +1,37 @@
+# v2.2.0 (Sun Mar 16 2025)
+
+#### 🚀 Enhancement
+
+- Update deployment flow to use node 18 [#229](https://github.com/vexuas/nessie/pull/229) ([@vexuas](https://github.com/vexuas))
+
+#### 🔧 Tweaks
+
+- Update node engine to above 18 [#228](https://github.com/vexuas/nessie/pull/228) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 01 06 [#216](https://github.com/vexuas/nessie/pull/216) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump cron from 1.8.3 to 4.1.0 [#225](https://github.com/vexuas/nessie/pull/225) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump pg and @types/pg [#226](https://github.com/vexuas/nessie/pull/226) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump eslint-plugin-unused-imports from 2.0.0 to 4.1.4 [#224](https://github.com/vexuas/nessie/pull/224) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump topgg-autoposter from 2.0.1 to 2.0.2 [#223](https://github.com/vexuas/nessie/pull/223) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump typescript from 5.1.3 to 5.7.3 [#221](https://github.com/vexuas/nessie/pull/221) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump tsc-watch from 6.0.4 to 6.2.1 [#219](https://github.com/vexuas/nessie/pull/219) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump date-fns from 2.30.0 to 4.1.0 [#222](https://github.com/vexuas/nessie/pull/222) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump @types/lodash from 4.17.14 to 4.17.15 [#220](https://github.com/vexuas/nessie/pull/220) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump ts-jest from 29.1.1 to 29.2.5 [#218](https://github.com/vexuas/nessie/pull/218) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump undici from 5.28.4 to 5.28.5 [#217](https://github.com/vexuas/nessie/pull/217) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.1.3 (Mon Jan 06 2025)
 
 #### 🔧 Tweaks
