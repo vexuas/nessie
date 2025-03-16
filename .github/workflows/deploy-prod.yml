@@ -21,7 +21,7 @@ jobs:
           script: |
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
-            nvm install 16.13.0
+            nvm install 18.0.0
             pm2 stop nessie
             pm2 delete nessie
             cd nessie
