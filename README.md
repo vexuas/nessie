@@ -18,7 +18,7 @@ If you want to use Nessie for your own projects, you would need the following be
 
 - Have a Discord Application created from the [Discord Dev Portal](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
 - Have the Discord Application [invited to a Discord Server](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
-- [Node](https://heynode.com/tutorial/install-nodejs-locally-nvm/) with a version of at least v16.13.0
+- [Node](https://heynode.com/tutorial/install-nodejs-locally-nvm/) with a version of at least v18.0.0
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
 - An API key generated from https://apexlegendsapi.com/
 
@@ -30,6 +30,7 @@ If you want to use Nessie for your own projects, you would need the following be
 2. Install dependencies
    - `yarn install`
 3. Add required environment variables
+
    - You would need the following core environment variables in order to start your Discord bot:
      - `BOT_TOKEN`
      - `BOT_ID`
@@ -40,6 +41,7 @@ If you want to use Nessie for your own projects, you would need the following be
      yarn config:init
      ```
    - Finally, fill in the required variables above with your data
+
      ```ts
      src / config / environment.ts;
      //Bot Configuration; Required
@@ -50,7 +52,9 @@ If you want to use Nessie for your own projects, you would need the following be
      //API key to retrieve apex data
      export const ALS_API_KEY = 'Your API key from apexlegendsapi';
      ```
+
    - Note: You may have noticed at this point there are other environment variables generated as well. These are optional to use and is not necessary for the bot to run but they are defined to avoid typescript errors. More information on these [variables in this discord bot template here](https://github.com/vexuas/djs-typescript-template#advanced-features)
+
 4. Start your App
    - `yarn start`
 
