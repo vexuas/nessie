@@ -33,7 +33,7 @@
     "mixpanel": "^0.13.0",
     "pg": "^8.14.0",
     "topgg-autoposter": "^2.0.2",
-    "uuid": "^8.3.2"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/cron": "^2.0.1",
