@@ -10,6 +10,7 @@ import {
 } from '../schemas/mapRotation';
 import { SeasonAPISchema } from '../schemas/season';
 import { sendErrorLog } from '../utils/helpers';
+import redis from './redis';
 
 //Documentation on API: https://apexlegendsapi.com/documentation.php
 const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
@@ -23,8 +24,15 @@ export async function getRotationData(): Promise<MapRotationAPIObject> {
 }
 export async function getSeasonInformation(): Promise<SeasonAPISchema | null> {
   try {
-    const response: string = (await got.get(seasonUrl)).body;
-    return JSON.parse(response);
+    let seasonData = await redis.get('season:current');
+
+    if (!seasonData) {
+      const latestSeason: string = (await got.get(seasonUrl)).body;
+      seasonData = JSON.stringify(latestSeason);
+      await redis.set('season:current', seasonData, { EX: 60 * 60 }); // Expires 1 hour
+    }
+
+    return JSON.parse(seasonData);
   } catch (error) {
     sendErrorLog({ error });
     return null;
