@@ -1,3 +1,24 @@
+# v2.2.1 (Sun Apr 13 2025)
+
+#### 🏠 Internal
+
+- Release/2025 03 16 [#230](https://github.com/vexuas/nessie/pull/230) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump pg and @types/pg [#236](https://github.com/vexuas/nessie/pull/236) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump typescript from 5.7.3 to 5.8.2 [#235](https://github.com/vexuas/nessie/pull/235) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump uuid from 8.3.2 to 11.1.0 [#234](https://github.com/vexuas/nessie/pull/234) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump cron from 4.1.0 to 4.1.3 [#233](https://github.com/vexuas/nessie/pull/233) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump ts-jest from 29.2.5 to 29.3.1 [#232](https://github.com/vexuas/nessie/pull/232) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.2.0 (Sun Mar 16 2025)
 
 #### 🚀 Enhancement
