@@ -22,6 +22,9 @@ export async function getRotationData(): Promise<MapRotationAPIObject> {
   const response: string = (await got.get(url)).body;
   return JSON.parse(response);
 }
+// We don't really want to abuse this API so caching this data for 24 hours
+// Using redis for this since I don't really want to overengineer it and store this in a database
+// TODO: Add a way to invalidate the cache if we need to/not rely on Redis if 3rd-party projects don't want it
 export async function getSeasonInformation(): Promise<SeasonAPISchema | null> {
   try {
     let seasonData = await redis.get('season:current');
