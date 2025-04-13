@@ -28,7 +28,7 @@ export async function getSeasonInformation(): Promise<SeasonAPISchema | null> {
 
     if (!seasonData) {
       seasonData = (await got.get(seasonUrl)).body;
-      await redis.set('season:current', seasonData, { EX: 60 * 60 }); // Expires 1 hour
+      await redis.set('season:current', seasonData, { EX: 60 * 60 * 24 }); // Once a day
     }
 
     return JSON.parse(seasonData);
