@@ -50,10 +50,6 @@ import { sendAnalyticsEvent } from '../../../services/analytics';
 import { MapRotationAPIObject } from '../../../schemas/mapRotation';
 import { SeasonAPISchema } from '../../../schemas/season';
 
-//Cache season data as we don't want to abuse the API as well as only needing the end date anyway
-//Isn't the best way storing this in a variable but didn't want to overengineer and having it in the database for now
-let cachedSeason: SeasonAPISchema | null = null;
-
 const errorNotification = {
   count: 0,
   message: '',
@@ -220,7 +216,7 @@ const generateArenasStatusEmbeds = () => {
   const embedData: APIEmbed = {
     title: 'Arenas are no longer supported',
     color: 16711680,
-    description: 'To delete this channel, use /status stop'
+    description: 'To delete this channel, use /status stop',
   };
   return [embedData];
 };
@@ -452,8 +448,7 @@ export const createStatus = async ({
     await interaction.message.edit({ embeds: [embedLoadingChannels], components: [] });
 
     const rotationData = await getRotationData();
-    const seasonData = cachedSeason ?? (await getSeasonInformation());
-    if (!cachedSeason) cachedSeason = seasonData;
+    const seasonData = await getSeasonInformation();
     const statusBattleRoyaleEmbed = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
     /**
      * Gets the @everyone role of the guild
@@ -574,8 +569,7 @@ export const scheduleStatus = (nessie: Client) => {
     try {
       if (allStatus) {
         const rotationData = await getRotationData();
-        const seasonData = cachedSeason ?? (await getSeasonInformation());
-        if (!cachedSeason) cachedSeason = seasonData;
+        const seasonData = await getSeasonInformation();
         const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
         const arenasStatusEmbeds = generateArenasStatusEmbeds(); //TODO: Clean this up eventually
         allStatus.forEach(async (status, index) => {

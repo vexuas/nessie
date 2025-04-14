@@ -5,6 +5,7 @@ import { BOT_TOKEN, MIXPANEL_ID, TOP_GG_TOKEN } from './config/environment';
 import { registerEventHandlers } from './events/events';
 import { isEmpty } from 'lodash';
 import { sendErrorLog } from './utils/helpers';
+import { connectRedis } from './services/redis';
 
 const app = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -15,6 +16,7 @@ const initialize = async () => {
     await app.login(BOT_TOKEN);
     const mixpanel = MIXPANEL_ID && !isEmpty(MIXPANEL_ID) ? Mixpanel.init(MIXPANEL_ID) : null;
     TOP_GG_TOKEN && !isEmpty(TOP_GG_TOKEN) && AutoPoster(TOP_GG_TOKEN, app);
+    await connectRedis();
     registerEventHandlers({ app, mixpanel });
   } catch (error) {
     sendErrorLog({ error });

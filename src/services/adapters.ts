@@ -10,6 +10,7 @@ import {
 } from '../schemas/mapRotation';
 import { SeasonAPISchema } from '../schemas/season';
 import { sendErrorLog } from '../utils/helpers';
+import redis from './redis';
 
 //Documentation on API: https://apexlegendsapi.com/documentation.php
 const url = `https://api.mozambiquehe.re/maprotation?version=2&auth=${ALS_API_KEY}`;
@@ -21,10 +22,19 @@ export async function getRotationData(): Promise<MapRotationAPIObject> {
   const response: string = (await got.get(url)).body;
   return JSON.parse(response);
 }
+// We don't really want to abuse this API so caching this data for 24 hours
+// Using redis for this since I don't really want to overengineer it and store this in a database
+// TODO: Add a way to invalidate the cache if we need to/not rely on Redis if 3rd-party projects don't want it
 export async function getSeasonInformation(): Promise<SeasonAPISchema | null> {
   try {
-    const response: string = (await got.get(seasonUrl)).body;
-    return JSON.parse(response);
+    let seasonData = await redis.get('season:current');
+
+    if (!seasonData) {
+      seasonData = (await got.get(seasonUrl)).body;
+      await redis.set('season:current', seasonData, { EX: 60 * 60 * 24 }); // Once a day
+    }
+
+    return JSON.parse(seasonData);
   } catch (error) {
     sendErrorLog({ error });
     return null;
