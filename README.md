@@ -20,6 +20,7 @@ If you want to use Nessie for your own projects, you would need the following be
 - Have the Discord Application [invited to a Discord Server](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
 - [Node](https://heynode.com/tutorial/install-nodejs-locally-nvm/) with a version of at least v18.0.0
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
+- [Homebrew](https://brew.sh/)
 - An API key generated from https://apexlegendsapi.com/
 
 ## Installation
@@ -55,8 +56,16 @@ If you want to use Nessie for your own projects, you would need the following be
 
    - Note: You may have noticed at this point there are other environment variables generated as well. These are optional to use and is not necessary for the bot to run but they are defined to avoid typescript errors. More information on these [variables in this discord bot template here](https://github.com/vexuas/djs-typescript-template#advanced-features)
 
-4. Start your App
-   - `yarn start`
+## Redis Setup
+This project uses [Redis](https://redis.io/) for caching and storing lightweight runtime data, specifically season data to avoid abusing 3rd-party APIs
+
+1. Install redis
+   - `brew install redis`
+2. Start the redis server
+   - `brew services start redis` 
+
+## Start Your Bot
+At this point, simply run `yarn start`
 
 ## Command list
 
