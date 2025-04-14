@@ -57,7 +57,7 @@ If you want to use Nessie for your own projects, you would need the following be
    - Note: You may have noticed at this point there are other environment variables generated as well. These are optional to use and is not necessary for the bot to run but they are defined to avoid typescript errors. More information on these [variables in this discord bot template here](https://github.com/vexuas/djs-typescript-template#advanced-features)
 
 ## Redis Setup
-This project uses Redis for caching and storing lightweight runtime data, specifically season data to avoid abusing 3rd-party APIs
+This project uses [Redis](https://redis.io/) for caching and storing lightweight runtime data, specifically season data to avoid abusing 3rd-party APIs
 
 1. Install redis
    - `brew install redis`
