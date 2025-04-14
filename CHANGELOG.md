@@ -1,3 +1,31 @@
+# v2.3.0 (Tue Apr 15 2025)
+
+#### 🚀 Enhancement
+
+- Bump discord.js from 14.11.0 to 14.18.0 [#241](https://github.com/vexuas/nessie/pull/241) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### 🔧 Tweaks
+
+- Add redis installation guide [#244](https://github.com/vexuas/nessie/pull/244) ([@vexuas](https://github.com/vexuas))
+- Use redis to cache season data [#243](https://github.com/vexuas/nessie/pull/243) ([@vexuas](https://github.com/vexuas))
+
+#### 🐛 Bug Fix
+
+- Bump @types/lodash from 4.17.15 to 4.17.16 [#242](https://github.com/vexuas/nessie/pull/242) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump ts-jest from 29.3.1 to 29.3.2 [#240](https://github.com/vexuas/nessie/pull/240) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump cron from 4.1.3 to 4.1.4 [#238](https://github.com/vexuas/nessie/pull/238) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### 🏠 Internal
+
+- Release/2025 04 13 [#237](https://github.com/vexuas/nessie/pull/237) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.2.1 (Sun Apr 13 2025)
 
 #### 🏠 Internal
