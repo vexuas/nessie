@@ -19,6 +19,7 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           password: ${{ secrets.DO_PASSWORD }}
           script: |
+            sudo systemctl start redis || true
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
             nvm install 18.0.0
