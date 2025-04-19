@@ -22,7 +22,7 @@ jobs:
             sudo systemctl start redis || true
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
-            nvm install 18.0.0
+            nvm install 20.0.0
             pm2 stop nessie
             pm2 delete nessie
             cd nessie
