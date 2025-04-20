@@ -7,6 +7,7 @@ import { isEmpty } from 'lodash';
 import { sendErrorLog } from './utils/helpers';
 import { connectRedis } from './services/redis';
 import { initializeSentry } from './services/instrument';
+import { captureException } from '@sentry/node';
 
 initializeSentry();
 
@@ -22,6 +23,7 @@ const initialize = async () => {
     await connectRedis();
     registerEventHandlers({ app, mixpanel });
   } catch (error) {
+    captureException(error);
     sendErrorLog({ error });
   }
 };
