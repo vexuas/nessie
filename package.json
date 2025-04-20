@@ -25,6 +25,7 @@
     "release": "git fetch --tags --force && git checkout -b release/$(date +'%Y-%m-%d') && yarn auto:release && yarn update:version && git add . && git commit -m 'Update version' && git push -u origin head"
   },
   "dependencies": {
+    "@sentry/node": "^9.13.0",
     "cron": "^4.3.0",
     "date-fns": "^4.1.0",
     "discord.js": "^14.18.0",
