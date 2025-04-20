@@ -30,7 +30,7 @@
     "discord.js": "^14.18.0",
     "got": "11.8.6",
     "lodash": "^4.17.21",
-    "mixpanel": "^0.13.0",
+    "mixpanel": "^0.18.1",
     "pg": "^8.14.1",
     "redis": "^4.7.0",
     "topgg-autoposter": "^2.0.2",
