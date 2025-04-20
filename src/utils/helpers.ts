@@ -32,6 +32,7 @@ import {
 } from '../schemas/mapRotation';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../services/analytics';
+import { captureException } from '@sentry/node';
 
 export const serverNotificationEmbed = async ({
   app,
@@ -136,6 +137,7 @@ export const sendErrorLog = async ({
 }) => {
   console.error(error);
   const errorID = uuidV4();
+  captureException(error); // Sentry error logging
   if (interaction) {
     const errorEmbed = {
       description: `Oops something went wrong! D:\n\nError: ${
