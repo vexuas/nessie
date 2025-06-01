@@ -2136,7 +2136,7 @@ cron@^4.3.0:
     "@types/luxon" "~3.6.0"
     luxon "~3.6.0"
 
-cross-spawn@^7.0.2, cross-spawn@^7.0.3:
+cross-spawn@^7.0.2, cross-spawn@^7.0.3, cross-spawn@^7.0.6:
   version "7.0.6"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.6.tgz#8a58fe78f00dcd70c370451759dfbfaf03e8ee9f"
   integrity sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==
@@ -4493,7 +4493,7 @@ stream-combiner@~0.0.4:
   dependencies:
     duplexer "~0.1.1"
 
-string-argv@^0.3.1:
+string-argv@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.3.2.tgz#2b6d0ef24b656274d957d54e0a4bbf6153dc02b6"
   integrity sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==
@@ -4715,15 +4715,15 @@ ts-node@^9:
     source-map-support "^0.5.17"
     yn "3.1.1"
 
-tsc-watch@^6.2.1:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/tsc-watch/-/tsc-watch-6.2.1.tgz#861801be929b2fd3d597c5f608db2b7ddba503db"
-  integrity sha512-GLwdz5Dy9K3sVm3RzgkLcyDpl5cvU9HEcE1A3gf5rqEwlUe7gDLxNCgcuNEw3zoKOiegMo3LnbF1t6HLqxhrSA==
+tsc-watch@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/tsc-watch/-/tsc-watch-7.1.1.tgz#c2aaf1719b79d63ef04ab7e176113fa715fd4eb7"
+  integrity sha512-r6t37Dkk4vK44HwxOe+OzjpE/gDamZAwqXhtcAJD/hPVblcjJK45NxbK0HcDASXG0U4pEnCh640JZbeDVSC6yA==
   dependencies:
-    cross-spawn "^7.0.3"
+    cross-spawn "^7.0.6"
     node-cleanup "^2.1.2"
     ps-tree "^1.2.0"
-    string-argv "^0.3.1"
+    string-argv "^0.3.2"
 
 tslib@1.10.0:
   version "1.10.0"
