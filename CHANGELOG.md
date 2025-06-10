@@ -1,3 +1,34 @@
+# v2.3.1 (Tue Jun 10 2025)
+
+#### 🔧 Tweaks
+
+- Use node 20 [#246](https://github.com/vexuas/nessie/pull/246) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 04 15 [#245](https://github.com/vexuas/nessie/pull/245) ([@vexuas](https://github.com/vexuas))
+
+#### 🔩 Dependency Updates
+
+- Bump pg and @types/pg [#257](https://github.com/vexuas/nessie/pull/257) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump ts-jest from 29.3.2 to 29.3.4 [#259](https://github.com/vexuas/nessie/pull/259) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump cron from 4.3.0 to 4.3.1 [#258](https://github.com/vexuas/nessie/pull/258) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump discord.js from 14.19.2 to 14.19.3 [#256](https://github.com/vexuas/nessie/pull/256) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump tsc-watch from 6.2.1 to 7.1.1 [#255](https://github.com/vexuas/nessie/pull/255) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump discord.js from 14.18.0 to 14.19.2 [#253](https://github.com/vexuas/nessie/pull/253) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump pg and @types/pg [#252](https://github.com/vexuas/nessie/pull/252) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump @types/uuid from 9.0.2 to 10.0.0 [#250](https://github.com/vexuas/nessie/pull/250) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump mixpanel from 0.13.0 to 0.18.1 [#249](https://github.com/vexuas/nessie/pull/249) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump cron from 4.1.4 to 4.3.0 [#248](https://github.com/vexuas/nessie/pull/248) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump @types/pg from 8.11.12 to 8.11.13 [#247](https://github.com/vexuas/nessie/pull/247) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.3.0 (Tue Apr 15 2025)
 
 #### 🚀 Enhancement
