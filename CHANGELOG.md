@@ -1,3 +1,19 @@
+# v2.3.2 (Sat Jun 14 2025)
+
+#### 🔧 Tweaks
+
+- Use sentry for error logging [#261](https://github.com/vexuas/nessie/pull/261) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 06 10 [#260](https://github.com/vexuas/nessie/pull/260) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.3.1 (Tue Jun 10 2025)
 
 #### 🔧 Tweaks
