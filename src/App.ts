@@ -6,6 +6,9 @@ import { registerEventHandlers } from './events/events';
 import { isEmpty } from 'lodash';
 import { sendErrorLog } from './utils/helpers';
 import { connectRedis } from './services/redis';
+import { initializeSentry } from './services/instrument';
+
+initializeSentry();
 
 const app = new Client({
   intents: [GatewayIntentBits.Guilds],

@@ -4,7 +4,7 @@
   "description": "Apex Legends Map Rotation Discord Bot",
   "license": "MIT",
   "scripts": {
-    "config:init": "yarn config:file && yarn config:bot && yarn config:als && yarn config:env && yarn config:notification && yarn config:database && yarn config:product && yarn config:topgg",
+    "config:init": "yarn config:file && yarn config:bot && yarn config:als && yarn config:env && yarn config:notification && yarn config:database && yarn config:product && yarn config:topgg && yarn config:sentry",
     "config:file": "mkdir src/config && touch src/config/environment.ts",
     "config:bot": "echo \"//Bot Configuration; Required\nexport const BOT_TOKEN = '';\nexport const BOT_ID = '';\nexport const GUILD_ID = '';\n\" >> src/config/environment.ts",
     "config:als": "echo \"//API key to retrieve apex data\nexport const ALS_API_KEY = '';\n\" >> src/config/environment.ts",
@@ -13,6 +13,7 @@
     "config:database": "echo \"//Database\nexport const DATABASE_CONFIG = null;\n\" >> src/config/environment.ts",
     "config:product": "echo \"//Product Tracking\nexport const MIXPANEL_ID = '';\n\" >> src/config/environment.ts",
     "config:topgg": "echo \"//TopGG Tracking\nexport const TOP_GG_TOKEN = '';\n\" >> src/config/environment.ts",
+    "config:sentry": "echo \"//Error Logging\nexport const SENTRY_DSN_KEY = '';\n\" >> src/config/environment.ts",
     "start": "yarn build && yarn build:watch",
     "build": "tsc",
     "build:watch": "yarn tsc-watch --onSuccess 'node dist/App.js'",
@@ -25,6 +26,7 @@
     "release": "git fetch --tags --force && git checkout -b release/$(date +'%Y-%m-%d') && yarn auto:release && yarn update:version && git add . && git commit -m 'Update version' && git push -u origin head"
   },
   "dependencies": {
+    "@sentry/node": "^9.29.0",
     "cron": "^4.3.1",
     "date-fns": "^4.1.0",
     "discord.js": "^14.19.3",
