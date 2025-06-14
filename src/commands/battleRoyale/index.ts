@@ -1,13 +1,12 @@
 import { SlashCommandBuilder } from 'discord.js';
+import // getBattleRoyalePubs,
+// getBattleRoyaleRanked,
+// getSeasonInformation,
+'../../services/adapters';
 import {
-  getBattleRoyalePubs,
-  getBattleRoyaleRanked,
-  getSeasonInformation,
-} from '../../services/adapters';
-import {
-  formatEndDateCountdown,
-  generatePubsEmbed,
-  generateRankedEmbed,
+  // formatEndDateCountdown,
+  // generatePubsEmbed,
+  // generateRankedEmbed,
   sendErrorLog,
 } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
@@ -25,35 +24,36 @@ export default {
         .addChoices({ name: 'pubs', value: 'br_pubs' }, { name: 'ranked', value: 'br_ranked' })
     ),
   async execute({ interaction }: AppCommandOptions) {
-    let data;
+    // let data;
     let embed;
     const optionMode = interaction.options.getString('mode');
     try {
       await interaction.deferReply();
-      switch (optionMode) {
-        case 'br_pubs':
-          data = await getBattleRoyalePubs();
-          embed = generatePubsEmbed(data);
-          break;
-        case 'br_ranked':
-          data = await getBattleRoyaleRanked();
-          const season = await getSeasonInformation();
-          //TODO: Figure out formatting for different timezones eventually
-          const seasonEnd = season
-            ? formatEndDateCountdown({
-                endDate: season.dates.end.rankedEnd * 1000,
-                currentDate: new Date(),
-              })
-            : null;
-          const splitEnd = season
-            ? formatEndDateCountdown({
-                endDate: season.dates.split.timestamp * 1000,
-                currentDate: new Date(),
-              })
-            : null;
-          embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd, splitEnd);
-          break;
-      }
+      throw new Error('Test message');
+      // switch (optionMode) {
+      //   case 'br_pubs':
+      //     data = await getBattleRoyalePubs();
+      //     embed = generatePubsEmbed(data);
+      //     break;
+      //   case 'br_ranked':
+      //     data = await getBattleRoyaleRanked();
+      //     const season = await getSeasonInformation();
+      //     //TODO: Figure out formatting for different timezones eventually
+      //     const seasonEnd = season
+      //       ? formatEndDateCountdown({
+      //           endDate: season.dates.end.rankedEnd * 1000,
+      //           currentDate: new Date(),
+      //         })
+      //       : null;
+      //     const splitEnd = season
+      //       ? formatEndDateCountdown({
+      //           endDate: season.dates.split.timestamp * 1000,
+      //           currentDate: new Date(),
+      //         })
+      //       : null;
+      //     embed = generateRankedEmbed(data, 'Battle Royale', seasonEnd, splitEnd);
+      //     break;
+      // }
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       sendErrorLog({ error, interaction, option: optionMode });

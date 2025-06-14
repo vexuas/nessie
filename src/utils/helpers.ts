@@ -135,7 +135,6 @@ export const sendErrorLog = async ({
   customTitle?: string;
 }) => {
   console.error(error);
-  const errorID = captureException(error); // Sentry error logging
   const title = customTitle
     ? `Error | ${customTitle}`
     : interaction
@@ -155,6 +154,14 @@ export const sendErrorLog = async ({
         guildName: interaction.guild ? interaction.guild.name : '-',
       }
     : null;
+
+  const errorID = captureException(error, {
+    extra: {
+      title,
+      commandOption,
+      interactionDetails,
+    },
+  }); // Sentry error logging
   if (interaction) {
     const errorEmbed = {
       description: `Oops something went wrong! D:\n\nError: ${
