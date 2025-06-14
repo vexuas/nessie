@@ -221,6 +221,7 @@ export const sendStatusErrorLog = async ({
   status: StatusRecord;
 }) => {
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
+  captureException(error); // Sentry error logging
   const errorEmbed = {
     title: 'Error | Status Scheduler Cycle',
     color: 16711680,
