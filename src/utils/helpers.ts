@@ -136,6 +136,25 @@ export const sendErrorLog = async ({
 }) => {
   console.error(error);
   const errorID = captureException(error); // Sentry error logging
+  const title = customTitle
+    ? `Error | ${customTitle}`
+    : interaction
+    ? `Error | ${interaction.isCommand() ? capitalize(interaction.commandName) : ''}${
+        subCommand ? ` ${capitalize(subCommand)}` : ''
+      } Command`
+    : 'Error';
+  const commandOption = option ? option : '';
+  const interactionChannel = interaction?.channel as GuildChannel | undefined;
+  const interactionDetails = interaction
+    ? {
+        userId: interaction.user.id,
+        userName: interaction.user.username,
+        channelId: interaction.channelId,
+        channelName: interactionChannel ? interactionChannel.name : '-',
+        guildId: interaction.guild ? interaction.guild.id : '-',
+        guildName: interaction.guild ? interaction.guild.name : '-',
+      }
+    : null;
   if (interaction) {
     const errorEmbed = {
       description: `Oops something went wrong! D:\n\nError: ${
@@ -146,49 +165,42 @@ export const sendErrorLog = async ({
     await interaction.editReply({ embeds: [errorEmbed], components: [] });
   }
   if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
-    const interactionChannel = interaction?.channel as GuildChannel | undefined;
     const notificationEmbed: APIEmbed = {
-      title: customTitle
-        ? `Error | ${customTitle}`
-        : interaction
-        ? `Error | ${interaction.isCommand() ? capitalize(interaction.commandName) : ''}${
-            subCommand ? ` ${capitalize(subCommand)}` : ''
-          } Command`
-        : 'Error',
+      title,
       color: getEmbedColor('#FF0000'),
       description: `uuid: ${errorID}\nError: ${
         error.message ? error.message : 'Unexpected Error'
-      }\n${option ? `Option: ${option}` : ''}`,
-      fields: interaction
+      }\n${commandOption}`,
+      fields: interactionDetails
         ? [
             {
               name: 'User',
-              value: interaction.user.username,
+              value: interactionDetails.userName,
               inline: true,
             },
             {
               name: 'User ID',
-              value: interaction.user.id,
+              value: interactionDetails.userId,
               inline: true,
             },
             {
               name: 'Channel',
-              value: interactionChannel ? interactionChannel.name : '-',
+              value: interactionDetails.channelName,
               inline: true,
             },
             {
               name: 'Channel ID',
-              value: interaction.channelId,
+              value: interactionDetails.channelId,
               inline: true,
             },
             {
               name: 'Guild',
-              value: interaction.guild ? interaction.guild.name : '-',
+              value: interactionDetails.guildName,
               inline: true,
             },
             {
               name: 'Guild ID',
-              value: interaction.guildId ? interaction.guildId : '-',
+              value: interactionDetails.guildId,
               inline: true,
             },
           ]
