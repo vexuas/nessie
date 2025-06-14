@@ -693,8 +693,7 @@ const handleStatusCycle = async ({
      */
     errorNotification.count = errorNotification.count + 1;
     errorNotification.message = error.message;
-    const uuid = uuidV4();
-    errorNotification.count <= 3 && (await sendStatusErrorLog({ nessie, uuid, error, status }));
+    errorNotification.count <= 3 && (await sendStatusErrorLog({ nessie, error, status }));
     if (errorNotification.count !== 0 && totalCount && index === totalCount - 1) {
       const errorEmbed = {
         title: 'Error Summary | Status Cycle',
@@ -751,8 +750,7 @@ const handleStatusCycle = async ({
             ],
           }));
       } catch (error) {
-        const uuid = uuidV4();
-        await sendStatusErrorLog({ nessie, uuid, error, status });
+        await sendStatusErrorLog({ nessie, error, status });
       }
     }
   }

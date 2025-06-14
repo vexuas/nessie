@@ -20,7 +20,6 @@ import {
 } from '../config/environment';
 import { nessieLogo } from './constants';
 import { isEmpty } from 'lodash';
-import { v4 as uuidV4 } from 'uuid';
 import { inlineCode } from '@discordjs/builders';
 import { capitalize } from 'lodash';
 import { StatusRecord } from '../services/database';
@@ -136,8 +135,7 @@ export const sendErrorLog = async ({
   customTitle?: string;
 }) => {
   console.error(error);
-  const errorID = uuidV4();
-  const sentryId = captureException(error); // Sentry error logging
+  const errorID = captureException(error); // Sentry error logging
   if (interaction) {
     const errorEmbed = {
       description: `Oops something went wrong! D:\n\nError: ${
@@ -158,7 +156,7 @@ export const sendErrorLog = async ({
           } Command`
         : 'Error',
       color: getEmbedColor('#FF0000'),
-      description: `uuid: ${errorID}\nSentry ID: ${sentryId}\nError: ${
+      description: `uuid: ${errorID}\nError: ${
         error.message ? error.message : 'Unexpected Error'
       }\n${option ? `Option: ${option}` : ''}`,
       fields: interaction
@@ -211,21 +209,19 @@ export const sendErrorLog = async ({
  */
 export const sendStatusErrorLog = async ({
   nessie,
-  uuid,
   error,
   status,
 }: {
   nessie: Client;
-  uuid: string;
   error: any;
   status: StatusRecord;
 }) => {
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
-  const sentryId = captureException(error); // Sentry error logging
+  const errorID = captureException(error); // Sentry error logging
   const errorEmbed = {
     title: 'Error | Status Scheduler Cycle',
     color: 16711680,
-    description: `uuid: ${uuid}\nSentry ID: ${sentryId}\nError: ${inlineCode(error.message)}`,
+    description: `uuid: ${errorID}\nError: ${inlineCode(error.message)}`,
     fields: [
       {
         name: 'Status ID',
