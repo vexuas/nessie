@@ -146,20 +146,22 @@ export const sendErrorLog = async ({
   const interactionChannel = interaction?.channel as GuildChannel | undefined;
   const interactionDetails = interaction
     ? {
-        userId: interaction.user.id,
-        userName: interaction.user.username,
-        channelId: interaction.channelId,
-        channelName: interactionChannel ? interactionChannel.name : '-',
-        guildId: interaction.guild ? interaction.guild.id : '-',
-        guildName: interaction.guild ? interaction.guild.name : '-',
+        uuid: interaction.id,
+        user_id: interaction.user.id,
+        user_name: interaction.user.username,
+        channel_id: interaction.channelId,
+        channel_name: interactionChannel ? interactionChannel.name : '-',
+        guild_id: interaction.guild ? interaction.guild.id : '-',
+        guild_name: interaction.guild ? interaction.guild.name : '-',
       }
     : null;
 
   const errorID = captureException(error, {
     extra: {
       title,
-      commandOption,
-      interactionDetails,
+      command_option: commandOption,
+      interaction_details: interactionDetails,
+      type: 'interaction',
     },
   }); // Sentry error logging
   if (interaction) {
@@ -182,32 +184,32 @@ export const sendErrorLog = async ({
         ? [
             {
               name: 'User',
-              value: interactionDetails.userName,
+              value: interactionDetails.user_name,
               inline: true,
             },
             {
               name: 'User ID',
-              value: interactionDetails.userId,
+              value: interactionDetails.user_id,
               inline: true,
             },
             {
               name: 'Channel',
-              value: interactionDetails.channelName,
+              value: interactionDetails.channel_name,
               inline: true,
             },
             {
               name: 'Channel ID',
-              value: interactionDetails.channelId,
+              value: interactionDetails.channel_id,
               inline: true,
             },
             {
               name: 'Guild',
-              value: interactionDetails.guildName,
+              value: interactionDetails.guild_name,
               inline: true,
             },
             {
               name: 'Guild ID',
-              value: interactionDetails.guildId,
+              value: interactionDetails.guild_id,
               inline: true,
             },
           ]
@@ -236,9 +238,22 @@ export const sendStatusErrorLog = async ({
   status: StatusRecord;
 }) => {
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
-  const errorID = captureException(error); // Sentry error logging
+  const title = 'Error | Status Scheduler Cycle';
+  const errorID = captureException(error, {
+    extra: {
+      title,
+      status_details: {
+        uuid: status.uuid,
+        guild_id: status.guild_id,
+        guild_name: errorGuild ? errorGuild.name : '-',
+        created_by: status.created_by,
+        game_modes: status.game_mode_selected,
+      },
+      type: 'status',
+    },
+  });
   const errorEmbed = {
-    title: 'Error | Status Scheduler Cycle',
+    title,
     color: 16711680,
     description: `uuid: ${errorID}\nError: ${inlineCode(error.message)}`,
     fields: [
