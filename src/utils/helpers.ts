@@ -20,7 +20,6 @@ import {
 } from '../config/environment';
 import { nessieLogo } from './constants';
 import { isEmpty } from 'lodash';
-import { v4 as uuidV4 } from 'uuid';
 import { inlineCode } from '@discordjs/builders';
 import { capitalize } from 'lodash';
 import { StatusRecord } from '../services/database';
@@ -136,8 +135,35 @@ export const sendErrorLog = async ({
   customTitle?: string;
 }) => {
   console.error(error);
-  const errorID = uuidV4();
-  captureException(error); // Sentry error logging
+  const title = customTitle
+    ? `Error | ${customTitle}`
+    : interaction
+    ? `Error | ${interaction.isCommand() ? capitalize(interaction.commandName) : ''}${
+        subCommand ? ` ${capitalize(subCommand)}` : ''
+      } Command`
+    : 'Error';
+  const commandOption = option ? option : '';
+  const interactionChannel = interaction?.channel as GuildChannel | undefined;
+  const interactionDetails = interaction
+    ? {
+        uuid: interaction.id,
+        user_id: interaction.user.id,
+        user_name: interaction.user.username,
+        channel_id: interaction.channelId,
+        channel_name: interactionChannel ? interactionChannel.name : '-',
+        guild_id: interaction.guild ? interaction.guild.id : '-',
+        guild_name: interaction.guild ? interaction.guild.name : '-',
+      }
+    : null;
+
+  const errorID = captureException(error, {
+    extra: {
+      title,
+      command_option: commandOption,
+      interaction_details: interactionDetails,
+      type: 'interaction',
+    },
+  }); // Sentry error logging
   if (interaction) {
     const errorEmbed = {
       description: `Oops something went wrong! D:\n\nError: ${
@@ -148,49 +174,42 @@ export const sendErrorLog = async ({
     await interaction.editReply({ embeds: [errorEmbed], components: [] });
   }
   if (ERROR_NOTIFICATION_WEBHOOK_URL && !isEmpty(ERROR_NOTIFICATION_WEBHOOK_URL)) {
-    const interactionChannel = interaction?.channel as GuildChannel | undefined;
     const notificationEmbed: APIEmbed = {
-      title: customTitle
-        ? `Error | ${customTitle}`
-        : interaction
-        ? `Error | ${interaction.isCommand() ? capitalize(interaction.commandName) : ''}${
-            subCommand ? ` ${capitalize(subCommand)}` : ''
-          } Command`
-        : 'Error',
+      title,
       color: getEmbedColor('#FF0000'),
       description: `uuid: ${errorID}\nError: ${
         error.message ? error.message : 'Unexpected Error'
-      }\n${option ? `Option: ${option}` : ''}`,
-      fields: interaction
+      }\n${commandOption}`,
+      fields: interactionDetails
         ? [
             {
               name: 'User',
-              value: interaction.user.username,
+              value: interactionDetails.user_name,
               inline: true,
             },
             {
               name: 'User ID',
-              value: interaction.user.id,
+              value: interactionDetails.user_id,
               inline: true,
             },
             {
               name: 'Channel',
-              value: interactionChannel ? interactionChannel.name : '-',
+              value: interactionDetails.channel_name,
               inline: true,
             },
             {
               name: 'Channel ID',
-              value: interaction.channelId,
+              value: interactionDetails.channel_id,
               inline: true,
             },
             {
               name: 'Guild',
-              value: interaction.guild ? interaction.guild.name : '-',
+              value: interactionDetails.guild_name,
               inline: true,
             },
             {
               name: 'Guild ID',
-              value: interaction.guildId ? interaction.guildId : '-',
+              value: interactionDetails.guild_id,
               inline: true,
             },
           ]
@@ -211,20 +230,32 @@ export const sendErrorLog = async ({
  */
 export const sendStatusErrorLog = async ({
   nessie,
-  uuid,
   error,
   status,
 }: {
   nessie: Client;
-  uuid: string;
   error: any;
   status: StatusRecord;
 }) => {
   const errorGuild = nessie.guilds.cache.get(status.guild_id);
+  const title = 'Error | Status Scheduler Cycle';
+  const errorID = captureException(error, {
+    extra: {
+      title,
+      status_details: {
+        uuid: status.uuid,
+        guild_id: status.guild_id,
+        guild_name: errorGuild ? errorGuild.name : '-',
+        created_by: status.created_by,
+        game_modes: status.game_mode_selected,
+      },
+      type: 'status',
+    },
+  });
   const errorEmbed = {
-    title: 'Error | Status Scheduler Cycle',
+    title,
     color: 16711680,
-    description: `uuid: ${uuid}\nError: ${inlineCode(error.message)}`,
+    description: `uuid: ${errorID}\nError: ${inlineCode(error.message)}`,
     fields: [
       {
         name: 'Status ID',
