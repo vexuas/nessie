@@ -71,7 +71,7 @@ export const serverNotificationEmbed = async ({
       },
       {
         name: 'Members',
-        value: guild.memberCount.toString(),
+        value: guild.memberCount ? guild.memberCount.toString() : '-',
         inline: true,
       },
     ],
