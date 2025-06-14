@@ -1,3 +1,20 @@
+# v2.3.3 (Sun Jun 15 2025)
+
+#### 🔧 Tweaks
+
+- Add more logging data to sentry [#264](https://github.com/vexuas/nessie/pull/264) ([@vexuas](https://github.com/vexuas))
+- Add fallback if guild member count doesn't exist in guild notification [#263](https://github.com/vexuas/nessie/pull/263) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 06 14 [#262](https://github.com/vexuas/nessie/pull/262) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.3.2 (Sat Jun 14 2025)
 
 #### 🔧 Tweaks
