@@ -54,8 +54,8 @@ export const sendStopInteraction = async ({
       description: status
         ? `By confirming below, Nessie will stop all existing map status and **delete**:\n• <#${
             status.category_channel_id
-          }>${status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''}${
-            status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''
+          }>${
+            status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''
           }\n• Webhooks under each status channel\n\nThis status was created at ${
             status.created_at
           } by ${status.created_by}`
@@ -140,7 +140,6 @@ const sendStatusStopLog = async (interaction: ButtonInteraction) => {
  * - Edits initial message with a success message
  *
  * We don't need to delete the webhooks as they'll be automatically deleted along with its channels
- * TODO: Remove arenas code once we cleanup arenas in our database
  */
 export const deleteGuildStatus = async ({
   interaction,
@@ -162,13 +161,10 @@ export const deleteGuildStatus = async ({
       await interaction.message.edit({ embeds: [embedLoading], components: [] });
       const battleRoyaleStatusChannel =
         status.br_channel_id && (await nessie.channels.fetch(status.br_channel_id));
-      const arenasStatusChannel =
-        status.arenas_channel_id && (await nessie.channels.fetch(status.arenas_channel_id));
       const categoryStatusChannel =
         status.category_channel_id && (await nessie.channels.fetch(status.category_channel_id));
 
       battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
-      arenasStatusChannel && (await arenasStatusChannel.delete());
       categoryStatusChannel && (await categoryStatusChannel.delete());
 
       const embedSuccess = {

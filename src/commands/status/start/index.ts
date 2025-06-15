@@ -92,9 +92,7 @@ const generateGameModeSelectionMessage = (status?: StatusRecord | null) => {
       title: 'Status | Start',
       description: `There's currently an existing automated map status active in:${
         status.br_channel_id ? `\n• <#${status.br_channel_id}>` : ''
-      }${status.arenas_channel_id ? `\n• <#${status.arenas_channel_id}>` : ''}\n\nCreated at ${
-        status.created_at
-      } by ${status.created_by}`,
+      }\n\nCreated at ${status.created_at} by ${status.created_by}`,
       color: 3447003,
     };
   }
@@ -118,6 +116,7 @@ const generateConfirmStatusMessage = ({
   const isBattleRoyaleSelected = !!interaction.values.find(
     (value) => value === 'gameModeDropdown__battleRoyaleValue'
   );
+  // TODO: Support mixtape eventually
   const isMixtapeSelected = !!interaction.values.find(
     (value) => value === 'gameModeDropdown__mixtapeValue'
   );
@@ -205,20 +204,6 @@ const generateBattleRoyaleStatusEmbeds = (
     },
   };
   return [informationEmbed, battleRoyaleRankedEmbed, battleRoyalePubsEmbed];
-};
-/**
- * Generates relevant embeds for the status arenas channel
- * Initially was pubs but data shows that br is overwhelmingly more popular than arenas
- * Had to split it between br and arenas after seeing that
- * TODO: As of April 2024, the API does not return arenas data anymore. Clean this up when you get the time
- */
-const generateArenasStatusEmbeds = () => {
-  const embedData: APIEmbed = {
-    title: 'Arenas are no longer supported',
-    color: 16711680,
-    description: 'To delete this channel, use /status stop',
-  };
-  return [embedData];
 };
 /**
  * Handler for when a user initiates the /status start command
@@ -571,7 +556,6 @@ export const scheduleStatus = (nessie: Client) => {
         const rotationData = await getRotationData();
         const seasonData = await getSeasonInformation();
         const brStatusEmbeds = generateBattleRoyaleStatusEmbeds(rotationData, seasonData);
-        const arenasStatusEmbeds = generateArenasStatusEmbeds(); //TODO: Clean this up eventually
         allStatus.forEach(async (status, index) => {
           await handleStatusCycle({
             nessie,
@@ -580,7 +564,6 @@ export const scheduleStatus = (nessie: Client) => {
             startTime,
             totalCount: allStatus.length,
             brStatusEmbeds,
-            arenasStatusEmbeds,
           });
         });
       }
@@ -611,7 +594,6 @@ export const scheduleStatus = (nessie: Client) => {
             nessie,
             status,
             brStatusEmbeds: errorEmbed,
-            arenasStatusEmbeds: errorEmbed,
             index,
           });
         });
@@ -638,7 +620,6 @@ const handleStatusCycle = async ({
   startTime,
   totalCount,
   brStatusEmbeds,
-  arenasStatusEmbeds,
 }: {
   nessie: Client;
   status: StatusRecord;
@@ -646,7 +627,6 @@ const handleStatusCycle = async ({
   startTime?: number;
   totalCount?: number;
   brStatusEmbeds: APIEmbed[];
-  arenasStatusEmbeds: APIEmbed[];
 }) => {
   try {
     const brWebhook =
@@ -656,20 +636,8 @@ const handleStatusCycle = async ({
         id: status.br_webhook_id,
         token: status.br_webhook_token,
       });
-    const arenasWebhook =
-      status.arenas_webhook_id &&
-      status.arenas_webhook_token &&
-      new WebhookClient({
-        id: status.arenas_webhook_id,
-        token: status.arenas_webhook_token,
-      });
     if (brWebhook) {
       await brWebhook.editMessage(status.br_message_id, { embeds: brStatusEmbeds });
-    }
-    if (arenasWebhook) {
-      await arenasWebhook.editMessage(status.arenas_message_id, {
-        embeds: arenasStatusEmbeds,
-      });
     }
     /**
      * Logs health of status after the last guild gets done
@@ -727,12 +695,9 @@ const handleStatusCycle = async ({
         //Might have to revamp these when we have to do sharding
         const battleRoyaleStatusChannel =
           status.br_channel_id && nessie.channels.cache.get(status.br_channel_id);
-        const arenasStatusChannel =
-          status.arenas_channel_id && nessie.channels.cache.get(status.arenas_channel_id);
         const categoryStatusChannel =
           status.category_channel_id && nessie.channels.cache.get(status.category_channel_id);
         battleRoyaleStatusChannel && (await battleRoyaleStatusChannel.delete());
-        arenasStatusChannel && (await arenasStatusChannel.delete());
         categoryStatusChannel && (await categoryStatusChannel.delete());
         const originalChannel = (await nessie.channels.fetch(
           status.original_channel_id

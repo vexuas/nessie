@@ -2,8 +2,6 @@ import got from 'got';
 import { ALS_API_KEY } from '../config/environment';
 import {
   MapRotationAPIObject,
-  MapRotationArenasRankedSchema,
-  MapRotationArenasSchema,
   MapRotationBattleRoyaleSchema,
   MapRotationMixtapeSchema,
   MapRotationRankedSchema,
@@ -48,14 +46,6 @@ export async function getBattleRoyalePubs(): Promise<MapRotationBattleRoyaleSche
 export async function getBattleRoyaleRanked(): Promise<MapRotationRankedSchema> {
   const response = await getRotationData();
   return response.ranked;
-}
-export async function getArenasPubs(): Promise<MapRotationArenasSchema> {
-  const response = await getRotationData();
-  return response.arenas;
-}
-export async function getArenasRanked(): Promise<MapRotationArenasRankedSchema> {
-  const response = await getRotationData();
-  return response.arenasRanked;
 }
 export async function getMixtape(): Promise<MapRotationMixtapeSchema> {
   const response = await getRotationData();

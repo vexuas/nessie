@@ -23,12 +23,7 @@ import { isEmpty } from 'lodash';
 import { inlineCode } from '@discordjs/builders';
 import { capitalize } from 'lodash';
 import { StatusRecord } from '../services/database';
-import {
-  MapRotationArenasRankedSchema,
-  MapRotationArenasSchema,
-  MapRotationBattleRoyaleSchema,
-  MapRotationRankedSchema,
-} from '../schemas/mapRotation';
+import { MapRotationBattleRoyaleSchema, MapRotationRankedSchema } from '../schemas/mapRotation';
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../services/analytics';
 import { captureException } from '@sentry/node';
@@ -350,7 +345,7 @@ export const getCountdown = (timer: string) => {
  * As discord embed has a timestamp propery, I added the remianing milliseconds to the current date
  */
 export const generatePubsEmbed = (
-  data?: MapRotationBattleRoyaleSchema | MapRotationArenasSchema,
+  data?: MapRotationBattleRoyaleSchema,
   type = 'Battle Royale'
 ): APIEmbed => {
   if (!data)
@@ -389,7 +384,7 @@ export const generatePubsEmbed = (
  * Fairly simple, don't need any fancy timers and footers
  */
 export const generateRankedEmbed = (
-  data?: MapRotationRankedSchema | MapRotationArenasRankedSchema,
+  data?: MapRotationRankedSchema,
   type = 'Battle Royale',
   seasonEnd?: string | null,
   splitEnd?: string | null
