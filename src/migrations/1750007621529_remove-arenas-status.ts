@@ -1,28 +1,17 @@
-/**
- * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
- */
-export const shorthands = undefined;
+import { ColumnDefinitions, MigrationBuilder } from 'node-pg-migrate';
 
-/**
- * @param pgm {import('node-pg-migrate').MigrationBuilder}
- * @param run {() => void | undefined}
- * @returns {Promise<void> | void}
- */
-export const up = (pgm) => {
+export const shorthands: ColumnDefinitions | undefined = undefined;
+
+export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumns('status', [
     'arenas_channel_id',
     'arenas_message_id',
     'arenas_webhook_id',
     'arenas_webhook_token',
   ]);
-};
+}
 
-/**
- * @param pgm {import('node-pg-migrate').MigrationBuilder}
- * @param run {() => void | undefined}
- * @returns {Promise<void> | void}
- */
-export const down = (pgm) => {
+export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumns('status', {
     arenas_channel_id: {
       type: 'text',
@@ -41,4 +30,4 @@ export const down = (pgm) => {
       notNull: true,
     },
   });
-};
+}

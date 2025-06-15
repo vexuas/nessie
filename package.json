@@ -24,9 +24,7 @@
     "auto:version": "yarn version --`auto version`",
     "auto:release": "yarn auto:changelog && yarn auto:version",
     "release": "git fetch --tags --force && git checkout -b release/$(date +'%Y-%m-%d') && yarn auto:release && yarn update:version && git add . && git commit -m 'Update version' && git push -u origin head",
-    "migrate": "node-pg-migrate create",
-    "migrate:ts": "node-pg-migrate create --migrations-dir dist/migrations",
-    "migrate:up": "node-pg-migrate -j ts --migrations-dir dist/migrations"
+    "migrate": "node-pg-migrate -j ts create --migrations-dir src/migrations"
   },
   "dependencies": {
     "@sentry/node": "^9.29.0",
