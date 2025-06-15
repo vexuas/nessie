@@ -18,7 +18,7 @@ If you want to use Nessie for your own projects, you would need the following be
 
 - Have a Discord Application created from the [Discord Dev Portal](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
 - Have the Discord Application [invited to a Discord Server](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
-- [Node](https://heynode.com/tutorial/install-nodejs-locally-nvm/) with a version of at least v20.0.0
+- [Node](https://heynode.com/tutorial/install-nodejs-locally-nvm/) with a version of at least v20.11.0
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
 - [Homebrew](https://brew.sh/)
 - An API key generated from https://apexlegendsapi.com/
@@ -133,7 +133,7 @@ Full list [here](https://shizuka.notion.site/To-dos-and-Nice-to-Have-s-4946e00c7
 - Research multithreading
 - ~~CircleCi Integration~~ [Using github actions]
 - ~~Metabase Integration~~ [Using Trevor instead]
-- Datadog Integration
+- ~~Datadog Integration~~ [Using Sentry instead]
 
 ## Contributing
 
