@@ -15,19 +15,19 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumns('status', {
     arenas_channel_id: {
       type: 'text',
-      notNull: true,
+      notNull: false,
     },
     arenas_message_id: {
       type: 'text',
-      notNull: true,
+      notNull: false,
     },
     arenas_webhook_id: {
       type: 'text',
-      notNull: true,
+      notNull: false,
     },
     arenas_webhook_token: {
       type: 'text',
-      notNull: true,
+      notNull: false,
     },
   });
 }
