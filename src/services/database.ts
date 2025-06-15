@@ -18,13 +18,9 @@ export type StatusRecord = {
   guild_id: string;
   category_channel_id: string;
   br_channel_id: string;
-  arenas_channel_id: string;
   br_message_id: string;
-  arenas_message_id: string;
   br_webhook_id: string;
-  arenas_webhook_id: string;
   br_webhook_token: string;
-  arenas_webhook_token: string;
   original_channel_id: string;
   game_mode_selected: string;
   created_by: string;
@@ -129,7 +125,7 @@ export async function createStatusTable() {
     try {
       await client.query('BEGIN');
       const createStatusTableQuery =
-        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT, br_channel_id TEXT, arenas_channel_id TEXT, br_message_id TEXT, arenas_message_id TEXT, br_webhook_id TEXT, arenas_webhook_id TEXT, br_webhook_token TEXT, arenas_webhook_token TEXT, original_channel_id TEXT NOT NULL, game_mode_selected TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)';
+        'CREATE TABLE IF NOT EXISTS Status(uuid TEXT NOT NULL PRIMARY KEY, guild_id TEXT NOT NULL, category_channel_id TEXT, br_channel_id TEXT, br_message_id TEXT, br_webhook_id TEXT, br_webhook_token TEXT, original_channel_id TEXT NOT NULL, game_mode_selected TEXT NOT NULL, created_by TEXT NOT NULL, created_at TEXT NOT NULL)';
       await client.query(createStatusTableQuery);
       await client.query('COMMIT');
     } catch (error) {
@@ -148,19 +144,15 @@ export async function insertNewStatus(status: any) {
     try {
       await client.query('BEGIN');
       const insertNewStatusQuery =
-        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, arenas_channel_id, br_message_id, arenas_message_id, br_webhook_id, arenas_webhook_id, br_webhook_token, arenas_webhook_token, original_channel_id, game_mode_selected, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
+        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, br_message_id, br_webhook_id, br_webhook_token, original_channel_id, game_mode_selected, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
       await client.query(insertNewStatusQuery, [
         status.uuid,
         status.guildId,
         status.categoryChannelId,
         status.battleRoyaleChannelId,
-        status.arenasChannelId,
         status.battleRoyaleMessageId,
-        status.arenasMessageId,
         status.battleRoyaleWebhookId,
-        status.arenasWebhookId,
         status.battleRoyaleWebhookToken,
-        status.arenasWebhookToken,
         status.originalChannelId,
         status.gameModeSelected,
         status.createdBy,

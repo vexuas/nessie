@@ -483,20 +483,15 @@ export const createStatus = async ({
      * Create new status data object to be inserted in our database
      * We then call the insertNewStatus handler to start insertion
      * * Passes a success and error callback with the former editing the original message with a success embed
-     * TODO: Remove temporary arenas null values when cleaning up database rows
      */
     const newStatus = {
       uuid: uuidV4(),
       guildId: interaction.guildId,
       categoryChannelId: statusCategory.id,
       battleRoyaleChannelId: statusBattleRoyaleChannel ? statusBattleRoyaleChannel.id : null,
-      arenasChannelId: null,
       battleRoyaleMessageId: statusBattleRoyaleMessage ? statusBattleRoyaleMessage.id : null,
-      arenasMessageId: null,
       battleRoyaleWebhookId: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.id : null,
-      arenasWebhookId: null,
       battleRoyaleWebhookToken: statusBattleRoyaleWebhook ? statusBattleRoyaleWebhook.token : null,
-      arenasWebhookToken: null,
       originalChannelId: interaction.channelId,
       gameModeSelected,
       createdBy: interaction.user.tag,
