@@ -34,10 +34,12 @@ jobs:
             git branch | grep -v "develop" | xargs git branch -D            
             git checkout tags/${{ github.ref_name }} -b prod/${{ github.ref_name }}
             echo "${{ secrets.ENVIRONMENT_PROD }}" > src/config/environment.ts
+            echo "${{ secrets.CONFIG_PROD }}" > config/default.json
             yarn update:version
             yarn install
             rm -R dist
             yarn build
+            yarn migrate:up
             pm2 start deploy.config.js --env prod
 
       - name: Send notification to Discord
