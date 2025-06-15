@@ -1,8 +1,6 @@
 export interface MapRotationAPIObject {
   battle_royale: MapRotationBattleRoyaleSchema;
-  arenas: MapRotationArenasSchema;
   ranked: MapRotationRankedSchema;
-  arenasRanked: MapRotationArenasRankedSchema;
   ltm: MapRotationMixtapeSchema;
 }
 interface MapRotationCurrentSchema {
@@ -42,15 +40,7 @@ export interface MapRotationBattleRoyaleSchema {
   current: MapRotationCurrentSchema;
   next: MapRotationNextSchema;
 }
-export interface MapRotationArenasSchema {
-  current: MapRotationCurrentSchema;
-  next: MapRotationNextSchema;
-}
 export interface MapRotationRankedSchema {
-  current: MapRotationCurrentSchema;
-  next?: MapRotationNextSchema;
-}
-export interface MapRotationArenasRankedSchema {
   current: MapRotationCurrentSchema;
   next?: MapRotationNextSchema;
 }
