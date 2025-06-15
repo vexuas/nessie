@@ -10,7 +10,7 @@ export const initializeSentry = () => {
 
   Sentry.init({
     dsn: SENTRY_DSN_KEY,
-    environment: process.env.ENV || 'dev',
+    environment: process.env.BOT_ENV || 'dev',
   });
 
   console.log('Sentry initialized.');
