@@ -23,10 +23,14 @@
     "auto:changelog": "yarn auto changelog",
     "auto:version": "yarn version --`auto version`",
     "auto:release": "yarn auto:changelog && yarn auto:version",
-    "release": "git fetch --tags --force && git checkout -b release/$(date +'%Y-%m-%d') && yarn auto:release && yarn update:version && git add . && git commit -m 'Update version' && git push -u origin head"
+    "release": "git fetch --tags --force && git checkout -b release/$(date +'%Y-%m-%d') && yarn auto:release && yarn update:version && git add . && git commit -m 'Update version' && git push -u origin head",
+    "migrate": "node-pg-migrate -j ts create --migrations-dir src/migrations",
+    "migrate:up": "node-pg-migrate --migrations-dir dist/migrations up",
+    "migrate:down": "node-pg-migrate --migrations-dir dist/migrations down"
   },
   "dependencies": {
     "@sentry/node": "^9.29.0",
+    "config": "^4.0.0",
     "cron": "^4.3.1",
     "date-fns": "^4.1.0",
     "discord.js": "^14.19.3",
@@ -51,6 +55,7 @@
     "eslint": "^8.42.0",
     "eslint-plugin-unused-imports": "^4.1.4",
     "jest": "^29.7.0",
+    "node-pg-migrate": "^8.0.2",
     "ts-jest": "^29.3.4",
     "tsc-watch": "^7.1.1",
     "typescript": "^5.8.3"
@@ -63,6 +68,6 @@
     ]
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.11.0"
   }
 }
