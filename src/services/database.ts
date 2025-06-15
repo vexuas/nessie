@@ -144,7 +144,7 @@ export async function insertNewStatus(status: any) {
     try {
       await client.query('BEGIN');
       const insertNewStatusQuery =
-        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, br_message_id, br_webhook_id, br_webhook_token, original_channel_id, game_mode_selected, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
+        'INSERT INTO Status (uuid, guild_id, category_channel_id, br_channel_id, br_message_id, br_webhook_id, br_webhook_token, original_channel_id, game_mode_selected, created_by, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
       await client.query(insertNewStatusQuery, [
         status.uuid,
         status.guildId,
