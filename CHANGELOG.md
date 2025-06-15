@@ -1,3 +1,25 @@
+# v2.4.0 (Mon Jun 16 2025)
+
+#### 🚀 Enhancement
+
+- Add migration handlers [#268](https://github.com/vexuas/nessie/pull/268) ([@vexuas](https://github.com/vexuas))
+
+#### 🔧 Tweaks
+
+- Add migration step in production deployment [#269](https://github.com/vexuas/nessie/pull/269) ([@vexuas](https://github.com/vexuas))
+- Remove arenas code [#267](https://github.com/vexuas/nessie/pull/267) ([@vexuas](https://github.com/vexuas))
+- Correctly use environment for sentry [#266](https://github.com/vexuas/nessie/pull/266) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 06 15 [#265](https://github.com/vexuas/nessie/pull/265) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.3.3 (Sun Jun 15 2025)
 
 #### 🔧 Tweaks
