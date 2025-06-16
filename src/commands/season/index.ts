@@ -1,7 +1,8 @@
 import { APIEmbed, SlashCommandBuilder } from 'discord.js';
-import { getEmbedColor, sendErrorLog } from '../../utils/helpers';
+import { getEmbedColor, getMapUrl, sendErrorLog } from '../../utils/helpers';
 import { AppCommand, AppCommandOptions } from '../commands';
 import { getSeasonInformation } from '../../services/adapters';
+import { snakeCase } from 'lodash';
 
 export default {
   commandType: 'Information',
@@ -16,8 +17,10 @@ export default {
       const {
         season: seasonNumber,
         title,
-        data: { url },
+        description,
+        data: { image },
       } = season.info;
+      console.log(season);
 
       // const seasonEnd = formatEndDateCountdown({
       //   endDate: season.dates.end.rankedEnd * 1000,
@@ -31,9 +34,16 @@ export default {
       const embed: APIEmbed = {
         title: `Season ${seasonNumber} | ${title}`,
         color: getEmbedColor(),
+        description,
         image: {
-          url,
+          url: getMapUrl(`${snakeCase(image)}_rotation`) ?? '',
         },
+        fields: [
+          {
+            name: '',
+            value: '',
+          },
+        ],
       };
 
       await interaction.editReply({ embeds: [embed] });
