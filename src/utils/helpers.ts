@@ -19,7 +19,7 @@ import {
   ERROR_NOTIFICATION_WEBHOOK_URL,
 } from '../config/environment';
 import { nessieLogo } from './constants';
-import { isEmpty } from 'lodash';
+import { isEmpty, snakeCase } from 'lodash';
 import { inlineCode } from '@discordjs/builders';
 import { capitalize } from 'lodash';
 import { StatusRecord } from '../services/database';
@@ -27,6 +27,7 @@ import { MapRotationBattleRoyaleSchema, MapRotationRankedSchema } from '../schem
 import { Mixpanel } from 'mixpanel';
 import { sendAnalyticsEvent } from '../services/analytics';
 import { captureException } from '@sentry/node';
+import { SeasonAPISchema } from '../schemas/season';
 
 export const serverNotificationEmbed = async ({
   app,
@@ -427,6 +428,52 @@ export const generateRankedEmbed = (
     };
   }
   return embedData;
+};
+export const generateSeasonEmbed = (seasonData: SeasonAPISchema) => {
+  const {
+    season: seasonNumber,
+    title,
+    description,
+    split: splitNumber,
+    data: { image },
+  } = seasonData.info;
+  const { start, end, split } = seasonData.dates;
+
+  const seasonEnd = formatEndDateCountdown({
+    endDate: end.rankedEnd * 1000,
+    currentDate: new Date(),
+  });
+  const splitEnd = formatEndDateCountdown({
+    endDate: split.timestamp * 1000,
+    currentDate: new Date(),
+  });
+
+  const embed: APIEmbed = {
+    title: `Season ${seasonNumber} | ${title}`,
+    color: getEmbedColor(),
+    description: `${description}\n\nStarted on: ${inlineCode(
+      format(start.timestamp * 1000, 'dd MMM, h:mm a')
+    )}\nCurrent Split: ${inlineCode(splitNumber.toString())}`,
+    image: {
+      url: getMapUrl(`${snakeCase(image)}_rotation`) ?? '',
+    },
+    footer: {
+      text: `Season ends on ${format(end.rankedEnd * 1000, 'dd MMM, h:mm a')}`,
+    },
+    fields: [
+      {
+        name: 'Split ends in',
+        value: '```fix\n\n' + splitEnd + '```',
+        inline: true,
+      },
+      {
+        name: 'Season ends in',
+        value: '```fix\n\n' + seasonEnd + '```',
+        inline: true,
+      },
+    ],
+  };
+  return embed;
 };
 //TODO: Refactor this someday
 export const checkMissingBotPermissions = (
