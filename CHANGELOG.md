@@ -1,3 +1,19 @@
+# v2.4.1 (Thu Jun 19 2025)
+
+#### 🔧 Tweaks
+
+- Add season command [#271](https://github.com/vexuas/nessie/pull/271) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 06 16 [#270](https://github.com/vexuas/nessie/pull/270) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.4.0 (Mon Jun 16 2025)
 
 #### 🚀 Enhancement
