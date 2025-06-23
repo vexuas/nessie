@@ -1,3 +1,19 @@
+# v2.4.2 (Tue Jun 24 2025)
+
+#### 🔧 Tweaks
+
+- Update cdn to use digital ocean space [#273](https://github.com/vexuas/nessie/pull/273) ([@vexuas](https://github.com/vexuas))
+
+#### 🏠 Internal
+
+- Release/2025 06 19 [#272](https://github.com/vexuas/nessie/pull/272) ([@vexuas](https://github.com/vexuas))
+
+#### Authors: 1
+
+- Gabriel R ([@vexuas](https://github.com/vexuas))
+
+---
+
 # v2.4.1 (Thu Jun 19 2025)
 
 #### 🔧 Tweaks
