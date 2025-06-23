@@ -80,7 +80,7 @@ describe('Season Command', () => {
   it('displays the correct image url', () => {
     const embed = generateSeasonEmbed(mockSeasonData);
 
-    expect(embed.image?.url).toBe('https://vexuas.b-cdn.net/apex_legend_maps/olympus.jpg');
+    expect(embed.image?.url).toBe('https://cdn.vexuas.com/nessie/apex_legends_maps/olympus.jpg');
   });
   it('displays the correct end date in the footer', () => {
     const embed = generateSeasonEmbed(mockSeasonData);

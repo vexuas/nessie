@@ -53,27 +53,27 @@ describe('pluralize', () => {
 describe('getMapUrl', () => {
   it('returns the correct url when map_code is kings_canyon_rotation', () => {
     const result = getMapUrl('kings_canyon_rotation');
-    expect(result).toBe('https://vexuas.b-cdn.net/apex_legend_maps/kings_canyon.jpg');
+    expect(result).toBe('https://cdn.vexuas.com/nessie/apex_legends_maps/kings_canyon.jpg');
   });
   it('returns the correct url when map_code is worlds_edge_rotation', () => {
     const result = getMapUrl('worlds_edge_rotation');
-    expect(result).toBe('https://vexuas.b-cdn.net/apex_legend_maps/worlds_edge.jpg');
+    expect(result).toBe('https://cdn.vexuas.com/nessie/apex_legends_maps/worlds_edge.jpg');
   });
   it('returns the correct url when map_code is olympus_rotation', () => {
     const result = getMapUrl('olympus_rotation');
-    expect(result).toBe('https://vexuas.b-cdn.net/apex_legend_maps/olympus.jpg');
+    expect(result).toBe('https://cdn.vexuas.com/nessie/apex_legends_maps/olympus.jpg');
   });
   it('returns the correct url when map_code is storm_point_rotation', () => {
     const result = getMapUrl('storm_point_rotation');
-    expect(result).toBe('https://vexuas.b-cdn.net/apex_legend_maps/storm_point.jpg');
+    expect(result).toBe('https://cdn.vexuas.com/nessie/apex_legends_maps/storm_point.jpg');
   });
   it('returns the correct url when map_code is broken_moon_rotation', () => {
     const result = getMapUrl('broken_moon_rotation');
-    expect(result).toBe('https://vexuas.b-cdn.net/apex_legend_maps/broken_moon.jpg');
+    expect(result).toBe('https://cdn.vexuas.com/nessie/apex_legends_maps/broken_moon.jpg');
   });
   it('returns the correct url when map_code is edistrict_rotation', () => {
     const result = getMapUrl('edistrict_rotation');
-    expect(result).toBe('https://vexuas.b-cdn.net/apex_legend_maps/e-district.png');
+    expect(result).toBe('https://cdn.vexuas.com/nessie/apex_legends_maps/e-district.png');
   });
   it('returns null when map_code is not any of the maps', () => {
     const result = getMapUrl('some_map');
