@@ -91,24 +91,26 @@ describe('Season Command', () => {
     );
   });
   it('displays the correct countdown in the Split field', () => {
-    const embed = generateSeasonEmbed(mockSeasonData);
+    const mockDate = new Date('2025-06-18T16:10:49.193Z');
+    const embed = generateSeasonEmbed(mockSeasonData, mockDate);
     const { split } = mockSeasonData.dates;
 
     const splitEnd = formatEndDateCountdown({
       endDate: split.timestamp * 1000,
-      currentDate: new Date('2025-06-18T16:10:49.193Z'),
+      currentDate: mockDate,
     });
 
     expect(embed.fields && embed.fields[0].name).toBe('Split ends in');
     expect(embed.fields && embed.fields[0].value).toContain(splitEnd);
   });
   it('displays the correct countdown in the Season field', () => {
-    const embed = generateSeasonEmbed(mockSeasonData);
+    const mockDate = new Date('2025-06-18T16:10:49.193Z');
+    const embed = generateSeasonEmbed(mockSeasonData, mockDate);
     const { end } = mockSeasonData.dates;
 
     const seasonEnd = formatEndDateCountdown({
       endDate: end.rankedEnd * 1000,
-      currentDate: new Date('2025-06-18T16:10:49.193Z'),
+      currentDate: mockDate,
     });
 
     expect(embed.fields && embed.fields[1].name).toBe('Season ends in');

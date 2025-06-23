@@ -428,7 +428,7 @@ export const generateRankedEmbed = (
   }
   return embedData;
 };
-export const generateSeasonEmbed = (seasonData: SeasonAPISchema) => {
+export const generateSeasonEmbed = (seasonData: SeasonAPISchema, currentDate?: Date) => {
   const {
     season: seasonNumber,
     title,
@@ -440,11 +440,11 @@ export const generateSeasonEmbed = (seasonData: SeasonAPISchema) => {
 
   const seasonEnd = formatEndDateCountdown({
     endDate: end.rankedEnd * 1000,
-    currentDate: new Date(),
+    currentDate: currentDate ?? new Date(),
   });
   const splitEnd = formatEndDateCountdown({
     endDate: split.timestamp * 1000,
-    currentDate: new Date(),
+    currentDate: currentDate ?? new Date(),
   });
 
   const embed: APIEmbed = {
