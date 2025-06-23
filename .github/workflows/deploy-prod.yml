@@ -46,7 +46,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
           DISCORD_USERNAME: 'Nessie Release Notification'
-          DISCORD_AVATAR: 'https://vexuas.b-cdn.net/Nessie_Logo_v2.png'
+          DISCORD_AVATAR: 'https://cdn.vexuas.com/Avatars/Nessie_Logo_v2.png'
         uses: Ilshidur/action-discord@0.3.2
         with:
           args: 'Successfully deployed `${{ github.ref_name }}` to production'

@@ -1,1 +1,1 @@
-export const nessieLogo = 'https://vexuas.b-cdn.net/Nessie_Logo_v2.png';
+export const nessieLogo = 'https://cdn.vexuas.com/Avatars/Nessie_Logo_v2.png';

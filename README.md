@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://vexuas.b-cdn.net/Nessie_Logo_v2.png" width=120px/>
+  <img src="https://cdn.vexuas.com/Avatars/Nessie_Logo_v2.png" width=120px/>
 </div>
 
 # nessie <br>Apex Legends Map Status Discord Bot

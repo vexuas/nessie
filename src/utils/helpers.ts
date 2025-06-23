@@ -38,8 +38,7 @@ export const serverNotificationEmbed = async ({
   guild: Guild;
   type: 'join' | 'leave';
 }): Promise<APIEmbed> => {
-  const defaultIcon =
-    'https://cdn.discordapp.com/attachments/248430185463021569/614789995596742656/Wallpaper2.png';
+  const defaultIcon = 'https://cdn.vexuas.com/Avatars/you_got_that.png';
   const guildIcon = guild.icon && guild.iconURL();
   const guildOwner =
     type === 'join'
@@ -306,17 +305,17 @@ export const generateAnnouncementMessage = (prefix: string) => {
 export const getMapUrl = (map_code: string): string | null => {
   switch (map_code) {
     case 'kings_canyon_rotation':
-      return 'https://vexuas.b-cdn.net/apex_legend_maps/kings_canyon.jpg';
+      return 'https://cdn.vexuas.com/nessie/apex_legends_maps/kings_canyon.jpg';
     case 'worlds_edge_rotation':
-      return 'https://vexuas.b-cdn.net/apex_legend_maps/worlds_edge.jpg';
+      return 'https://cdn.vexuas.com/nessie/apex_legends_maps/worlds_edge.jpg';
     case 'olympus_rotation':
-      return 'https://vexuas.b-cdn.net/apex_legend_maps/olympus.jpg';
+      return 'https://cdn.vexuas.com/nessie/apex_legends_maps/olympus.jpg';
     case 'storm_point_rotation':
-      return 'https://vexuas.b-cdn.net/apex_legend_maps/storm_point.jpg';
+      return 'https://cdn.vexuas.com/nessie/apex_legends_maps/storm_point.jpg';
     case 'broken_moon_rotation':
-      return 'https://vexuas.b-cdn.net/apex_legend_maps/broken_moon.jpg';
+      return 'https://cdn.vexuas.com/nessie/apex_legends_maps/broken_moon.jpg';
     case 'edistrict_rotation':
-      return 'https://vexuas.b-cdn.net/apex_legend_maps/e-district.png';
+      return 'https://cdn.vexuas.com/nessie/apex_legends_maps/e-district.png';
     default:
       return null;
   }
@@ -429,7 +428,7 @@ export const generateRankedEmbed = (
   }
   return embedData;
 };
-export const generateSeasonEmbed = (seasonData: SeasonAPISchema) => {
+export const generateSeasonEmbed = (seasonData: SeasonAPISchema, currentDate?: Date) => {
   const {
     season: seasonNumber,
     title,
@@ -441,11 +440,11 @@ export const generateSeasonEmbed = (seasonData: SeasonAPISchema) => {
 
   const seasonEnd = formatEndDateCountdown({
     endDate: end.rankedEnd * 1000,
-    currentDate: new Date(),
+    currentDate: currentDate ?? new Date(),
   });
   const splitEnd = formatEndDateCountdown({
     endDate: split.timestamp * 1000,
-    currentDate: new Date(),
+    currentDate: currentDate ?? new Date(),
   });
 
   const embed: APIEmbed = {
