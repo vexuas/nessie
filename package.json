@@ -58,7 +58,7 @@
     "node-pg-migrate": "^8.0.2",
     "ts-jest": "^29.4.1",
     "tsc-watch": "^7.1.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   },
   "jest": {
     "preset": "ts-jest",
